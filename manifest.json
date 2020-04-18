@@ -1,9 +1,9 @@
 {
     "manifest_version": 2,
-    "name": "Focus Timer",
+    "name": "Productive Cycles",
     "version": "0.0.4",
 
-    "description": "Pomodoro-inspired timer for web browsers.",
+    "description": "Pomodoro-inspired timer extension for web browsers.",
     "homepage_url": "https://github.com/diegoserranor",
     "icons": {
         "512": "icons/time-512.png",
@@ -13,7 +13,7 @@
 
     "browser_action": {
         "default_icon": "icons/time-512.png",
-        "default_title": "Focus Timer",
+        "default_title": "Productive Cycles",
         "default_popup": "popup/timer.html"
     },
 
@@ -24,7 +24,7 @@
 
     "background": {
         "scripts": ["background-timer.js"],
-        "persistent": true
+        "persistent": false
     },
 
     "permissions": [
