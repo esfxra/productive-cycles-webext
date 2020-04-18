@@ -3,6 +3,16 @@ body, html {
     font-family: "Lucida Console", Monaco, monospace;
 }
 
+#time {
+    margin-bottom: 5px;
+    text-align: center;
+    font-size: 1.25em;
+}
+
+.hidden {
+    display: none;
+}
+
 .control {
     width: 100%;
     display: flex;
@@ -14,12 +24,13 @@ body, html {
     max-width: 12.5px;
     padding: 3.5px;
     border-radius: 3px;
+    cursor: pointer;
 }
 
 #start {
     background-color: black;
 }
 
-#reset, #reset-all {
-    background-color: silver;
+#pause, #reset, #reset-all {
+    background-color: gray;
 }
