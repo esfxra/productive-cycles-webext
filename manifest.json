@@ -1,0 +1,35 @@
+{
+    "manifest_version": 2,
+    "name": "Focus Timer",
+    "version": "0.0.4",
+
+    "description": "Pomodoro-inspired timer for web browsers.",
+    "homepage_url": "https://github.com/diegoserranor",
+    "icons": {
+        "512": "icons/time-512.png",
+        "128": "icons/time-128.png",
+        "48": "icons/time-48.png"
+    },
+
+    "browser_action": {
+        "default_icon": "icons/time-512.png",
+        "default_title": "Focus Timer",
+        "default_popup": "popup/timer.html"
+    },
+
+    "options_ui": {
+        "page": "options/options.html",
+        "open_in_tab": false
+      },
+
+    "background": {
+        "scripts": ["background-timer.js"],
+        "persistent": true
+    },
+
+    "permissions": [
+        "notifications",
+        "storage",
+        "alarms"
+    ]
+}
