@@ -1,0 +1,25 @@
+body, html {
+    min-width: 80px;
+    font-family: "Lucida Console", Monaco, monospace;
+}
+
+.control {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.control img {
+    max-width: 12.5px;
+    padding: 3.5px;
+    border-radius: 3px;
+}
+
+#start {
+    background-color: black;
+}
+
+#reset, #reset-all {
+    background-color: silver;
+}

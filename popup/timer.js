@@ -1,0 +1,1 @@
+document.querySelector("#time").textContent = "25:00";
