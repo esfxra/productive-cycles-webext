@@ -6,7 +6,7 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 1 * 60000;
+let defaultTime = 25 * 60000;
 let defaultCycles = 4;
 
 // Timer object
@@ -37,58 +37,75 @@ var Timer = {
 
     return minStr + ":" + secStr;
   },
-  updateTarget: function (target) {
+  updateTarget: function (target, save) {
     this.target = target;
-    chrome.storage.local.set({ target: this.target }, () => console.log("Timer target saved:", this.target));
+    if (save) {
+      chrome.storage.local.set({ target: this.target }, () => console.log("Timer target saved:", this.target));
+    }
   },
-  updateStatus: function (status) {
+  updateStatus: function (status, save) {
     this.status = status;
-    chrome.storage.local.set({ status: this.status }, () => console.log("Timer status saved:", this.status));
+    if (save) {
+      chrome.storage.local.set({ status: this.status }, () => console.log("Timer status saved:", this.status));
+    }
+  },
+  updateRemaining: function (remaining, save) {
+    this.remaining = remaining;
+    if (save) {
+      chrome.storage.local.set({ remaining: this.remaining }, () => console.log("Timer remaining saved:", this.remaining));
+    }
   }
 };
 
 function handleInput(message) {
   switch (message.command) {
     case "start":
+      console.log("Command:", message.command, "Status:", Timer.status);
+
       if (Timer.status === "initial") {
-        console.log("Command:", message.command, "Status:", Timer.status)
-
-        let startTime = Date.now(); // The current time + what the timer is set up to count as a cycle
-        Timer.updateTarget(startTime + defaultTime);
-        Timer.remaining = Timer.target - startTime; // This is the same amount as defaultTime
-        Timer.updateStatus("running");
-
+        Timer.updateRemaining(defaultTime, true);
         // Set an alarm
         // chrome.alarms.create( ... );
       }
       else if (Timer.status === "paused") {
-        // This code will run when the timer is resumed ...
-        // No need to update the target ... or the status
-        Timer.updateTarget(Date.now() + Timer.remaining);
-        console.log("Command:", message.command, "Status:", Timer.status)
-        Timer.updateStatus("running");
+        // What other code should go here?
+        // This runs when the user requests the time to start ... and the timer was previously paused
       }
+
+      Timer.updateTarget(Timer.remaining + Date.now(), true);
+      Timer.updateStatus("running", true);
       uiUpdater = setInterval(updateUI, 1000);
+
       break;
     case "pause":
-      console.log("Command:", message.command, "Status:", Timer.status)
+      console.log("Command:", message.command, "Status:", Timer.status);
+
       clearInterval(uiUpdater);
-      Timer.updateStatus("paused");
+
+      Timer.updateRemaining(Timer.remaining, true);
+      Timer.updateStatus("paused", true);
+
+      // Timer.target is not updated ... since that is updated when the timer is resumed
+
       break;
     case "preload":
-      if (Timer.status === "initial" || Timer.status === "paused") {
-        console.log("Command:", message.command, "Status:", Timer.status)
-        port.postMessage(Timer.remainingStr());
-      }
-      else if (Timer.status === "running") {
-        console.log("Command:", message.command, "Status:", Timer.status)
-        // Start an interval after recalculating remaining time
-        Timer.remaining = Timer.target - Date.now();
-        console.log("Time left (ms)", Timer.remaining)
-        port.postMessage(Timer.remainingStr());
+      chrome.storage.local.get(["target", "status", "remaining"], (result) => {
+        Timer.updateTarget(result.target, false);
+        Timer.updateStatus(result.status, false);
+        Timer.updateRemaining(result.remaining, false); // Experimental
 
-        uiUpdater = setInterval(updateUI, 1000);
-      }
+        console.log("Command:", message.command, "Status:", Timer.status);
+
+        if (Timer.status === "running") {
+          Timer.updateRemaining(Timer.target - Date.now(), false);
+          port.postMessage(Timer.remainingStr());
+
+          uiUpdater = setInterval(updateUI, 1000);
+        }
+        else if (Timer.status === "initial" || Timer.status === "paused") {
+          port.postMessage(Timer.remainingStr());
+        }
+      });
       break;
     default:
       console.log(message, "is not a known input");
@@ -110,6 +127,22 @@ function updateUI() {
   }
 }
 
+// Listen for communications from PopUp
+chrome.runtime.onConnect.addListener((portFromPopUp) => {
+  port = portFromPopUp;
+  popUpOpen = true;
+
+  port.onDisconnect.addListener(() => {
+    popUpOpen = false;
+    Timer.updateRemaining(Timer.remaining, true);
+    // Timer.updateTarget(Timer.target, true);
+    clearInterval(uiUpdater);
+    console.log("PopUp port disconnected; interval cleared");
+  })
+
+  port.onMessage.addListener(handleInput); // Input includes the pre-load command
+});
+
 // Listen for "install" or "update" event
 chrome.runtime.onInstalled.addListener((details) => {
   // if (details.reason === "install") {
@@ -121,32 +154,9 @@ chrome.runtime.onInstalled.addListener((details) => {
 
   chrome.storage.local.set({
     target: null,
-    status: "initial"
-  }, () => console.log("OnInstalled config for target and status"));
-});
-
-// Listen for communications from PopUp
-chrome.runtime.onConnect.addListener((portFromPopUp) => {
-  port = portFromPopUp;
-  popUpOpen = true;
-
-  // Experimental: This seems to be the best place to ...
-  // update target after the popup has gone inactive ...
-  // IF this does not work ... move it to preload ... case === "running" ...
-  // OR move it to the initialization of the Object ... and specifiy default value too
-  chrome.storage.local.get(["target", "status"], (result) => {
-    Timer.target = result.target;
-    Timer.status = result.status;
-    console.log(Timer.target);
-  });
-
-  port.onDisconnect.addListener(() => {
-    popUpOpen = false;
-    clearInterval(uiUpdater);
-    console.log("PopUp port disconnected; interval cleared");
-  })
-
-  port.onMessage.addListener(handleInput);
+    status: "initial",
+    remaining: defaultTime // experimental
+  }, () => console.log("OnInstalled config for target, status and remaining (in storage)"));
 });
 
 // chrome.alarms.onAlarm.addListener(() => {
