@@ -37,6 +37,14 @@ var Timer = {
 
     return minStr + ":" + secStr;
   },
+  updateTarget: function (target) {
+    this.target = target;
+    chrome.storage.local.set({ target: this.target }, () => console.log("Timer target saved:", this.target));
+  },
+  updateStatus: function (status) {
+    this.status = status;
+    chrome.storage.local.set({ status: this.status }, () => console.log("Timer status saved:", this.status));
+  }
 };
 
 function handleInput(message) {
@@ -46,9 +54,9 @@ function handleInput(message) {
         console.log("Command:", message.command, "Status:", Timer.status)
 
         let startTime = Date.now(); // The current time + what the timer is set up to count as a cycle
-        updateTarget(startTime + defaultTime);
+        Timer.updateTarget(startTime + defaultTime);
         Timer.remaining = Timer.target - startTime; // This is the same amount as defaultTime
-        updateStatus("running");
+        Timer.updateStatus("running");
 
         // Set an alarm
         // chrome.alarms.create( ... );
@@ -56,16 +64,16 @@ function handleInput(message) {
       else if (Timer.status === "paused") {
         // This code will run when the timer is resumed ...
         // No need to update the target ... or the status
-        updateTarget(Date.now() + Timer.remaining);
+        Timer.updateTarget(Date.now() + Timer.remaining);
         console.log("Command:", message.command, "Status:", Timer.status)
-        updateStatus("running");
+        Timer.updateStatus("running");
       }
       uiUpdater = setInterval(updateUI, 1000);
       break;
     case "pause":
       console.log("Command:", message.command, "Status:", Timer.status)
       clearInterval(uiUpdater);
-      updateStatus("paused");
+      Timer.updateStatus("paused");
       break;
     case "preload":
       if (Timer.status === "initial" || Timer.status === "paused") {
@@ -100,17 +108,6 @@ function updateUI() {
   if (time === "00:00" || !popUpOpen) {
     clearInterval(uiUpdater);
   }
-}
-
-function updateTarget(target) {
-  Timer.target = target;
-  chrome.storage.local.set({ target: Timer.target }, () => console.log("Timer target saved:", Timer.target));
-}
-
-function updateStatus(status) {
-  // Consider making this a method of Timer
-  Timer.status = status;
-  chrome.storage.local.set({ status: Timer.status }, () => console.log("Timer status saved:", Timer.status));
 }
 
 // Listen for "install" or "update" event
