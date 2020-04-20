@@ -4,6 +4,12 @@ body, html {
 }
 
 #time {
+    /*
+    experimental:
+        min-height = font-size is used to add height
+        before timer.js fills the value in #timer
+    */
+    /* min-height:  1.25em;  */
     margin-bottom: 5px;
     text-align: center;
     font-size: 1.25em;
