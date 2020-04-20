@@ -39,78 +39,49 @@ var Timer = {
   },
 };
 
-chrome.runtime.onInstalled.addListener((details) => {
-  // need to add if statements for install or update
-  chrome.storage.local.set({
-    target: null,
-    status: "initial"
-  }, () => console.log("OnInstalled config for target and status"));
-})
-
-chrome.runtime.onConnect.addListener((portFromPopUp) => {
-  port = portFromPopUp;
-  popUpOpen = true;
-
-  port.onMessage.addListener(handleInput);
-
-  // Experimental: This seems to be the best place to ...
-  // update target after the popup has gone inactive ...
-  // IF this does not work ... move it to preload ... case === "running" ...
-  // OR move it to the initialization of the Object ... and specifiy default value too
-  chrome.storage.local.get(["target", "status"], (result) => {
-    Timer.target = result.target;
-    Timer.status = result.status;
-    console.log(Timer.target);
-  });
-
-  port.onDisconnect.addListener(() => {
-    popUpOpen = false;
-    clearInterval(uiUpdater);
-    console.log("PopUp port disconnected; interval cleared");
-  })
-});
-
 function handleInput(message) {
-  if (message.command === "start") {
+  switch (message.command) {
+    case "start":
+      if (Timer.status === "initial") {
+        // The current time + what the timer is set up to count as a cycle
+        let startTime = Date.now();
+        Timer.target = startTime + defaultTime;
 
-    if (Timer.status === "initial") {
-      // The current time + what the timer is set up to count as a cycle
-      let startTime = Date.now();
-      Timer.target = startTime + defaultTime;
+        // The amount of milliseconds needed to reach Timer.target
+        // This is the same amount as defaultTime
+        Timer.remaining = Timer.target - startTime;
 
-      // The amount of milliseconds needed to reach Timer.target
-      // This is the same amount as defaultTime
-      Timer.remaining = Timer.target - startTime;
+        // The status of the timer
+        Timer.status = "running";
 
-      // The status of the timer
-      Timer.status = "running";
+        console.log("Timer.target:", Timer.target);
+        console.log("Timer.remaining:", Timer.remaining);
+        console.log("Timer.status:", Timer.status);
 
-      console.log("Timer.target:", Timer.target);
-      console.log("Timer.remaining:", Timer.remaining);
-      console.log("Timer.status:", Timer.status);
+        chrome.storage.local.set({
+          target: Timer.target,
+          status: Timer.status
+        }, () => console.log("Timer target and status (running) saved"));
 
-      chrome.storage.local.set({
-        target: Timer.target,
-        status: Timer.status
-      }, () => console.log("Timer target and status (running) saved"));
-
-      // Set an alarm
-      // chrome.alarms.create( ... );
-    }
-
-    uiUpdater = setInterval(updateUI, 1000);
-  }
-  else if (message.command === "preload") {
-    if (Timer.status === "initial") {
-      port.postMessage(Timer.remainingStr());
-    }
-    else if (Timer.status === "running") {
-      Timer.remaining = Timer.target - Date.now();
-      console.log("Time left (ms)", Timer.remaining)
-      port.postMessage(Timer.remainingStr());
-
+        // Set an alarm
+        // chrome.alarms.create( ... );
+      }
       uiUpdater = setInterval(updateUI, 1000);
-    }
+      break;
+    case "preload":
+      if (Timer.status === "initial") {
+        port.postMessage(Timer.remainingStr());
+      }
+      else if (Timer.status === "running") {
+        Timer.remaining = Timer.target - Date.now();
+        console.log("Time left (ms)", Timer.remaining)
+        port.postMessage(Timer.remainingStr());
+
+        uiUpdater = setInterval(updateUI, 1000);
+      }
+      break;
+    default:
+      console.log(message, "is not a known input");
   }
 }
 
@@ -127,8 +98,46 @@ function updateUI() {
   if (time === "00:00" || !popUpOpen) {
     clearInterval(uiUpdater);
   }
-
 }
+
+// Listen for "install" or "update" event
+chrome.runtime.onInstalled.addListener((details) => {
+  // if (details.reason === "install") {
+
+  // }
+  // else if (details.reason === "update") {
+
+  // }
+
+  chrome.storage.local.set({
+    target: null,
+    status: "initial"
+  }, () => console.log("OnInstalled config for target and status"));
+});
+
+// Listen for communications from PopUp
+chrome.runtime.onConnect.addListener((portFromPopUp) => {
+  port = portFromPopUp;
+  popUpOpen = true;
+
+  // Experimental: This seems to be the best place to ...
+  // update target after the popup has gone inactive ...
+  // IF this does not work ... move it to preload ... case === "running" ...
+  // OR move it to the initialization of the Object ... and specifiy default value too
+  chrome.storage.local.get(["target", "status"], (result) => {
+    Timer.target = result.target;
+    Timer.status = result.status;
+    console.log(Timer.target);
+  });
+
+  port.onDisconnect.addListener(() => {
+    popUpOpen = false;
+    clearInterval(uiUpdater);
+    console.log("PopUp port disconnected; interval cleared");
+  })
+
+  port.onMessage.addListener(handleInput);
+});
 
 // chrome.alarms.onAlarm.addListener(() => {
 //   Timer.status = "complete";
