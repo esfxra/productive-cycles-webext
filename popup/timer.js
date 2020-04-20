@@ -8,6 +8,21 @@ let status = null;
 document.addEventListener("click", (e) => {
   let selection = e.target.id;
   port.postMessage({ command: selection });
+
+  if (selection === "start") {
+    let elt = document.querySelector("#start");
+    elt.classList.add("hidden");
+
+    elt = document.querySelector("#pause");
+    elt.classList.remove("hidden");
+  }
+  else if (selection === "pause") {
+    let elt = document.querySelector("#pause");
+    elt.classList.add("hidden");
+
+    elt = document.querySelector("#start");
+    elt.classList.remove("hidden");
+  }
 });
 
 // Register the UI has been loaded and let the background script know
