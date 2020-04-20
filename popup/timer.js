@@ -2,26 +2,18 @@
 
 // timer.js globals
 let port = chrome.runtime.connect({ name: "port-from-popup" });
-let status = null;
 
 // Handle inputs
 document.addEventListener("click", (e) => {
   let selection = e.target.id;
   port.postMessage({ command: selection });
 
+  // Switch buttons based on input
   if (selection === "start") {
-    let elt = document.querySelector("#start");
-    elt.classList.add("hidden");
-
-    elt = document.querySelector("#pause");
-    elt.classList.remove("hidden");
+    switchButtons("#start", "#pause")
   }
   else if (selection === "pause") {
-    let elt = document.querySelector("#pause");
-    elt.classList.add("hidden");
-
-    elt = document.querySelector("#start");
-    elt.classList.remove("hidden");
+    switchButtons("#pause", "#start")
   }
 });
 
@@ -29,7 +21,25 @@ document.addEventListener("click", (e) => {
 window.addEventListener("DOMContentLoaded", (event) => {
   console.log(event);
   port.postMessage({ command: "preload" });
+
+  // Get status from local storage and enable either pause or start
+  chrome.storage.local.get(["status"], (result) => {
+    let status = result.status;
+    if (status === "running") {
+      switchButtons("#start", "#pause")
+    } else if (status === "paused") {
+      switchButtons("#pause", "#start")
+    }
+  });
 });
 
 // Change the text in the #time element with the updated time coming from the background script
 port.onMessage.addListener( (message) => document.querySelector("#time").textContent = message );
+
+function switchButtons(hide, show) {
+  let elt = document.querySelector(hide);
+  elt.classList.add("hidden");
+
+  elt = document.querySelector(show);
+  elt.classList.remove("hidden");
+}
