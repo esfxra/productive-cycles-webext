@@ -43,36 +43,38 @@ function handleInput(message) {
   switch (message.command) {
     case "start":
       if (Timer.status === "initial") {
-        // The current time + what the timer is set up to count as a cycle
-        let startTime = Date.now();
-        Timer.target = startTime + defaultTime;
+        console.log("Command:", message.command, "Status:", Timer.status)
 
-        // The amount of milliseconds needed to reach Timer.target
-        // This is the same amount as defaultTime
-        Timer.remaining = Timer.target - startTime;
-
-        // The status of the timer
-        Timer.status = "running";
-
-        console.log("Timer.target:", Timer.target);
-        console.log("Timer.remaining:", Timer.remaining);
-        console.log("Timer.status:", Timer.status);
-
-        chrome.storage.local.set({
-          target: Timer.target,
-          status: Timer.status
-        }, () => console.log("Timer target and status (running) saved"));
+        let startTime = Date.now(); // The current time + what the timer is set up to count as a cycle
+        updateTarget(startTime + defaultTime);
+        Timer.remaining = Timer.target - startTime; // This is the same amount as defaultTime
+        updateStatus("running");
 
         // Set an alarm
         // chrome.alarms.create( ... );
       }
+      else if (Timer.status === "paused") {
+        // This code will run when the timer is resumed ...
+        // No need to update the target ... or the status
+        updateTarget(Date.now() + Timer.remaining);
+        console.log("Command:", message.command, "Status:", Timer.status)
+        updateStatus("running");
+      }
       uiUpdater = setInterval(updateUI, 1000);
       break;
+    case "pause":
+      console.log("Command:", message.command, "Status:", Timer.status)
+      clearInterval(uiUpdater);
+      updateStatus("paused");
+      break;
     case "preload":
-      if (Timer.status === "initial") {
+      if (Timer.status === "initial" || Timer.status === "paused") {
+        console.log("Command:", message.command, "Status:", Timer.status)
         port.postMessage(Timer.remainingStr());
       }
       else if (Timer.status === "running") {
+        console.log("Command:", message.command, "Status:", Timer.status)
+        // Start an interval after recalculating remaining time
         Timer.remaining = Timer.target - Date.now();
         console.log("Time left (ms)", Timer.remaining)
         port.postMessage(Timer.remainingStr());
@@ -98,6 +100,17 @@ function updateUI() {
   if (time === "00:00" || !popUpOpen) {
     clearInterval(uiUpdater);
   }
+}
+
+function updateTarget(target) {
+  Timer.target = target;
+  chrome.storage.local.set({ target: Timer.target }, () => console.log("Timer target saved:", Timer.target));
+}
+
+function updateStatus(status) {
+  // Consider making this a method of Timer
+  Timer.status = status;
+  chrome.storage.local.set({ status: Timer.status }, () => console.log("Timer status saved:", Timer.status));
 }
 
 // Listen for "install" or "update" event
