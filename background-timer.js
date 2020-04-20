@@ -6,7 +6,7 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 25 * 60000;
+let defaultTime = 1 * 60000;
 let defaultCycles = 4;
 
 // Timer object
@@ -19,7 +19,7 @@ var Timer = {
   remainingStr: function () {
     // Use a time library for better ms-to-minutes-seconds in the future
     let min = Math.floor((this.remaining) % (1000 * 60 * 60) / (1000 * 60));
-    let sec = Math.ceil((this.remaining) % (1000 * 60) / 1000);
+    let sec = Math.floor((this.remaining) % (1000 * 60) / 1000);
 
     // Temporary fix for -1 at the end of timer
     if (min < 1) { min = 0; }
