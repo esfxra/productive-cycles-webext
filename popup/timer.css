@@ -3,14 +3,18 @@ body, html {
     font-family: "Lucida Console", Monaco, monospace;
 }
 
+.popup-container {
+    padding: 2px;
+}
+
 #time {
     /*
     experimental:
         min-height = font-size is used to add height
         before timer.js fills the value in #timer
     */
-    /* min-height:  1.25em;  */
-    margin-bottom: 5px;
+    min-height: 1.25em; 
+    margin-bottom: 7.5vh;
     text-align: center;
     font-size: 1.25em;
 }
@@ -21,6 +25,7 @@ body, html {
 
 .control {
     width: 100%;
+    margin-bottom: 7.5vh;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -39,4 +44,47 @@ body, html {
 
 #pause, #reset, #reset-all {
     background-color: gray;
+}
+
+hr {
+    border-top: 1.25vh dotted gray;
+}
+
+.cycles {
+    margin-top: 7.5vh;
+    display: grid;
+    grid-template-columns: auto auto auto auto;
+    grid-gap: 10vw;
+    /* padding: 10px; */
+}
+
+.dot {
+    width: 11.5vw;
+    height: 11.5vw;
+    /* margin-right: 2.5vw; */
+    /* width: 12.5px; */
+    border: 0.75px solid black;
+    border-radius: 100%;
+    display: inline-block;
+}
+
+.running {
+    animation: runningCycle 2s infinite;
+    background-color: black;
+}
+
+.pending {
+    opacity: 0.4;
+}
+
+@keyframes runningCycle {
+    0% { opacity: 1; }
+    25% { opacity: 0.6; }
+    50% { opacity: 0.3; }
+    75% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+.complete {
+    background-color: black;
 }

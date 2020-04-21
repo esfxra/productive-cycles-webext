@@ -21,7 +21,7 @@ document.addEventListener("click", (e) => {
 window.addEventListener("DOMContentLoaded", (event) => {
   console.log(event);
   port.postMessage({ command: "preload" });
-
+  
   // Get status from local storage and enable either pause or start
   chrome.storage.local.get(["status"], (result) => {
     let status = result.status;
