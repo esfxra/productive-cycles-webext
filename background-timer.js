@@ -6,8 +6,8 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 25 * 60000;
-let defaultCycles = 4;
+let defaultTime = 1/10 * 60000;
+let defaultCycles = 2;
 
 // Timer object
 var Timer = {
@@ -54,6 +54,12 @@ var Timer = {
     if (save) {
       chrome.storage.local.set({ remaining: this.remaining }, () => console.log("Timer remaining saved:", this.remaining));
     }
+  },
+  updateCycle: function (cycle, save) {
+    this.cycle = cycle;
+    if (save) {
+      chrome.storage.local.set({ cycle: this.cycle }, () => console.log("Timer cycle saved:", this.cycle));
+    }
   }
 };
 
@@ -89,21 +95,33 @@ function handleInput(message) {
 
       break;
     case "preload":
-      chrome.storage.local.get(["target", "status", "remaining"], (result) => {
+      chrome.storage.local.get(["target", "status", "remaining", "cycle"], (result) => {
+        // Get timer values from storage during preload (for idle background)
         Timer.updateTarget(result.target, false);
         Timer.updateStatus(result.status, false);
-        Timer.updateRemaining(result.remaining, false); // Experimental
+        Timer.updateRemaining(result.remaining, false);
+        Timer.updateCycle(result.cycle, false);
 
         console.log("Command:", message.command, "Status:", Timer.status);
 
         if (Timer.status === "running") {
-          Timer.updateRemaining(Timer.target - Date.now(), false);
-          port.postMessage(Timer.remainingStr());
+          Timer.updateRemaining(Timer.target - Date.now(), false); // Consider using a conditional to either do this OR the one above
+          port.postMessage({
+            time: Timer.remainingStr(),
+            totalCycles: Timer.totalCycles,
+            cycle: Timer.cycle,
+            status: Timer.status
+          });
 
           uiUpdater = setInterval(updateUI, 1000);
         }
-        else if (Timer.status === "initial" || Timer.status === "paused") {
-          port.postMessage(Timer.remainingStr());
+        else if (Timer.status === "initial" || Timer.status === "paused" || Timer.status === "complete") {
+          port.postMessage({
+            time: Timer.remainingStr(),
+            totalCycles: Timer.totalCycles,
+            cycle: Timer.cycle,
+            status: Timer.status
+          });
         }
       });
       break;
@@ -119,10 +137,35 @@ function updateUI() {
 
   if (popUpOpen) {
     console.log("Time posted:", time);
-    port.postMessage(time);
+    port.postMessage({
+      time: Timer.remainingStr(),
+      totalCycles: Timer.totalCycles,
+      cycle: Timer.cycle,
+      status: Timer.status
+    });
   }
 
   if (time === "00:00" || !popUpOpen) {
+    if (time === "00:00") {
+      Timer.cycle++;
+
+      if (Timer.cycle > Timer.totalCycles) {
+        Timer.updateStatus("complete", true);
+      }
+      else {
+        Timer.updateStatus("initial", true);
+        Timer.updateRemaining(defaultTime, true);
+      }
+
+      Timer.updateCycle(Timer.cycle, true);
+
+      port.postMessage({
+        time: Timer.remainingStr(),
+        totalCycles: Timer.totalCycles,
+        cycle: Timer.cycle,
+        status: Timer.status
+      });
+    }
     clearInterval(uiUpdater);
   }
 }
@@ -155,8 +198,10 @@ chrome.runtime.onInstalled.addListener((details) => {
   chrome.storage.local.set({
     target: null,
     status: "initial",
-    remaining: defaultTime // experimental
-  }, () => console.log("OnInstalled config for target, status and remaining (in storage)"));
+    remaining: defaultTime, // experimental,
+    cycle: 1,
+    cyclesTotal: defaultCycles
+  }, () => console.log("OnInstalled config for target, status, remaining, cycle, and cycleTotal (in storage)"));
 });
 
 // chrome.alarms.onAlarm.addListener(() => {

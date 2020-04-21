@@ -68,13 +68,17 @@ hr {
     display: inline-block;
 }
 
-.running {
-    animation: runningCycle 2s infinite;
+.complete {
     background-color: black;
 }
 
 .pending {
     opacity: 0.4;
+}
+
+.running {
+    animation: runningCycle 2s infinite;
+    background-color: black;
 }
 
 @keyframes runningCycle {
@@ -83,8 +87,4 @@ hr {
     50% { opacity: 0.3; }
     75% { opacity: 0.6; }
     100% { opacity: 1; }
-}
-
-.complete {
-    background-color: black;
 }
