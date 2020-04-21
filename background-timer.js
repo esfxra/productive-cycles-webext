@@ -7,7 +7,7 @@ let popUpOpen = false;
 
 // Defaults
 let defaultTime = 1/10 * 60000;
-let defaultCycles = 4;
+let defaultCycles = 2;
 
 // Timer object
 var Timer = {
@@ -115,7 +115,7 @@ function handleInput(message) {
 
           uiUpdater = setInterval(updateUI, 1000);
         }
-        else if (Timer.status === "initial" || Timer.status === "paused" || Timer.status === "cycle-complete") {
+        else if (Timer.status === "initial" || Timer.status === "paused" || Timer.status === "complete") {
           port.postMessage({
             time: Timer.remainingStr(),
             totalCycles: Timer.totalCycles,
@@ -148,9 +148,17 @@ function updateUI() {
   if (time === "00:00" || !popUpOpen) {
     if (time === "00:00") {
       Timer.cycle++;
-      Timer.updateStatus("initial", true)
-      Timer.updateRemaining(defaultTime, true);
+
+      if (Timer.cycle > Timer.totalCycles) {
+        Timer.updateStatus("complete", true);
+      }
+      else {
+        Timer.updateStatus("initial", true);
+        Timer.updateRemaining(defaultTime, true);
+      }
+
       Timer.updateCycle(Timer.cycle, true);
+
       port.postMessage({
         time: Timer.remainingStr(),
         totalCycles: Timer.totalCycles,

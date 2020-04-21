@@ -29,6 +29,11 @@ port.onMessage.addListener((message) => {
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector("#time").textContent = message.time;
 
+  // Check if the timer is complete, and disable start and pause (temporary)
+  if (message.status === "complete") {
+    document.querySelector("#time").textContent = "complete"
+  }
+
   // Switch buttons based on status of the Timer
   if (message.status === "initial" || message.status === "paused") {
     switchButtons("#pause", "#start");
