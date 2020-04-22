@@ -6,8 +6,8 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 1 * 60000;
-let defaultCycles = 4;
+let defaultTime = 1 / 60 * 60000;
+let defaultCycles = 2;
 
 // Timer object
 var Timer = {
@@ -104,9 +104,14 @@ function handleInput(message) {
       clearInterval(uiUpdater);
       chrome.alarms.clear("cycle-complete-alarm");
 
-      if (Timer.status === "complete") {
+      // It can only *go back* IF the timer has completed ... if it is running ... no reason for Timer.cycle--
+      if (Timer.status === "complete" || Timer.status === "initial" && Timer.cycle > 0) {
         Timer.cycle--;
         Timer.updateCycle(Timer.cycle, true);
+
+        // Clear notification for this cycle only
+        let id = "cycle-complete-alarm" + Timer.cycle;
+        chrome.notifications.clear(id);
       }
 
       Timer.updateRemaining(defaultTime, true);
@@ -205,28 +210,37 @@ function updateUI() {
   }
 
   if (time === "00:00" || !popUpOpen) {
-    if (time === "00:00") {
-      Timer.cycle++;
-
-      if (Timer.cycle > Timer.totalCycles) {
-        Timer.updateStatus("complete", true);
-      }
-      else {
-        Timer.updateStatus("initial", true);
-        Timer.updateRemaining(defaultTime, true);
-      }
-
-      Timer.updateCycle(Timer.cycle, true);
-
-      port.postMessage({
-        time: Timer.remainingStr(),
-        totalCycles: Timer.totalCycles,
-        cycle: Timer.cycle,
-        status: Timer.status
-      });
-    }
     clearInterval(uiUpdater);
+
+    // The following 3 are handled onAlarm();
+    // Timer.updateStatus(...)
+    // Timer.updateRemaining(...)
+    // Timer.updateCycle(...)
   }
+
+  // if (time === "00:00" || !popUpOpen) {
+  //   if (time === "00:00") {
+  //     Timer.cycle++;
+
+  //     if (Timer.cycle > Timer.totalCycles) {
+  //       Timer.updateStatus("complete", true);
+  //     }
+  //     else {
+  //       Timer.updateStatus("initial", true);
+  //       Timer.updateRemaining(defaultTime, true);
+  //     }
+
+  //     Timer.updateCycle(Timer.cycle, true);
+
+  // port.postMessage({
+  //   time: Timer.remainingStr(),
+  //   totalCycles: Timer.totalCycles,
+  //   cycle: Timer.cycle,
+  //   status: Timer.status
+  // });
+  //   }
+  //   clearInterval(uiUpdater);
+  // }
 }
 
 // Listen for communications from PopUp
@@ -275,16 +289,53 @@ chrome.runtime.onInstalled.addListener((details) => {
 
 chrome.alarms.onAlarm.addListener(() => {
   // Add Timer.cycle++ and Timer.cycleUpdate(...) here in the future
-  chrome.storage.local.get(["cycle"], (result) => {
-    let cycle = result.cycle;
+  chrome.storage.local.get(["target", "status", "remaining", "cycle"], (result) => {
+
+    console.log("Alarm fired. Cycle completed:", result.cycle);
+
+    // Update the cycle
+    let nextCycle = result.cycle + 1;
+    Timer.updateCycle(nextCycle, true);
+
+    if (nextCycle > Timer.totalCycles) {
+      Timer.updateStatus("complete", true);
+    }
+    else {
+      Timer.updateStatus("initial", true);
+      Timer.updateRemaining(defaultTime, true);
+    }
+
+    // If popUp is open while alarm fires
+    // Should not be needed if uiUpdater posts the message ...
+    // But uiUpdater does not know if these changed have occured
+    if (popUpOpen) {
+      console.log("Time posted (from onAlarm):", Timer.remainingStr());
+      port.postMessage({
+        time: Timer.remainingStr(),
+        totalCycles: Timer.totalCycles,
+        cycle: Timer.cycle,
+        status: Timer.status
+      });
+    }
 
     // Notify the user
-    let notificationID = "cycle-complete-alarm" + cycle;
-    chrome.notifications.create(notificationID, {
-      "type": "basic",
-      "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-      "title": "cycle " + cycle + " complete!",
-      "message": "great job. take a break :)"
-    });
+    let notificationID = "cycle-complete-alarm" + result.cycle;
+
+    if (result.cycle < Timer.totalCycles) {
+      chrome.notifications.create(notificationID, {
+        "type": "basic",
+        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+        "title": "cycle " + result.cycle + " complete!",
+        "message": "great job. everyone, take 5"
+      });
+    }
+    else if (result.cycle === Timer.totalCycles) {
+      chrome.notifications.create(notificationID, {
+        "type": "basic",
+        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+        "title": "cycle " + result.cycle + " complete!",
+        "message": "take a long break :)"
+      });
+    }
   });
 });
