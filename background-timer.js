@@ -70,8 +70,6 @@ function handleInput(message) {
 
       if (Timer.status === "initial") {
         Timer.updateRemaining(defaultTime, true);
-        // Set an alarm
-        // chrome.alarms.create( ... );
       }
       else if (Timer.status === "paused") {
         // What other code should go here?
@@ -80,6 +78,10 @@ function handleInput(message) {
 
       Timer.updateTarget(Timer.remaining + Date.now(), true);
       Timer.updateStatus("running", true);
+
+      // Set an alarm ... or change a previous one (if the user pressed start to resume a timer)
+      chrome.alarms.create("cycle-complete-alarm", {when: Timer.target});
+
       uiUpdater = setInterval(updateUI, 1000);
 
       break;
@@ -244,19 +246,14 @@ chrome.runtime.onInstalled.addListener((details) => {
   }, () => console.log("OnInstalled config for target, status, remaining, cycle, and cycleTotal (in storage)"));
 });
 
-// chrome.alarms.onAlarm.addListener(() => {
-//   Timer.status = "complete";
+chrome.alarms.onAlarm.addListener(() => {
 
-//   // Clear the interval from here ... Need to test this ... Since the interval is started by another listener
-//   // Also, this code will only run if the popup view is open ??
-//   clearInterval(uiUpdater);
-
-//   // Notify the user
-//   let notificationID = "cycle-complete-alarm";
-//   chrome.notifications.create(notificationID, {
-//     "type": "basic",
-//     "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-//     "title": "cycle complete!",
-//     "message": "everyone, take 5"
-//   });
-// });
+  // Notify the user
+  let notificationID = "cycle-complete-alarm";
+  chrome.notifications.create(notificationID, {
+    "type": "basic",
+    "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+    "title": "cycle complete!",
+    "message": "everyone, take 5"
+  });
+});
