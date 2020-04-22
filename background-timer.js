@@ -99,6 +99,11 @@ function handleInput(message) {
 
       clearInterval(uiUpdater);
 
+      if (Timer.status === "complete") {
+        Timer.cycle--;
+        Timer.updateCycle(Timer.cycle, true);
+      }
+
       Timer.updateRemaining(defaultTime, true);
       Timer.updateStatus("initial", true);
 

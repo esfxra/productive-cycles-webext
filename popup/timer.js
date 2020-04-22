@@ -12,7 +12,7 @@ document.addEventListener("click", (e) => {
   if (selection === "start") {
     switchButtons("#start", "#pause")
   }
-  else if (selection === "pause" || selection === "reset-cycle" || selection ==="reset-all") {
+  else if (selection === "pause" || selection === "reset-cycle" || selection === "reset-all") {
     switchButtons("#pause", "#start")
   }
 });
@@ -32,7 +32,24 @@ port.onMessage.addListener((message) => {
   // Check if the timer is complete, and change time text to "complete"
   if (message.status === "complete") {
     document.querySelector("#time").textContent = "complete";
-    switchButtons("#pause", "#start");
+
+    // Hide "start" and "pause"
+    let elt = document.querySelector("#pause");
+    if (!elt.classList.contains("hidden")) {
+      elt.classList.add("hidden")
+    }
+
+    elt = document.querySelector("#start");
+    if (!elt.classList.contains("hidden")) {
+      elt.classList.add("hidden")
+    }
+
+    // Change CSS justify-content to space-around for .control
+    document.querySelector(".control").style.justifyContent = "space-around";
+  }
+  else {
+    // Change CSS justify-content to space-around for .control
+    document.querySelector(".control").style.justifyContent = "space-between";
   }
 
   // Switch buttons based on status of the Timer
