@@ -42,7 +42,7 @@ body, html {
     background-color: black;
 }
 
-#pause, #reset, #reset-all {
+#pause, #reset-cycle, #reset-all {
     background-color: gray;
 }
 
@@ -51,6 +51,12 @@ hr {
 }
 
 .cycles {
+        /*
+    experimental:
+        min-height = font-size is used to add height
+        before timer.js fills the value in #timer
+    */
+    min-height: 11.5vw;
     margin-top: 7.5vh;
     display: grid;
     grid-template-columns: auto auto auto auto;
