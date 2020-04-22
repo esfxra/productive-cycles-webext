@@ -80,7 +80,7 @@ function handleInput(message) {
       Timer.updateStatus("running", true);
 
       // Set an alarm ... or change a previous one (if the user pressed start to resume a timer)
-      chrome.alarms.create("cycle-complete-alarm", {when: Timer.target});
+      chrome.alarms.create("cycle-complete-alarm", { when: Timer.target });
 
       uiUpdater = setInterval(updateUI, 1000);
 
@@ -243,17 +243,20 @@ chrome.runtime.onInstalled.addListener((details) => {
     remaining: defaultTime, // experimental,
     cycle: 1,
     cyclesTotal: defaultCycles
-  }, () => console.log("OnInstalled config for target, status, remaining, cycle, and cycleTotal (in storage)"));
+  }, () => console.log("OnInstalled - config for target, status, remaining, cycle, and cycleTotal (in storage)"));
+
+  chrome.alarms.clearAll( () => console.log("OnInstalled - all alarms cleared"));
 });
 
 chrome.alarms.onAlarm.addListener(() => {
+  // Add Timer.cycle++ and Timer.cycleUpdate(...) here in the future
 
   // Notify the user
-  let notificationID = "cycle-complete-alarm";
+  let notificationID = "cycle-complete-alarm" + Timer.cycle;
   chrome.notifications.create(notificationID, {
     "type": "basic",
     "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-    "title": "cycle complete!",
-    "message": "everyone, take 5"
+    "title": "cycle " + Timer.cycle + " complete!",
+    "message": "great job. take a break :)"
   });
 });
