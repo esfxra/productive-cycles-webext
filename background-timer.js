@@ -246,6 +246,14 @@ chrome.runtime.onInstalled.addListener((details) => {
   }, () => console.log("OnInstalled - config for target, status, remaining, cycle, and cycleTotal (in storage)"));
 
   chrome.alarms.clearAll( () => console.log("OnInstalled - all alarms cleared"));
+
+  let i = 1;
+  while (i <= Timer.totalCycles) {
+    let id = "cycle-complete-alarm" + i;
+    chrome.notifications.clear(id);
+    i++;
+  }
+  console.log("OnInstalled - all notifications cleared")
 });
 
 chrome.alarms.onAlarm.addListener(() => {
