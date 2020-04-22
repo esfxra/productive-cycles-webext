@@ -6,7 +6,7 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 1 / 10 * 60000;
+let defaultTime = 1 * 60000;
 let defaultCycles = 4;
 
 // Timer object
@@ -70,8 +70,6 @@ function handleInput(message) {
 
       if (Timer.status === "initial") {
         Timer.updateRemaining(defaultTime, true);
-        // Set an alarm
-        // chrome.alarms.create( ... );
       }
       else if (Timer.status === "paused") {
         // What other code should go here?
@@ -80,6 +78,11 @@ function handleInput(message) {
 
       Timer.updateTarget(Timer.remaining + Date.now(), true);
       Timer.updateStatus("running", true);
+
+      // Set an alarm ... but first clear a previous (commented since we are clearing when pause, reset, reset all is pressed)
+      // chrome.alarms.clear("cycle-complete-alarm")
+      chrome.alarms.create("cycle-complete-alarm", { when: Timer.target });
+
       uiUpdater = setInterval(updateUI, 1000);
 
       break;
@@ -87,6 +90,7 @@ function handleInput(message) {
       console.log("Command:", message.command, "Status:", Timer.status);
 
       clearInterval(uiUpdater);
+      chrome.alarms.clear("cycle-complete-alarm");
 
       Timer.updateRemaining(Timer.remaining, true);
       Timer.updateStatus("paused", true);
@@ -98,6 +102,7 @@ function handleInput(message) {
       console.log("Command:", message.command, "Status:", Timer.status);
 
       clearInterval(uiUpdater);
+      chrome.alarms.clear("cycle-complete-alarm");
 
       if (Timer.status === "complete") {
         Timer.cycle--;
@@ -120,6 +125,20 @@ function handleInput(message) {
       console.log("Command:", message.command, "Status:", Timer.status);
 
       clearInterval(uiUpdater);
+
+      // Clear the alarm
+      chrome.alarms.clear("cycle-complete-alarm");
+
+      // Clear all notifications
+      // Could update in the future to clear up until current cycle only ...
+      // Or up until current cycle (non-inclusive)
+      let i = 1;
+      while (i <= Timer.totalCycles) {
+        let id = "cycle-complete-alarm" + i;
+        chrome.notifications.clear(id);
+        i++;
+      }
+      console.log("OnInstalled - all notifications cleared")
 
       Timer.updateRemaining(defaultTime, true);
       Timer.updateStatus("initial", true);
@@ -241,22 +260,31 @@ chrome.runtime.onInstalled.addListener((details) => {
     remaining: defaultTime, // experimental,
     cycle: 1,
     cyclesTotal: defaultCycles
-  }, () => console.log("OnInstalled config for target, status, remaining, cycle, and cycleTotal (in storage)"));
+  }, () => console.log("OnInstalled - config for target, status, remaining, cycle, and cycleTotal (in storage)"));
+
+  chrome.alarms.clearAll(() => console.log("OnInstalled - all alarms cleared"));
+
+  let i = 1;
+  while (i <= Timer.totalCycles) {
+    let id = "cycle-complete-alarm" + i;
+    chrome.notifications.clear(id);
+    i++;
+  }
+  console.log("OnInstalled - all notifications cleared")
 });
 
-// chrome.alarms.onAlarm.addListener(() => {
-//   Timer.status = "complete";
+chrome.alarms.onAlarm.addListener(() => {
+  // Add Timer.cycle++ and Timer.cycleUpdate(...) here in the future
+  chrome.storage.local.get(["cycle"], (result) => {
+    let cycle = result.cycle;
 
-//   // Clear the interval from here ... Need to test this ... Since the interval is started by another listener
-//   // Also, this code will only run if the popup view is open ??
-//   clearInterval(uiUpdater);
-
-//   // Notify the user
-//   let notificationID = "cycle-complete-alarm";
-//   chrome.notifications.create(notificationID, {
-//     "type": "basic",
-//     "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-//     "title": "cycle complete!",
-//     "message": "everyone, take 5"
-//   });
-// });
+    // Notify the user
+    let notificationID = "cycle-complete-alarm" + cycle;
+    chrome.notifications.create(notificationID, {
+      "type": "basic",
+      "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+      "title": "cycle " + cycle + " complete!",
+      "message": "great job. take a break :)"
+    });
+  });
+});
