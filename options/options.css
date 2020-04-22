@@ -30,3 +30,7 @@ button {
     padding: 2.5px 8px;
     vertical-align: middle;
 }
+
+#status {
+    margin-bottom: 7.5vh;
+}

@@ -6,8 +6,8 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 1 / 60 * 60000;
-let defaultCycles = 2;
+let defaultTime = 25 * 60000;
+let defaultCycles = 4;
 
 // Timer object
 var Timer = {
