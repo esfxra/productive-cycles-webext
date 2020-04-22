@@ -6,8 +6,8 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 1/10 * 60000;
-let defaultCycles = 2;
+let defaultTime = 1 / 10 * 60000;
+let defaultCycles = 4;
 
 // Timer object
 var Timer = {
@@ -92,6 +92,41 @@ function handleInput(message) {
       Timer.updateStatus("paused", true);
 
       // Timer.target is not updated ... since that is updated when the timer is resumed
+
+      break;
+    case "reset-cycle":
+      console.log("Command:", message.command, "Status:", Timer.status);
+
+      clearInterval(uiUpdater);
+
+      Timer.updateRemaining(defaultTime, true);
+      Timer.updateStatus("initial", true);
+
+      // Post message ... so that the UI updates
+      port.postMessage({
+        time: Timer.remainingStr(),
+        totalCycles: Timer.totalCycles,
+        cycle: Timer.cycle,
+        status: Timer.status
+      });
+
+      break;
+    case "reset-all":
+      console.log("Command:", message.command, "Status:", Timer.status);
+
+      clearInterval(uiUpdater);
+
+      Timer.updateRemaining(defaultTime, true);
+      Timer.updateStatus("initial", true);
+      Timer.updateCycle(1, true);
+
+      // Post message ... so that the UI updates
+      port.postMessage({
+        time: Timer.remainingStr(),
+        totalCycles: Timer.totalCycles,
+        cycle: Timer.cycle,
+        status: Timer.status
+      });
 
       break;
     case "preload":

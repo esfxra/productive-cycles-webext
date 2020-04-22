@@ -42,7 +42,7 @@ body, html {
     background-color: black;
 }
 
-#pause, #reset, #reset-all {
+#pause, #reset-cycle, #reset-all {
     background-color: gray;
 }
 

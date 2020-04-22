@@ -12,7 +12,7 @@ document.addEventListener("click", (e) => {
   if (selection === "start") {
     switchButtons("#start", "#pause")
   }
-  else if (selection === "pause") {
+  else if (selection === "pause" || selection === "reset-cycle" || selection ==="reset-all") {
     switchButtons("#pause", "#start")
   }
 });
@@ -29,9 +29,10 @@ port.onMessage.addListener((message) => {
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector("#time").textContent = message.time;
 
-  // Check if the timer is complete, and disable start and pause (temporary)
+  // Check if the timer is complete, and change time text to "complete"
   if (message.status === "complete") {
-    document.querySelector("#time").textContent = "complete"
+    document.querySelector("#time").textContent = "complete";
+    switchButtons("#pause", "#start");
   }
 
   // Switch buttons based on status of the Timer
