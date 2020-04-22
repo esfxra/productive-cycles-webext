@@ -4,6 +4,8 @@ body, html {
 }
 
 .popup-container {
+    --margin-elements: 7.5vh;
+
     padding: 2px;
 }
 
@@ -14,7 +16,7 @@ body, html {
         before timer.js fills the value in #timer
     */
     min-height: 1.25em; 
-    margin-bottom: 7.5vh;
+    margin-bottom: var(--margin-elements);
     text-align: center;
     font-size: 1.25em;
 }
@@ -25,7 +27,8 @@ body, html {
 
 .control {
     width: 100%;
-    margin-bottom: 7.5vh;
+    padding-bottom: var(--margin-elements);
+    border-bottom: 2px dotted gray;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
@@ -46,13 +49,6 @@ body, html {
     background-color: gray;
 }
 
-hr {
-    border-top: 2vh dotted gray;
-    border-bottom: 0;
-    border-left: 0;
-    border-right: 0;
-}
-
 .cycles {
         /*
     experimental:
@@ -60,7 +56,7 @@ hr {
         before timer.js fills the value in #timer
     */
     min-height: 11.5vw;
-    margin-top: 7.5vh;
+    margin-top: var(--margin-elements);;
     display: grid;
     grid-template-columns: auto auto auto auto;
     grid-gap: 10vw;
