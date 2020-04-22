@@ -63,6 +63,130 @@ var Timer = {
   }
 };
 
+// Any other time after OnInstalled ... should cover all cases
+chrome.storage.local.get({
+  minutes: defaultTime / 60000,
+  totalCycles: defaultCycles
+}, function(result) {
+  console.log("Init - getting user minutes and cycles:", result.minutes, result.totalCycles);
+  defaultTime = result.minutes * 60000;
+  defaultCycles = result.totalCycles;
+
+  Timer.updateRemaining(defaultTime, true);
+  Timer.totalCycles = defaultCycles;
+});
+
+// Listen for communications from PopUp
+chrome.runtime.onConnect.addListener((portFromPopUp) => {
+  port = portFromPopUp;
+  popUpOpen = true;
+
+  port.onDisconnect.addListener(() => {
+    popUpOpen = false;
+    Timer.updateRemaining(Timer.remaining, true);
+    // Timer.updateTarget(Timer.target, true);
+    clearInterval(uiUpdater);
+    console.log("PopUp port disconnected; interval cleared");
+  })
+
+  port.onMessage.addListener(handleInput); // Input includes the pre-load command
+});
+
+// Listen for "install" or "update" event
+chrome.runtime.onInstalled.addListener((details) => {
+  // if (details.reason === "install") {
+
+  // }
+  // else if (details.reason === "update") {
+
+  // }
+
+  chrome.storage.local.set({
+    target: null,
+    status: "initial",
+    remaining: defaultTime, // experimental,
+    cycle: 1,
+    totalCycles: defaultCycles
+  }, () => console.log("OnInstalled - config for target, status, remaining, cycle, and cycleTotal (in storage)"));
+
+  chrome.alarms.clearAll(() => console.log("OnInstalled - all alarms cleared"));
+
+  let i = 1;
+  while (i <= Timer.totalCycles) {
+    let id = "cycle-complete-alarm" + i;
+    chrome.notifications.clear(id);
+    i++;
+  }
+  console.log("OnInstalled - all notifications cleared")
+});
+
+// Listen for cycle complete alarm
+chrome.alarms.onAlarm.addListener(() => {
+  // Add Timer.cycle++ and Timer.cycleUpdate(...) here in the future
+  chrome.storage.local.get(["target", "status", "remaining", "cycle"], (result) => {
+
+    console.log("Alarm fired. Cycle completed:", result.cycle);
+
+    // Update the cycle
+    let nextCycle = result.cycle + 1;
+    Timer.updateCycle(nextCycle, true);
+
+    if (nextCycle > Timer.totalCycles) {
+      Timer.updateStatus("complete", true);
+    }
+    else {
+      Timer.updateStatus("initial", true);
+      Timer.updateRemaining(defaultTime, true);
+    }
+
+    // If popUp is open while alarm fires
+    // Should not be needed if uiUpdater posts the message ...
+    // But uiUpdater does not know if these changed have occured
+    if (popUpOpen) {
+      console.log("Time posted (from onAlarm):", Timer.remainingStr());
+      port.postMessage({
+        time: Timer.remainingStr(),
+        totalCycles: Timer.totalCycles,
+        cycle: Timer.cycle,
+        status: Timer.status
+      });
+    }
+
+    // Notify the user
+    let notificationID = "cycle-complete-alarm" + result.cycle;
+
+    if (result.cycle < Timer.totalCycles) {
+      chrome.notifications.create(notificationID, {
+        "type": "basic",
+        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+        "title": "cycle " + result.cycle + " complete!",
+        "message": "great job. everyone, take 5"
+      });
+    }
+    else if (result.cycle === Timer.totalCycles) {
+      chrome.notifications.create(notificationID, {
+        "type": "basic",
+        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+        "title": "cycle " + result.cycle + " complete!",
+        "message": "take a long break :)"
+      });
+    }
+  });
+});
+
+// // Listen for changes in the options, report and reload
+// chrome.storage.onChanged.addListener(function(changes, namespace) {
+//   for (var key in changes) {
+//     var storageChange = changes[key];
+//     console.log('Storage key "%s" in namespace "%s" changed. ' +
+//                 'Old value was "%s", new value is "%s".',
+//                 key,
+//                 namespace,
+//                 storageChange.oldValue,
+//                 storageChange.newValue);
+//   }
+
+
 function handleInput(message) {
   switch (message.command) {
     case "start":
@@ -242,100 +366,3 @@ function updateUI() {
   //   clearInterval(uiUpdater);
   // }
 }
-
-// Listen for communications from PopUp
-chrome.runtime.onConnect.addListener((portFromPopUp) => {
-  port = portFromPopUp;
-  popUpOpen = true;
-
-  port.onDisconnect.addListener(() => {
-    popUpOpen = false;
-    Timer.updateRemaining(Timer.remaining, true);
-    // Timer.updateTarget(Timer.target, true);
-    clearInterval(uiUpdater);
-    console.log("PopUp port disconnected; interval cleared");
-  })
-
-  port.onMessage.addListener(handleInput); // Input includes the pre-load command
-});
-
-// Listen for "install" or "update" event
-chrome.runtime.onInstalled.addListener((details) => {
-  // if (details.reason === "install") {
-
-  // }
-  // else if (details.reason === "update") {
-
-  // }
-
-  chrome.storage.local.set({
-    target: null,
-    status: "initial",
-    remaining: defaultTime, // experimental,
-    cycle: 1,
-    cyclesTotal: defaultCycles
-  }, () => console.log("OnInstalled - config for target, status, remaining, cycle, and cycleTotal (in storage)"));
-
-  chrome.alarms.clearAll(() => console.log("OnInstalled - all alarms cleared"));
-
-  let i = 1;
-  while (i <= Timer.totalCycles) {
-    let id = "cycle-complete-alarm" + i;
-    chrome.notifications.clear(id);
-    i++;
-  }
-  console.log("OnInstalled - all notifications cleared")
-});
-
-chrome.alarms.onAlarm.addListener(() => {
-  // Add Timer.cycle++ and Timer.cycleUpdate(...) here in the future
-  chrome.storage.local.get(["target", "status", "remaining", "cycle"], (result) => {
-
-    console.log("Alarm fired. Cycle completed:", result.cycle);
-
-    // Update the cycle
-    let nextCycle = result.cycle + 1;
-    Timer.updateCycle(nextCycle, true);
-
-    if (nextCycle > Timer.totalCycles) {
-      Timer.updateStatus("complete", true);
-    }
-    else {
-      Timer.updateStatus("initial", true);
-      Timer.updateRemaining(defaultTime, true);
-    }
-
-    // If popUp is open while alarm fires
-    // Should not be needed if uiUpdater posts the message ...
-    // But uiUpdater does not know if these changed have occured
-    if (popUpOpen) {
-      console.log("Time posted (from onAlarm):", Timer.remainingStr());
-      port.postMessage({
-        time: Timer.remainingStr(),
-        totalCycles: Timer.totalCycles,
-        cycle: Timer.cycle,
-        status: Timer.status
-      });
-    }
-
-    // Notify the user
-    let notificationID = "cycle-complete-alarm" + result.cycle;
-
-    if (result.cycle < Timer.totalCycles) {
-      chrome.notifications.create(notificationID, {
-        "type": "basic",
-        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-        "title": "cycle " + result.cycle + " complete!",
-        "message": "great job. everyone, take 5"
-      });
-    }
-    else if (result.cycle === Timer.totalCycles) {
-      chrome.notifications.create(notificationID, {
-        "type": "basic",
-        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-        "title": "cycle " + result.cycle + " complete!",
-        "message": "take a long break :)"
-      });
-    }
-  });
-});
