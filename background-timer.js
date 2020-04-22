@@ -6,8 +6,8 @@ let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
-let defaultTime = 1 / 5 * 60000;
-let defaultCycles = 4;
+let defaultTime = 1 / 60 * 60000;
+let defaultCycles = 2;
 
 // Timer object
 var Timer = {
@@ -320,11 +320,22 @@ chrome.alarms.onAlarm.addListener(() => {
 
     // Notify the user
     let notificationID = "cycle-complete-alarm" + result.cycle;
-    chrome.notifications.create(notificationID, {
-      "type": "basic",
-      "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-      "title": "cycle " + result.cycle + " complete!",
-      "message": "great job. take a break :)"
-    });
+
+    if (result.cycle < Timer.totalCycles) {
+      chrome.notifications.create(notificationID, {
+        "type": "basic",
+        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+        "title": "cycle " + result.cycle + " complete!",
+        "message": "great job. everyone, take 5"
+      });
+    }
+    else if (result.cycle === Timer.totalCycles) {
+      chrome.notifications.create(notificationID, {
+        "type": "basic",
+        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+        "title": "cycle " + result.cycle + " complete!",
+        "message": "take a long break :)"
+      });
+    }
   });
 });
