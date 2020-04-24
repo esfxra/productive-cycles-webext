@@ -23,4 +23,4 @@ MIT License; check out the LICENSE.md file in the repo
 - [Chrome Developer Resources - Extensions](https://developer.chrome.com/extensions)
 
 ### Icons
-From the open source collection [Font Awesome](https://fontawesome.com/)
+From the open source collection [Font Awesome](https://fontawesome.com/license/free)
