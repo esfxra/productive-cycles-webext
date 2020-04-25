@@ -1,7 +1,7 @@
 {
     "manifest_version": 2,
     "name": "Productive Cycles",
-    "version": "0.0.2",
+    "version": "0.0.3",
 
     "description": "Pomodoro-inspired timer extension for web browsers",
     "homepage_url": "https://github.com/diegoserranor/productive-cycles",

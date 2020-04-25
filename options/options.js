@@ -1,7 +1,7 @@
 // Saves options to chrome.storage.local
 function save_options() {
-  var time = document.getElementById('minutes').value;
-  var cycleNumber = document.getElementById('cycles').value;
+  var time = parseInt(document.getElementById('minutes').value);
+  var cycleNumber = parseInt(document.getElementById('cycles').value);
   chrome.storage.local.set({
     minutes: time,
     totalCycles: cycleNumber
@@ -13,20 +13,14 @@ function save_options() {
       status.textContent = '';
     }, 750);
   });
-
-  // Reload
-  chrome.extension.getBackgroundPage().window.location.reload();
 }
 
 // Restores select box and checkbox state using the preferences
 // stored in chrome.storage.
 function restore_options() {
-  chrome.storage.local.get({
-    minutes: 25,
-    cycles: 4
-  }, function (items) {
+  chrome.storage.local.get(["minutes", "totalCycles"], function (items) {
     document.getElementById('minutes').value = items.minutes;
-    document.getElementById('cycles').value = items.cycles;
+    document.getElementById('cycles').value = items.totalCycles;
   });
 }
 document.addEventListener('DOMContentLoaded', restore_options);

@@ -1,7 +1,7 @@
 "use strict";
 
 // timer.js globals
-let port = chrome.runtime.connect({ name: "port-from-popup" });
+var port = chrome.runtime.connect({ name: "port-from-popup" });
 
 // Handle inputs
 document.addEventListener("click", (e) => {
@@ -19,18 +19,20 @@ document.addEventListener("click", (e) => {
 
 // Register the UI has been loaded and let the background script know
 window.addEventListener("DOMContentLoaded", (event) => {
-  console.log(event);
   port.postMessage({ command: "preload" });
 });
 
 // Make UI changes based on Timer details messaged by the background script
 port.onMessage.addListener((message) => {
+  console.log(message);
 
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector("#time").textContent = message.time;
 
   // Check if the timer is complete, and change time text to "complete"
-  if (message.status === "complete") {
+  // if (message.status === "complete" || message.cycle > message.totalCycles) {
+    if (message.status === "complete") {
+
     document.querySelector("#time").textContent = "complete";
 
     // Hide "start" and "pause"
@@ -64,13 +66,12 @@ port.onMessage.addListener((message) => {
   // Compute the number of cycles to display, which one is running, and which are complete
   let html = '';
   let i = 1;
-  console.log("current cycle:", message.cycle, "status:", message.status);
   while (i <= message.totalCycles) {
     if (i === message.cycle) {
       if (message.status === "initial") {
         html += '<span id="cycle-' + i + '" class="dot pending"></span>';
       }
-      else {
+      else if (message.status === "running" || message.status === "paused") {
         html += '<span id="cycle-' + i + '" class="dot running"></span>';
       }
     }

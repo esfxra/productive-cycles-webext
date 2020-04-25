@@ -1,20 +1,148 @@
 "use strict";
 
 // background-timer.js globals
-let port = null;
+var port = null;
 let uiUpdater = null;
 let popUpOpen = false;
 
 // Defaults
 let defaultTime = 25 * 60000;
 let defaultCycles = 4;
+let alarmID = "cycle-complete-alarm";
+let notificationID = "cycle-complete-noti";
+
+// Default overrides
+let userMinutes = null;
+let userCycles = null;
+
+// Listen for "install" or "update" event
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === "install") {
+    chrome.storage.local.set({
+      // User options
+      minutes: defaultTime / 60000,
+      totalCycles: defaultCycles,
+      // Timer properties
+      target: null,
+      remaining: defaultTime,
+      cycle: 1,
+      status: "initial"
+    }, () => console.log("Extension installed - stored initial config for all variables"));
+  }
+  else if (details.reason === "update") {
+    // Future release: Open new tab with changes for this version
+
+    chrome.alarms.clear(alarmID);
+    console.log("Extension updated or reloaded - all previous alarms cleared");
+
+    let i = 1;
+    while (i <= Timer.totalCycles) {
+      chrome.notifications.clear(notificationID + i);
+      i++;
+    }
+    console.log("Extension updated or reloaded - all notifications cleared")
+  }
+});
+
+// Listen for communications from PopUp
+chrome.runtime.onConnect.addListener((portFromPopUp) => {
+  port = portFromPopUp;
+  popUpOpen = true;
+
+  port.onDisconnect.addListener(() => {
+    popUpOpen = false;
+    Timer.updateRemaining(Timer.remaining, true);
+    clearInterval(uiUpdater);
+    console.log("PopUp port disconnected; interval cleared");
+  })
+
+  port.onMessage.addListener(handleInput); // Input includes the pre-load command
+});
+
+// Listen for cycle complete alarm
+chrome.alarms.onAlarm.addListener(() => {
+  chrome.storage.local.get(["cycle", "totalCycles"], (result) => {
+
+    console.log("Alarm fired. Cycle completed:", result.cycle);
+    console.log("Alarm fired.", "Cycle:", result.cycle, "totalCycles:", result.totalCycles);
+
+    if (result.cycle === result.totalCycles) {
+      console.log("Timer completed")
+      notify(result.cycle, true);
+      Timer.updateStatus("complete", true);
+    }
+    else if (result.cycle < result.totalCycles) {
+      notify(result.cycle, false);
+      Timer.updateStatus("initial", true);
+      Timer.updateRemaining(userMinutes, true);
+    }
+
+    // Increment the cycle counter
+    let nextCycle = result.cycle + 1;
+    Timer.updateCycle(nextCycle, true);
+
+    // If popUp is open while alarm fires
+    // Note: setTimeout() is a temporary fix for waiting until uiUpdater() clears interval
+    if (popUpOpen) {
+      setTimeout(function () {
+        messageUI();
+      }, 200);
+    }
+
+    // // Future check if needed?
+    // if (target - Date.now() < 0) {
+    //   // Yes timer has ended ...
+    // }
+    // else if (intervalComplete) {
+    //   // Flag set by updateUI
+    //   // Yer timer has ended
+    // }
+  });
+});
+
+// Listen for changes in the options, report and reload
+chrome.storage.onChanged.addListener(function(changes, namespace) {
+  for (var key in changes) {
+    var storageChange = changes[key];
+    console.log('Storage key "%s" in namespace "%s" changed. ' +
+                'Old value was "%s", new value is "%s".',
+                key,
+                namespace,
+                storageChange.oldValue,
+                storageChange.newValue);
+  }
+  if (key === "minutes" || key === "totalCycles") {
+    Timer.updateRemaining(userMinutes, true);
+    Timer.updateStatus("initial", true);
+    Timer.updateCycle(1, true);
+    Timer.totalCycles = 4;
+
+    chrome.alarms.clear(alarmID);
+
+    // Clear all notifications
+    let i = 1;
+    while (i <= Timer.totalCycles) {
+      chrome.notifications.clear(notificationID + i);
+      i++;
+    }
+    chrome.runtime.reload();
+  }
+});
+
+// Will run in init (once for Firefox, and everytime the script wakes up for Chrome)
+chrome.storage.local.get(["minutes", "totalCycles"], function (result) {
+  console.log("Init - getting user minutes and cycles:", result.minutes, result.totalCycles);
+
+  if (result.minutes === undefined) { userMinutes = defaultTime; } else { userMinutes = result.minutes * 60000; }
+  if (result.totalCycles === undefined) { userCycles = defaultCycles; } else { userCycles = result.totalCycles; }
+});
 
 // Timer object
 var Timer = {
   target: null,
-  remaining: defaultTime, // Time remaining
+  remaining: null, // Time remaining
   cycle: 1,
-  totalCycles: defaultCycles, // Will replace with a number read from file / storage / etc
+  totalCycles: null, // Will replace with a number read from file / storage / etc
   status: "initial",
   remainingStr: function () {
     // Use a time library for better ms-to-minutes-seconds in the future
@@ -63,137 +191,13 @@ var Timer = {
   }
 };
 
-// Any other time after OnInstalled ... should cover all cases
-chrome.storage.local.get({
-  minutes: defaultTime / 60000,
-  totalCycles: defaultCycles
-}, function(result) {
-  console.log("Init - getting user minutes and cycles:", result.minutes, result.totalCycles);
-  defaultTime = result.minutes * 60000;
-  defaultCycles = result.totalCycles;
-
-  Timer.updateRemaining(defaultTime, true);
-  Timer.totalCycles = defaultCycles;
-});
-
-// Listen for communications from PopUp
-chrome.runtime.onConnect.addListener((portFromPopUp) => {
-  port = portFromPopUp;
-  popUpOpen = true;
-
-  port.onDisconnect.addListener(() => {
-    popUpOpen = false;
-    Timer.updateRemaining(Timer.remaining, true);
-    // Timer.updateTarget(Timer.target, true);
-    clearInterval(uiUpdater);
-    console.log("PopUp port disconnected; interval cleared");
-  })
-
-  port.onMessage.addListener(handleInput); // Input includes the pre-load command
-});
-
-// Listen for "install" or "update" event
-chrome.runtime.onInstalled.addListener((details) => {
-  // if (details.reason === "install") {
-
-  // }
-  // else if (details.reason === "update") {
-
-  // }
-
-  chrome.storage.local.set({
-    target: null,
-    status: "initial",
-    remaining: defaultTime, // experimental,
-    cycle: 1,
-    totalCycles: defaultCycles
-  }, () => console.log("OnInstalled - config for target, status, remaining, cycle, and cycleTotal (in storage)"));
-
-  chrome.alarms.clearAll(() => console.log("OnInstalled - all alarms cleared"));
-
-  let i = 1;
-  while (i <= Timer.totalCycles) {
-    let id = "cycle-complete-alarm" + i;
-    chrome.notifications.clear(id);
-    i++;
-  }
-  console.log("OnInstalled - all notifications cleared")
-});
-
-// Listen for cycle complete alarm
-chrome.alarms.onAlarm.addListener(() => {
-  // Add Timer.cycle++ and Timer.cycleUpdate(...) here in the future
-  chrome.storage.local.get(["target", "status", "remaining", "cycle"], (result) => {
-
-    console.log("Alarm fired. Cycle completed:", result.cycle);
-
-    // Update the cycle
-    let nextCycle = result.cycle + 1;
-    Timer.updateCycle(nextCycle, true);
-
-    if (nextCycle > Timer.totalCycles) {
-      Timer.updateStatus("complete", true);
-    }
-    else {
-      Timer.updateStatus("initial", true);
-      Timer.updateRemaining(defaultTime, true);
-    }
-
-    // If popUp is open while alarm fires
-    // Should not be needed if uiUpdater posts the message ...
-    // But uiUpdater does not know if these changed have occured
-    if (popUpOpen) {
-      console.log("Time posted (from onAlarm):", Timer.remainingStr());
-      port.postMessage({
-        time: Timer.remainingStr(),
-        totalCycles: Timer.totalCycles,
-        cycle: Timer.cycle,
-        status: Timer.status
-      });
-    }
-
-    // Notify the user
-    let notificationID = "cycle-complete-alarm" + result.cycle;
-
-    if (result.cycle < Timer.totalCycles) {
-      chrome.notifications.create(notificationID, {
-        "type": "basic",
-        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-        "title": "cycle " + result.cycle + " complete!",
-        "message": "great job. everyone, take 5"
-      });
-    }
-    else if (result.cycle === Timer.totalCycles) {
-      chrome.notifications.create(notificationID, {
-        "type": "basic",
-        "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
-        "title": "cycle " + result.cycle + " complete!",
-        "message": "take a long break :)"
-      });
-    }
-  });
-});
-
-// // Listen for changes in the options, report and reload
-// chrome.storage.onChanged.addListener(function(changes, namespace) {
-//   for (var key in changes) {
-//     var storageChange = changes[key];
-//     console.log('Storage key "%s" in namespace "%s" changed. ' +
-//                 'Old value was "%s", new value is "%s".',
-//                 key,
-//                 namespace,
-//                 storageChange.oldValue,
-//                 storageChange.newValue);
-//   }
-
-
 function handleInput(message) {
   switch (message.command) {
     case "start":
       console.log("Command:", message.command, "Status:", Timer.status);
 
       if (Timer.status === "initial") {
-        Timer.updateRemaining(defaultTime, true);
+        Timer.updateRemaining(userMinutes, true);
       }
       else if (Timer.status === "paused") {
         // What other code should go here?
@@ -203,9 +207,7 @@ function handleInput(message) {
       Timer.updateTarget(Timer.remaining + Date.now(), true);
       Timer.updateStatus("running", true);
 
-      // Set an alarm ... but first clear a previous (commented since we are clearing when pause, reset, reset all is pressed)
-      // chrome.alarms.clear("cycle-complete-alarm")
-      chrome.alarms.create("cycle-complete-alarm", { when: Timer.target });
+      chrome.alarms.create(alarmID, { when: Timer.target });
 
       uiUpdater = setInterval(updateUI, 1000);
 
@@ -214,103 +216,76 @@ function handleInput(message) {
       console.log("Command:", message.command, "Status:", Timer.status);
 
       clearInterval(uiUpdater);
-      chrome.alarms.clear("cycle-complete-alarm");
+      chrome.alarms.clear(alarmID);
 
       Timer.updateRemaining(Timer.remaining, true);
       Timer.updateStatus("paused", true);
-
-      // Timer.target is not updated ... since that is updated when the timer is resumed
 
       break;
     case "reset-cycle":
       console.log("Command:", message.command, "Status:", Timer.status);
 
       clearInterval(uiUpdater);
-      chrome.alarms.clear("cycle-complete-alarm");
+      chrome.alarms.clear(alarmID);
 
-      // It can only *go back* IF the timer has completed ... if it is running ... no reason for Timer.cycle--
-      if (Timer.status === "complete" || Timer.status === "initial" && Timer.cycle > 0) {
-        Timer.cycle--;
-        Timer.updateCycle(Timer.cycle, true);
-
-        // Clear notification for this cycle only
-        let id = "cycle-complete-alarm" + Timer.cycle;
-        chrome.notifications.clear(id);
+      // Go back to the previous cycle
+      if (Timer.status === "complete" || Timer.status === "initial" && Timer.cycle > 1) {
+        Timer.updateCycle(Timer.cycle - 1, true);
+        chrome.notifications.clear(notificationID + Timer.cycle); // Clear notification for this cycle only
       }
 
-      Timer.updateRemaining(defaultTime, true);
+      Timer.updateRemaining(userMinutes, true);
       Timer.updateStatus("initial", true);
 
-      // Post message ... so that the UI updates
-      port.postMessage({
-        time: Timer.remainingStr(),
-        totalCycles: Timer.totalCycles,
-        cycle: Timer.cycle,
-        status: Timer.status
-      });
+      messageUI();
 
       break;
     case "reset-all":
       console.log("Command:", message.command, "Status:", Timer.status);
 
       clearInterval(uiUpdater);
-
-      // Clear the alarm
-      chrome.alarms.clear("cycle-complete-alarm");
+      chrome.alarms.clear(alarmID);
 
       // Clear all notifications
-      // Could update in the future to clear up until current cycle only ...
-      // Or up until current cycle (non-inclusive)
       let i = 1;
       while (i <= Timer.totalCycles) {
-        let id = "cycle-complete-alarm" + i;
-        chrome.notifications.clear(id);
+        chrome.notifications.clear(notificationID + i);
         i++;
       }
-      console.log("OnInstalled - all notifications cleared")
 
-      Timer.updateRemaining(defaultTime, true);
+      Timer.updateRemaining(userMinutes, true);
       Timer.updateStatus("initial", true);
       Timer.updateCycle(1, true);
 
-      // Post message ... so that the UI updates
-      port.postMessage({
-        time: Timer.remainingStr(),
-        totalCycles: Timer.totalCycles,
-        cycle: Timer.cycle,
-        status: Timer.status
-      });
+      messageUI();
 
       break;
     case "preload":
-      chrome.storage.local.get(["target", "status", "remaining", "cycle"], (result) => {
-        // Get timer values from storage during preload (for idle background)
+      // Get timer values from storage during preload (for idle background)
+      chrome.storage.local.get(["target", "status", "remaining", "cycle", "minutes", "totalCycles"], (result) => {
+        console.log("Command:", message.command, "Status:", result.status);
+
         Timer.updateTarget(result.target, false);
         Timer.updateStatus(result.status, false);
-        Timer.updateRemaining(result.remaining, false);
+        // Timer.updateRemaining(result.remaining, false);
         Timer.updateCycle(result.cycle, false);
+        Timer.totalCycles = result.totalCycles;
 
-        console.log("Command:", message.command, "Status:", Timer.status);
 
         if (Timer.status === "running") {
-          Timer.updateRemaining(Timer.target - Date.now(), false); // Consider using a conditional to either do this OR the one above
-          port.postMessage({
-            time: Timer.remainingStr(),
-            totalCycles: Timer.totalCycles,
-            cycle: Timer.cycle,
-            status: Timer.status
-          });
-
+          Timer.updateRemaining(result.target - Date.now(), false);
           uiUpdater = setInterval(updateUI, 1000);
         }
-        else if (Timer.status === "initial" || Timer.status === "paused" || Timer.status === "complete") {
-          port.postMessage({
-            time: Timer.remainingStr(),
-            totalCycles: Timer.totalCycles,
-            cycle: Timer.cycle,
-            status: Timer.status
-          });
+        else if (Timer.status === "paused") {
+          Timer.updateRemaining(result.remaining, true);
         }
+        else if (Timer.status === "initial") {
+          if (userMinutes !== result.minutes) { userMinutes = result.minutes * 60000; }
+          Timer.updateRemaining(userMinutes, true);
+        }
+
+        messageUI();
+
       });
       break;
     default:
@@ -320,49 +295,41 @@ function handleInput(message) {
 
 function updateUI() {
   // Make calculations to find remaining time (ms to minutes-seconds)
-  Timer.remaining = Timer.remaining - 1000;
-  let time = Timer.remainingStr();
+  Timer.updateRemaining(Timer.remaining - 1000, false);
 
   if (popUpOpen) {
-    console.log("Time posted:", time);
-    port.postMessage({
-      time: Timer.remainingStr(),
-      totalCycles: Timer.totalCycles,
-      cycle: Timer.cycle,
-      status: Timer.status
-    });
+    messageUI();
   }
 
-  if (time === "00:00" || !popUpOpen) {
+  if (Timer.remainingStr() === "00:00" || !popUpOpen) {
     clearInterval(uiUpdater);
 
-    // The following 3 are handled onAlarm();
-    // Timer.updateStatus(...)
-    // Timer.updateRemaining(...)
-    // Timer.updateCycle(...)
+    // The following is handled onAlarm();
+    // Timer.updateStatus(...);
+    // Timer.updateRemaining(...);
+    // Timer.updateCycle(...);
   }
+}
 
-  // if (time === "00:00" || !popUpOpen) {
-  //   if (time === "00:00") {
-  //     Timer.cycle++;
+function messageUI() {
 
-  //     if (Timer.cycle > Timer.totalCycles) {
-  //       Timer.updateStatus("complete", true);
-  //     }
-  //     else {
-  //       Timer.updateStatus("initial", true);
-  //       Timer.updateRemaining(defaultTime, true);
-  //     }
+  port.postMessage({
+    time: Timer.remainingStr(),
+    totalCycles: Timer.totalCycles,
+    cycle: Timer.cycle,
+    status: Timer.status
+  });
+}
 
-  //     Timer.updateCycle(Timer.cycle, true);
+function notify(cycle, complete) {
+  let message = "";
+  if (complete) { message = "take a long break :)"; }
+  else { message = "great job. everyone, take 5"; }
 
-  // port.postMessage({
-  //   time: Timer.remainingStr(),
-  //   totalCycles: Timer.totalCycles,
-  //   cycle: Timer.cycle,
-  //   status: Timer.status
-  // });
-  //   }
-  //   clearInterval(uiUpdater);
-  // }
+  chrome.notifications.create(notificationID + cycle, {
+    "type": "basic",
+    "iconUrl": chrome.runtime.getURL("icons/time-512.png"),
+    "title": "cycle " + cycle + " complete!",
+    "message": message
+  });
 }
