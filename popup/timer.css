@@ -10,14 +10,14 @@
 }
 
 body, html {
-    min-width: 100px;
+    min-width: 110px;
     font-family: robotoMono, monospace;
 }
 
 .popup-container {
     --margin-elements: 15px;
 
-    padding: 2px;
+    padding: 5px;
 }
 
 .top {

@@ -4,6 +4,7 @@
 var port = chrome.runtime.connect({ name: "port-from-popup" });
 var statusChanged = false;
 var previousStatus = null;
+var resetRequested = false;
 
 // Handle inputs
 document.addEventListener("click", (e) => {
@@ -12,10 +13,14 @@ document.addEventListener("click", (e) => {
 
   // Switch buttons based on input
   if (selection === "start") {
-    switchButtons("#start", "#pause")
+    switchButtons("#start", "#pause");
   }
-  else if (selection === "pause" || selection === "reset-cycle" || selection === "reset-all") {
-    switchButtons("#pause", "#start")
+  else if (selection === "pause") {
+    switchButtons("#pause", "#start");
+  }
+  else if ( selection === "reset-cycle" || selection === "reset-all") {
+    switchButtons("#pause", "#start");
+    resetRequested = true;
   }
   else if (selection === "options") {
     if (chrome.runtime.openOptionsPage) {
@@ -79,7 +84,7 @@ port.onMessage.addListener((message) => {
 
   // Tracker
   // Compute the number of cycles to display, which one is running, and which are complete
-  if (statusChanged) {
+  if (statusChanged || resetRequested) {
     console.log("Rebuilding the tracker ...")
     console.log(previousStatus);
     let cyclesNode = document.querySelector(".cycles");
@@ -97,6 +102,7 @@ port.onMessage.addListener((message) => {
     while (i <= message.totalCycles) {
       dotNode = document.createElement("span");
       dotNode.id = "cycle-" + i;
+      dotNode.setAttribute("title", "cycle " + i);
       dotNode.classList.add("dot");
       if (i === message.cycle) {
         if (message.status === "initial") {
@@ -121,6 +127,7 @@ port.onMessage.addListener((message) => {
       i++;
     }
     // document.querySelector(".cycles").innerHTML = html;
+    resetRequested = false;
   }
 });
 
