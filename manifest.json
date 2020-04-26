@@ -6,9 +6,10 @@
     "description": "Pomodoro-inspired timer extension for web browsers",
     "homepage_url": "https://github.com/diegoserranor/productive-cycles",
     "icons": {
-        "512": "icons/time-512.png",
+        "16": "icons/time-16.png",
+        "48": "icons/time-48.png",
         "128": "icons/time-128.png",
-        "48": "icons/time-48.png"
+        "512": "icons/time-512.png"
     },
 
     "browser_action": {
