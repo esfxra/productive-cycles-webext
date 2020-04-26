@@ -1,6 +1,17 @@
+@font-face {
+    font-family: robotoMono;
+    src: url(../fonts/RobotoMono-Regular.ttf);
+}
+
+@font-face {
+    font-family: robotoMono;
+    src: url(../fonts/RobotoMono-Bold.ttf);
+    font-weight: bold;
+}
+
 body, html {
     min-width: 80px;
-    font-family: "Lucida Console", Monaco, monospace;
+    font-family: robotoMono, monospace;
 }
 
 .popup-container {
@@ -27,10 +38,10 @@ body, html {
         min-height = font-size is used to add height
         before timer.js fills the value in #timer
     */
-    min-height: 1.25em; 
+    min-height: 20px; 
     margin-bottom: var(--margin-elements);
     text-align: center;
-    font-size: 1.25em;
+    font-size: 20px;
 }
 
 .hidden {
