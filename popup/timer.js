@@ -15,6 +15,13 @@ document.addEventListener("click", (e) => {
   else if (selection === "pause" || selection === "reset-cycle" || selection === "reset-all") {
     switchButtons("#pause", "#start")
   }
+  else if (selection === "options") {
+    if (chrome.runtime.openOptionsPage) {
+      chrome.runtime.openOptionsPage();
+    } else {
+      window.open(chrome.runtime.getURL('../options/options.html'));
+    }
+  }
 });
 
 // Register the UI has been loaded and let the background script know

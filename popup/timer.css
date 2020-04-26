@@ -4,9 +4,21 @@ body, html {
 }
 
 .popup-container {
-    --margin-elements: 7.5vh;
+    --margin-elements: 15px;
 
     padding: 2px;
+}
+
+.top {
+    width: 100%;
+    margin-bottom: var(--margin-elements);
+}
+
+#options {
+    max-width: 13px;
+    padding: 0 3.5px;
+    float: right;
+    cursor: pointer;
 }
 
 #time {
@@ -27,7 +39,6 @@ body, html {
 
 .control {
     width: 100%;
-    padding-bottom: var(--margin-elements);
     border-bottom: 2px dotted gray;
     display: flex;
     flex-direction: row;
@@ -36,6 +47,7 @@ body, html {
 
 .control img {
     max-width: 12.5px;
+    margin-bottom: var(--margin-elements);
     padding: 3.5px;
     border-radius: 3px;
     cursor: pointer;
