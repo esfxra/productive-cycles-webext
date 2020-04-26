@@ -22,6 +22,7 @@ body, html {
 
 .top {
     width: 100%;
+    height: 4px;
     margin-bottom: var(--margin-elements);
 }
 
@@ -92,7 +93,7 @@ body, html {
     /* margin-right: 2.5vw; */
     /* width: 12.5px; */
     border: 0.75px solid black;
-    border-radius: 100%;
+    border-radius: 50%;
     display: inline-block;
 }
 
