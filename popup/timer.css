@@ -57,9 +57,9 @@ body, html {
 }
 
 .control img {
-    max-width: 12.5px;
+    max-width: 13px;
     margin-bottom: var(--margin-elements);
-    padding: 3.5px;
+    padding: 4px;
     border-radius: 3px;
     cursor: pointer;
 }
