@@ -10,7 +10,7 @@
 }
 
 body, html {
-    min-width: 80px;
+    min-width: 100px;
     font-family: robotoMono, monospace;
 }
 
