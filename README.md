@@ -1,5 +1,5 @@
 # Productive Cycles
-Pomodoro-inspired timer extension for Firefox and Google Chrome 
+Pomodoro-inspired timer extension for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/productive-cycles/) and [Google Chrome](https://chrome.google.com/webstore/detail/productive-cycles/lhcaggipefcoefbijhmdehhloonnlobh)
 
 This [article](https://blog.trello.com/how-to-pomodoro-your-way-to-productivity) from the Trello blog explains it nicely
 
