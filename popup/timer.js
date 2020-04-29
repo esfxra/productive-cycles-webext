@@ -29,7 +29,7 @@ document.addEventListener("click", (e) => {
     //   window.open(chrome.runtime.getURL('../options/options.html'));
     // }
     restoreOptions();
-    
+
     let ui = document.querySelector(".timer-ui");
     ui.classList.add("hidden");
 
@@ -46,6 +46,7 @@ document.addEventListener("click", (e) => {
   }
   else if (selection === "save") {
     saveOptions();
+    resetRequested = true;
   }
 });
 
@@ -61,7 +62,10 @@ port.onMessage.addListener((message) => {
   // Check if there is a change in status
   // Note: case "pause" does not send updated "paused" status to timer.js until after UI is opened again
   // That is when preload command runs again
-  if (previousStatus !== message.status) { statusChanged = true; previousStatus = message.status; }
+  if (previousStatus !== message.status) { 
+    statusChanged = true;
+    previousStatus = message.status;
+  }
   else { statusChanged = false; }
 
   // Change the text in the #time element with the updated time coming from the background script
@@ -166,7 +170,7 @@ function saveOptions() {
   }, function () {
     // Update status to let user know options were saved.
     var status = document.getElementById('status');
-    status.textContent = 'saved :]';
+    status.textContent = 'saved 🎉';
     setTimeout(function () {
       status.textContent = '';
     }, 5000);

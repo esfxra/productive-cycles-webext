@@ -101,21 +101,29 @@ chrome.alarms.onAlarm.addListener(() => {
 });
 
 // Listen for changes in the options, report and reload
-chrome.storage.onChanged.addListener(function(changes, namespace) {
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+  let optionsChange = false;
   for (var key in changes) {
     var storageChange = changes[key];
     console.log('Storage key "%s" in namespace "%s" changed. ' +
-                'Old value was "%s", new value is "%s".',
-                key,
-                namespace,
-                storageChange.oldValue,
-                storageChange.newValue);
+      'Old value was "%s", new value is "%s".',
+      key,
+      namespace,
+      storageChange.oldValue,
+      storageChange.newValue);
+
+    if (key == "minutes") {
+      Timer.updateRemaining(storageChange.newValue * 60000, true);
+      optionsChange = true;
+    }
+    else if (key == "totalCycles") {
+      Timer.totalCycles = storageChange.newValue;
+      optionsChange = true;
+    }
   }
-  if (key === "minutes" || key === "totalCycles") {
-    Timer.updateRemaining(userMinutes, true);
+  if (optionsChange) {
     Timer.updateStatus("initial", true);
     Timer.updateCycle(1, true);
-    Timer.totalCycles = 4;
 
     chrome.alarms.clear(alarmID);
 
@@ -125,7 +133,9 @@ chrome.storage.onChanged.addListener(function(changes, namespace) {
       chrome.notifications.clear(notificationID + i);
       i++;
     }
-    chrome.runtime.reload();
+
+    messageUI();
+    // chrome.runtime.reload();
   }
 });
 
