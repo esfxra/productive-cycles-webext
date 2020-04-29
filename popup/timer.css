@@ -12,6 +12,8 @@
 body, html {
     min-width: 110px;
     font-family: robotoMono, monospace;
+    /* Firefox shows a scrolling bar ... */
+    overflow: hidden; 
 }
 
 .popup-container {
@@ -124,7 +126,7 @@ body, html {
 }
 
 .options-ui {
-    width: 150px;
+    width: 135px;
     font-size: 12px;
 }
 
@@ -176,6 +178,10 @@ p span {
 #back {
     max-width: 13px;
     /* padding: 0 3.5px; */
-    float: left;
+    float: right;
     cursor: pointer;
+}
+
+#status {
+    display: inline-block;
 }

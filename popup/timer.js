@@ -18,7 +18,7 @@ document.addEventListener("click", (e) => {
   else if (selection === "pause") {
     switchButtons("#pause", "#start");
   }
-  else if ( selection === "reset-cycle" || selection === "reset-all") {
+  else if (selection === "reset-cycle" || selection === "reset-all") {
     switchButtons("#pause", "#start");
     resetRequested = true;
   }
@@ -28,18 +28,24 @@ document.addEventListener("click", (e) => {
     // } else {
     //   window.open(chrome.runtime.getURL('../options/options.html'));
     // }
+    restoreOptions();
+    
     let ui = document.querySelector(".timer-ui");
     ui.classList.add("hidden");
 
     ui = document.querySelector(".options-ui");
     ui.classList.remove("hidden");
   }
+  // Options-related handlers
   else if (selection === "back") {
-    let ui = document.querySelector(".options-ui");
-    ui.classList.add("hidden");
-
-    ui = document.querySelector(".timer-ui");
-    ui.classList.remove("hidden");
+      let ui = document.querySelector(".options-ui");
+      ui.classList.add("hidden");
+  
+      ui = document.querySelector(".timer-ui");
+      ui.classList.remove("hidden");
+  }
+  else if (selection === "save") {
+    saveOptions();
   }
 });
 
@@ -149,4 +155,27 @@ function switchButtons(hide, show) {
 
   elt = document.querySelector(show);
   elt.classList.remove("hidden");
+}
+
+function saveOptions() {
+  var time = parseInt(document.getElementById('minutes').value);
+  var cycleNumber = parseInt(document.getElementById('cycles').value);
+  chrome.storage.local.set({
+    minutes: time,
+    totalCycles: cycleNumber
+  }, function () {
+    // Update status to let user know options were saved.
+    var status = document.getElementById('status');
+    status.textContent = 'saved :]';
+    setTimeout(function () {
+      status.textContent = '';
+    }, 5000);
+  });
+}
+
+function restoreOptions() {
+  chrome.storage.local.get(["minutes", "totalCycles"], function (items) {
+    document.getElementById('minutes').value = items.minutes;
+    document.getElementById('cycles').value = items.totalCycles;
+  });
 }
