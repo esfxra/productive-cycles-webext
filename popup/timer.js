@@ -18,16 +18,35 @@ document.addEventListener("click", (e) => {
   else if (selection === "pause") {
     switchButtons("#pause", "#start");
   }
-  else if ( selection === "reset-cycle" || selection === "reset-all") {
+  else if (selection === "reset-cycle" || selection === "reset-all") {
     switchButtons("#pause", "#start");
     resetRequested = true;
   }
   else if (selection === "options") {
-    if (chrome.runtime.openOptionsPage) {
-      chrome.runtime.openOptionsPage();
-    } else {
-      window.open(chrome.runtime.getURL('../options/options.html'));
-    }
+    // if (chrome.runtime.openOptionsPage) {
+    //   chrome.runtime.openOptionsPage();
+    // } else {
+    //   window.open(chrome.runtime.getURL('../options/options.html'));
+    // }
+    restoreOptions();
+
+    let ui = document.querySelector(".timer-ui");
+    ui.classList.add("hidden");
+
+    ui = document.querySelector(".options-ui");
+    ui.classList.remove("hidden");
+  }
+  // Options-related handlers
+  else if (selection === "back") {
+      let ui = document.querySelector(".options-ui");
+      ui.classList.add("hidden");
+  
+      ui = document.querySelector(".timer-ui");
+      ui.classList.remove("hidden");
+  }
+  else if (selection === "save") {
+    saveOptions();
+    resetRequested = true;
   }
 });
 
@@ -43,7 +62,10 @@ port.onMessage.addListener((message) => {
   // Check if there is a change in status
   // Note: case "pause" does not send updated "paused" status to timer.js until after UI is opened again
   // That is when preload command runs again
-  if (previousStatus !== message.status) { statusChanged = true; previousStatus = message.status; }
+  if (previousStatus !== message.status) { 
+    statusChanged = true;
+    previousStatus = message.status;
+  }
   else { statusChanged = false; }
 
   // Change the text in the #time element with the updated time coming from the background script
@@ -137,4 +159,27 @@ function switchButtons(hide, show) {
 
   elt = document.querySelector(show);
   elt.classList.remove("hidden");
+}
+
+function saveOptions() {
+  var time = parseInt(document.getElementById('minutes').value);
+  var cycleNumber = parseInt(document.getElementById('cycles').value);
+  chrome.storage.local.set({
+    minutes: time,
+    totalCycles: cycleNumber
+  }, function () {
+    // Update status to let user know options were saved.
+    var status = document.getElementById('status');
+    status.textContent = 'saved 🎉';
+    setTimeout(function () {
+      status.textContent = '';
+    }, 5000);
+  });
+}
+
+function restoreOptions() {
+  chrome.storage.local.get(["minutes", "totalCycles"], function (items) {
+    document.getElementById('minutes').value = items.minutes;
+    document.getElementById('cycles').value = items.totalCycles;
+  });
 }
