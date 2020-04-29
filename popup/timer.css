@@ -117,3 +117,65 @@ body, html {
     75% { opacity: 0.6; }
     100% { opacity: 1; }
 }
+
+/* Experimental - Main UI and Options UI in the same Popup */
+.timer-ui {
+
+}
+
+.options-ui {
+    width: 150px;
+    font-size: 12px;
+}
+
+.options-ui h1 {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+button {
+    width: max-content;
+    display: inline-block;
+    font-family: inherit;
+    vertical-align: middle;
+    cursor: pointer;
+    border-radius: 5px;
+    border: 0;
+    color: white;
+    background-color: black;
+    padding: 2.5px 8px;
+    vertical-align: middle;
+}
+
+label {
+    padding: 4px 0;
+}
+
+input[type=number] {
+    width: 30%;
+    padding: 4px;
+    border: 0;
+    border-bottom: 1px solid rgb(209, 209, 209);
+    background-color: #F2F2F2;
+}
+
+p {
+    color: gray;
+    margin-bottom: 7.5vh;
+}
+
+p span {
+    font-weight: bold;
+}
+
+.option {
+    display: block;
+    margin-bottom: 7.5vh;
+}
+
+#back {
+    max-width: 13px;
+    /* padding: 0 3.5px; */
+    float: left;
+    cursor: pointer;
+}

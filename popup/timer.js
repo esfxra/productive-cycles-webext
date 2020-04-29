@@ -23,11 +23,23 @@ document.addEventListener("click", (e) => {
     resetRequested = true;
   }
   else if (selection === "options") {
-    if (chrome.runtime.openOptionsPage) {
-      chrome.runtime.openOptionsPage();
-    } else {
-      window.open(chrome.runtime.getURL('../options/options.html'));
-    }
+    // if (chrome.runtime.openOptionsPage) {
+    //   chrome.runtime.openOptionsPage();
+    // } else {
+    //   window.open(chrome.runtime.getURL('../options/options.html'));
+    // }
+    let ui = document.querySelector(".timer-ui");
+    ui.classList.add("hidden");
+
+    ui = document.querySelector(".options-ui");
+    ui.classList.remove("hidden");
+  }
+  else if (selection === "back") {
+    let ui = document.querySelector(".options-ui");
+    ui.classList.add("hidden");
+
+    ui = document.querySelector(".timer-ui");
+    ui.classList.remove("hidden");
   }
 });
 

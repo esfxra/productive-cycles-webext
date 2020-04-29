@@ -1,16 +1,22 @@
 <!DOCTYPE html>
 
 <html>
-    <head>
-        <meta charset="utf-8">
-        <link rel="stylesheet" href="timer.css">
-    </head>
-    <body>
-        <div class="popup-container">
+
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="timer.css">
+    <link rel="stylesheet" href="options/options.css">
+</head>
+
+<body>
+    <div class="popup-container">
+        <div class="timer-ui hidden">
             <div class="top">
                 <img id="options" alt="options icon" title="options" src="../icons/options-512.png" />
             </div>
-            <div id="time"></div>
+            <div id="time">
+                <!-- Figure out a way to diminish flicker when time is loaded -->
+            </div>
             <div class="control">
                 <img id="start" alt="start" title="start" src="../icons/start-white-512.png" />
                 <img id="pause" alt="pause" title="pause" class="hidden" src="../icons/pause-white-512.png" />
@@ -20,6 +26,29 @@
             <div class="cycles">
             </div>
         </div>
-        <script src="timer.js"></script>
-    </body>
+        <!-- Experimental: options -->
+        <div class="options-ui">
+            <div class="top">
+                <img id="back" alt="back icon" title="back" src="../icons/back-512.png" />
+            </div>
+            <h1>options</h1>
+            <p><span>note:</span> any changes will reset the timer</p>
+            <div class="option">
+                <label for="minutes">minutes:</label>
+                <input type="number" id="minutes" name="minutes" min="1" max="60">
+            </div>
+
+            <div class="option">
+                <label for="cycles">cycles:</label>
+                <input type="number" id="cycles" name="cycles" min="1" max="8">
+            </div>
+
+            <div id="status"></div>
+            <button id="save">save</button>
+        </div>
+    </div>
+    <script src="timer.js"></script>
+    <script src="options/options.js"></script>
+</body>
+
 </html>
