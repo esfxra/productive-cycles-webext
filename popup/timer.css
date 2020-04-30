@@ -18,7 +18,7 @@ body, html {
 }
 
 .popup-container {
-    --margin-elements: 15px;
+    --margin-elements: 14px;
 
     padding: 5px;
     transition: width 0.1s;
@@ -85,12 +85,9 @@ body, html {
     display: grid;
     grid-template-columns: auto auto auto auto;
     grid-auto-flow: row;
-    grid-auto-rows: 11vw;
-    gap: 11vw;
+    grid-auto-rows: 14px;
+    gap: 14px;
     justify-content: space-evenly;
-    transition: none !important;
-    transition-property: none !important;
-    animation: none !important;
 }
 
 .dot {
@@ -162,7 +159,7 @@ input[type=number] {
 
 p {
     color: gray;
-    margin-bottom: 7.5vh;
+    margin-bottom: 14px;
 }
 
 p span {
@@ -172,7 +169,7 @@ p span {
 .option {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    margin-bottom: 7.5vh;
+    margin-bottom: 14px;
 }
 
 #back {
@@ -183,6 +180,6 @@ p span {
 }
 
 #status {
-    display: inline-block;
+    /* display: inline-block; */
     float: right;
 }
