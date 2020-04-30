@@ -134,8 +134,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
       i++;
     }
 
-    messageUI();
-    // chrome.runtime.reload();
+    if (popUpOpen) {
+      messageUI();
+    }
   }
 });
 
