@@ -170,24 +170,24 @@ function switchButtons(hide, show) {
 }
 
 function saveOptions() {
-  var time = parseInt(document.getElementById('minutes').value);
-  var cycleNumber = parseInt(document.getElementById('cycles').value);
+  var time = parseInt(document.querySelector("#minutes").value);
+  var cycleNumber = parseInt(document.querySelector("#cycles").value);
   chrome.storage.local.set({
     minutes: time,
     totalCycles: cycleNumber
   }, function () {
     // Update status to let user know options were saved.
-    var status = document.getElementById('status');
-    status.textContent = 'saved 🎉';
+    var status = document.querySelector("#status");
+    status.textContent = "saved 🎉";
     setTimeout(function () {
-      status.textContent = '';
+      status.textContent = "";
     }, 5000);
   });
 }
 
 function restoreOptions() {
   chrome.storage.local.get(["minutes", "totalCycles"], function (items) {
-    document.getElementById('minutes').value = items.minutes;
-    document.getElementById('cycles').value = items.totalCycles;
+    document.querySelector("#minutes").value = items.minutes;
+    document.querySelector("#cycles").value = items.totalCycles;
   });
 }
