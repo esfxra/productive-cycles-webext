@@ -112,16 +112,18 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
       storageChange.oldValue,
       storageChange.newValue);
 
-    if (key == "minutes") {
-      Timer.updateRemaining(storageChange.newValue * 60000, true);
+    if (key === "minutes") {
+      userMinutes = storageChange.newValue * 60000;
       optionsChange = true;
-    }
-    else if (key == "totalCycles") {
-      Timer.totalCycles = storageChange.newValue;
+    } 
+    else if (key === "totalCycles") {
+      userCycles = storageChange.newValue;
       optionsChange = true;
     }
   }
   if (optionsChange) {
+    Timer.updateRemaining(userMinutes, true);
+    Timer.totalCycles = userCycles;
     Timer.updateStatus("initial", true);
     Timer.updateCycle(1, true);
 
