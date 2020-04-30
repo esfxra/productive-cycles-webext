@@ -118,9 +118,7 @@ body, html {
 
 @keyframes runningCycle {
     0% { opacity: 1; }
-    25% { opacity: 0.6; }
-    50% { opacity: 0.3; }
-    75% { opacity: 0.6; }
+    50% { opacity: 0.5; }
     100% { opacity: 1; }
 }
 
