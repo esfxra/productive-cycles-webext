@@ -14,24 +14,21 @@ body, html {
     font-family: robotoMono, monospace;
     /* Firefox shows a scrolling bar ... */
     overflow: hidden; 
+    transition: width 0.1s;
 }
-
-/* Smooth out main UI to options UI animation and viceversa */
-.resize-animation-stopper * {
-    animation: none !important;
-    transition: none !important;
-  }
 
 .popup-container {
     --margin-elements: 15px;
 
     padding: 5px;
+    transition: width 0.1s;
 }
 
 /* Main UI */
-/* .timer-ui {
-    width: 135px;
-} */
+.timer-ui {
+    /* width: 135px; */
+    transition: width 0.1s;
+} 
 
 .top {
     width: 100%;
@@ -82,7 +79,7 @@ body, html {
 }
 
 .cycles {
-    min-height: 11.5vw;
+    min-height: 14px;
     margin-top: var(--margin-elements);
     /* Grid related: */
     display: grid;
@@ -91,11 +88,14 @@ body, html {
     grid-auto-rows: 11vw;
     gap: 11vw;
     justify-content: space-evenly;
+    transition: none !important;
+    transition-property: none !important;
+    animation: none !important;
 }
 
 .dot {
-    width: 11vw;
-    height: 11vw;
+    width: 14px;
+    height: 14px;
     border: 0.75px solid black;
     border-radius: 50%;
     display: inline-block;
