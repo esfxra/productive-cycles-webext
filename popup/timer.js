@@ -55,30 +55,6 @@ window.addEventListener("DOMContentLoaded", (event) => {
   port.postMessage({ command: "preload" });
 });
 
-// // Stop all animations when the dimensions of body change
-// // From CSS Tricks (css-tricks.com), but modified to handle Firefox 
-// let resizeTimer;
-// let previousWidth = null;
-// let previousHeight = null;
-// window.addEventListener("resize", () => {
-//   let width = window.innerWidth;
-//   let height = window.innerHeight;
-//   // console.log("resize ...", "width:", width, "height:", height);
-//   // This check is necessary for Firefox
-//   if (width !== previousWidth || height !== previousHeight) {
-//     console.log("resize ...", "width:", width, "height:", height);
-//     // console.log("pausing animation");
-//     document.body.classList.add("resize-animation-stopper");
-//     previousWidth = width;
-//     previousHeight = height;
-//     clearTimeout(resizeTimer);
-//     resizeTimer = setTimeout(() => {
-//       // console.log("resuming animation");
-//       document.body.classList.remove("resize-animation-stopper");
-//     }, 400);
-//   }
-// });
-
 // Make UI changes based on Timer details messaged by the background script
 port.onMessage.addListener((message) => {
   console.log(message);
