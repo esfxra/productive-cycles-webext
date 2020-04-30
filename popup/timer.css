@@ -16,6 +16,12 @@ body, html {
     overflow: hidden; 
 }
 
+/* Smooth out main UI to options UI animation and viceversa */
+.resize-animation-stopper * {
+    animation: none !important;
+    transition: none !important;
+  }
+
 .popup-container {
     --margin-elements: 15px;
 

@@ -55,6 +55,17 @@ window.addEventListener("DOMContentLoaded", (event) => {
   port.postMessage({ command: "preload" });
 });
 
+// Stop all animations when the dimensions of body change
+// From CSS Tricks (css-tricks.com)
+window.addEventListener("resize", () => {
+  let resizeTimer = null;
+  document.body.classList.add("resize-animation-stopper");
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    document.body.classList.remove("resize-animation-stopper");
+  }, 400);
+});
+
 // Make UI changes based on Timer details messaged by the background script
 port.onMessage.addListener((message) => {
   console.log(message);
