@@ -12,8 +12,6 @@
 body, html {
     min-width: 110px;
     font-family: robotoMono, monospace;
-    /* Firefox shows a scrolling bar ... */
-    overflow: hidden; 
 }
 
 .popup-container {
