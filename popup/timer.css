@@ -12,21 +12,15 @@
 body, html {
     min-width: 110px;
     font-family: robotoMono, monospace;
-    /* Firefox shows a scrolling bar ... */
-    overflow: hidden; 
 }
 
 .popup-container {
-    --margin-elements: 15px;
+    --margin-elements: 14px;
 
     padding: 5px;
 }
 
 /* Main UI */
-.timer-ui {
-    /* width: 135px; */
-}
-
 .top {
     width: 100%;
     height: 8px;
@@ -41,16 +35,10 @@ body, html {
 }
 
 #time {
-    /*
-    experimental:
-        min-height = font-size is used to add height
-        before timer.js fills the value in #timer
-    */
-    min-height: 20px; 
+    min-height: 25px; 
     margin-bottom: var(--margin-elements);
     text-align: center;
     font-size: 20px;
-    /* font-size: 24px; */
 }
 
 .hidden {
@@ -67,10 +55,8 @@ body, html {
 
 .control img {
     max-width: 13px;
-    /* max-width: 15px; */
     margin-bottom: var(--margin-elements);
     padding: 4px;
-    /* padding: 5px; */
     border-radius: 3px;
     cursor: pointer;
 }
@@ -84,28 +70,25 @@ body, html {
 }
 
 .cycles {
-        /*
-    experimental:
-        min-height = font-size is used to add height
-        before timer.js fills the value in #timer
-    */
-    min-height: 11.5vw;
-    margin-top: var(--margin-elements);;
+    min-height: 14px;
+    margin-top: var(--margin-elements);
+    /* grid related: */
     display: grid;
     grid-template-columns: auto auto auto auto;
-    grid-gap: 10vw;
-    /* grid-gap: 12vw; */
-    /* padding: 10px; */
+    grid-auto-flow: row;
+    grid-auto-rows: 14px;
+    gap: 14px;
+    justify-content: space-evenly;
 }
 
 .dot {
-    width: 11vw;
-    height: 11vw;
-    /* width: 15px;
-    height: 15px; */
+    width: 14px;
+    height: 14px;
     border: 0.75px solid black;
     border-radius: 50%;
     display: inline-block;
+    /* grid related: */
+    justify-self: center;
 }
 
 .complete {
@@ -123,14 +106,11 @@ body, html {
 
 @keyframes runningCycle {
     0% { opacity: 1; }
-    25% { opacity: 0.6; }
-    50% { opacity: 0.3; }
-    75% { opacity: 0.6; }
+    50% { opacity: 0.5; }
     100% { opacity: 1; }
 }
 
 /* Options UI */
-
 .options-ui {
     width: 135px;
     font-size: 12px;
@@ -160,7 +140,8 @@ label {
 }
 
 input[type=number] {
-    width: 30%;
+    font-family: robotoMono;
+    width: 50%;
     padding: 4px;
     border: 0;
     border-bottom: 1px solid rgb(209, 209, 209);
@@ -169,7 +150,7 @@ input[type=number] {
 
 p {
     color: gray;
-    margin-bottom: 7.5vh;
+    margin-bottom: 14px;
 }
 
 p span {
@@ -177,18 +158,17 @@ p span {
 }
 
 .option {
-    display: block;
-    margin-bottom: 7.5vh;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin-bottom: 14px;
 }
 
 #back {
     max-width: 13px;
-    /* padding: 0 3.5px; */
     float: right;
     cursor: pointer;
 }
 
 #status {
-    display: inline-block;
     float: right;
 }

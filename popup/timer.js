@@ -118,6 +118,14 @@ port.onMessage.addListener((message) => {
       node = cyclesNode.lastElementChild;
     }
 
+    // Adjust CSS for < 4 cycles
+    if (message.totalCycles < 4) {
+      cyclesNode.style.gridTemplateColumns = "repeat(" + message.totalCycles + ", auto)";
+    }
+    else {
+      cyclesNode.style.gridTemplateColumns = "repeat(4, auto)";
+    }
+
     // Build cyclesNode
     let dotNode = null;
     let i = 1;
