@@ -90,22 +90,24 @@ body, html {
         before timer.js fills the value in #timer
     */
     min-height: 11.5vw;
-    margin-top: var(--margin-elements);;
+    margin-top: var(--margin-elements);
+    /* Grid related: */
     display: grid;
     grid-template-columns: auto auto auto auto;
-    grid-gap: 10vw;
-    /* grid-gap: 12vw; */
-    /* padding: 10px; */
+    grid-auto-flow: row;
+    grid-auto-rows: 11vw;
+    gap: 11vw;
+    justify-content: space-evenly;
 }
 
 .dot {
     width: 11vw;
     height: 11vw;
-    /* width: 15px;
-    height: 15px; */
     border: 0.75px solid black;
     border-radius: 50%;
     display: inline-block;
+    /* grid related: */
+    justify-self: center;
 }
 
 .complete {
@@ -160,6 +162,7 @@ label {
 }
 
 input[type=number] {
+    font-family: robotoMono;
     width: 30%;
     padding: 4px;
     border: 0;
