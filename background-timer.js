@@ -122,6 +122,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
   }
   if (optionsChange) {
+    clearInterval(uiUpdater);
     Timer.updateRemaining(userMinutes, true);
     Timer.totalCycles = userCycles;
     Timer.updateStatus("initial", true);
