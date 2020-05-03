@@ -19,8 +19,7 @@
     },
 
     "background": {
-        "scripts": ["background-timer.js"],
-        "persistent": false
+        "scripts": ["background-timer.js"]
     },
 
     "permissions": [
