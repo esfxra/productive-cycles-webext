@@ -14,15 +14,12 @@ document.addEventListener("click", (e) => {
   // Switch buttons based on input
   if (selection === "start") {
     switchButtons("#start", "#pause");
-  }
-  else if (selection === "pause") {
+  } else if (selection === "pause") {
     switchButtons("#pause", "#start");
-  }
-  else if (selection === "reset-cycle" || selection === "reset-all") {
+  } else if (selection === "reset-cycle" || selection === "reset-all") {
     switchButtons("#pause", "#start");
     resetRequested = true;
-  }
-  else if (selection === "options") {
+  } else if (selection === "options") {
     // if (chrome.runtime.openOptionsPage) {
     //   chrome.runtime.openOptionsPage();
     // } else {
@@ -38,13 +35,12 @@ document.addEventListener("click", (e) => {
   }
   // Options-related handlers
   else if (selection === "back") {
-      let ui = document.querySelector(".options-ui");
-      ui.classList.add("hidden");
-  
-      ui = document.querySelector(".timer-ui");
-      ui.classList.remove("hidden");
-  }
-  else if (selection === "save") {
+    let ui = document.querySelector(".options-ui");
+    ui.classList.add("hidden");
+
+    ui = document.querySelector(".timer-ui");
+    ui.classList.remove("hidden");
+  } else if (selection === "save") {
     saveOptions();
     resetRequested = true;
   }
@@ -62,11 +58,12 @@ port.onMessage.addListener((message) => {
   // Check if there is a change in status
   // Note: case "pause" does not send updated "paused" status to timer.js until after UI is opened again
   // That is when preload command runs again
-  if (previousStatus !== message.status) { 
+  if (previousStatus !== message.status) {
     statusChanged = true;
     previousStatus = message.status;
+  } else {
+    statusChanged = false;
   }
-  else { statusChanged = false; }
 
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector("#time").textContent = message.time;
@@ -74,24 +71,22 @@ port.onMessage.addListener((message) => {
   // Check if the timer is complete, and change time text to "complete"
   // if (message.status === "complete" || message.cycle > message.totalCycles) {
   if (message.status === "complete") {
-
     document.querySelector("#time").textContent = "complete";
 
     // Hide "start" and "pause"
     let elt = document.querySelector("#pause");
     if (!elt.classList.contains("hidden")) {
-      elt.classList.add("hidden")
+      elt.classList.add("hidden");
     }
 
     elt = document.querySelector("#start");
     if (!elt.classList.contains("hidden")) {
-      elt.classList.add("hidden")
+      elt.classList.add("hidden");
     }
 
     // Change CSS justify-content to space-around for .control
     document.querySelector(".control").style.justifyContent = "space-around";
-  }
-  else {
+  } else {
     // Change CSS justify-content to space-around for .control
     document.querySelector(".control").style.justifyContent = "space-between";
   }
@@ -99,15 +94,14 @@ port.onMessage.addListener((message) => {
   // Switch buttons based on status of the Timer
   if (message.status === "initial" || message.status === "paused") {
     switchButtons("#pause", "#start");
-  }
-  else if (message.status === "running") {
+  } else if (message.status === "running") {
     switchButtons("#start", "#pause");
   }
 
   // Tracker
   // Compute the number of cycles to display, which one is running, and which are complete
   if (statusChanged || resetRequested) {
-    console.log("Rebuilding the tracker ...")
+    console.log("Rebuilding the tracker ...");
     console.log(previousStatus);
     let cyclesNode = document.querySelector(".cycles");
 
@@ -120,9 +114,9 @@ port.onMessage.addListener((message) => {
 
     // Adjust CSS for < 4 cycles
     if (message.totalCycles < 4) {
-      cyclesNode.style.gridTemplateColumns = "repeat(" + message.totalCycles + ", auto)";
-    }
-    else {
+      cyclesNode.style.gridTemplateColumns =
+        "repeat(" + message.totalCycles + ", auto)";
+    } else {
       cyclesNode.style.gridTemplateColumns = "repeat(4, auto)";
     }
 
@@ -138,17 +132,17 @@ port.onMessage.addListener((message) => {
         if (message.status === "initial") {
           dotNode.classList.add("pending");
           // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
-        }
-        else if (message.status === "running" || message.status === "paused") {
+        } else if (
+          message.status === "running" ||
+          message.status === "paused"
+        ) {
           dotNode.classList.add("running");
           // html += '<span id="cycle-' + i + '" class="dot running"></span>';
         }
-      }
-      else if (i < message.cycle) {
+      } else if (i < message.cycle) {
         dotNode.classList.add("complete");
         // html += '<span id="cycle-' + i + '" class="dot complete"></span>';
-      }
-      else {
+      } else {
         // This should affect all cycles that are past the current (i.e. i > message.cycle)
         dotNode.classList.add("pending");
         // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
@@ -172,22 +166,31 @@ function switchButtons(hide, show) {
 function saveOptions() {
   var time = parseInt(document.querySelector("#minutes").value);
   var cycleNumber = parseInt(document.querySelector("#cycles").value);
-  chrome.storage.local.set({
-    minutes: time,
-    totalCycles: cycleNumber
-  }, function () {
-    // Update status to let user know options were saved.
-    var status = document.querySelector("#status");
-    status.textContent = "saved 🎉";
-    setTimeout(function () {
-      status.textContent = "";
-    }, 5000);
-  });
+  chrome.storage.local.set(
+    {
+      minutes: time,
+      totalCycles: cycleNumber,
+    },
+    function () {
+      // Update status to let user know options were saved.
+      var status = document.querySelector("#status");
+      status.textContent = "saved 🎉";
+      setTimeout(function () {
+        status.textContent = "";
+      }, 5000);
+    }
+  );
 }
 
 function restoreOptions() {
-  chrome.storage.local.get(["minutes", "totalCycles"], function (items) {
-    document.querySelector("#minutes").value = items.minutes;
-    document.querySelector("#cycles").value = items.totalCycles;
-  });
+  chrome.storage.local.get(
+    {
+      minutes: 25,
+      totalCycles: 4,
+    },
+    function (items) {
+      document.querySelector("#minutes").value = items.minutes;
+      document.querySelector("#cycles").value = items.totalCycles;
+    }
+  );
 }
