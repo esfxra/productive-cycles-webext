@@ -6,6 +6,7 @@ var uiUpdater = null;
 var cycleTimer = null;
 var breakTimer = null;
 var popUpOpen = false;
+var autoStartEnabled = true;
 
 // Defaults
 const defaultTime = 25 * 60000;
@@ -231,6 +232,10 @@ function completeCycle() {
   console.log(
     `Cycle completed: ${Timer.cycle}, Total cycles: ${Timer.totalCycles}`
   );
+  // if (popUpOpen) {
+  // }
+  // Clear the interval
+  clearInterval(uiUpdater);
   if (Timer.cycle === Timer.totalCycles) {
     notify("timer-complete");
     Timer.status = "complete";
@@ -238,16 +243,14 @@ function completeCycle() {
     notify("cycle-complete");
     Timer.status = "initial";
     Timer.remaining = userMinutes;
+    // Start the break timer
+    if (autoStartEnabled) {
+      breakTimer = setTimeout(autoStart, Timer.break);
+    }
   }
-  // if (popUpOpen) {
-  // }
-  // Clear the interval
-  clearInterval(uiUpdater);
   // Increment the cycle counter
   Timer.cycle = Timer.cycle + 1;
   messageUI();
-  // Start the break timer
-  breakTimer = setTimeout(autoStart, Timer.break);
 }
 
 function autoStart() {
@@ -293,7 +296,7 @@ function notify(type) {
       break;
     case "autostart":
       title = `cycle ${Timer.cycle} starting`;
-      message = "time to grind my friend";
+      message = "time to grind, friend";
       break;
   }
 
