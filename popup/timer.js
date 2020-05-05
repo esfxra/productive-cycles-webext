@@ -165,11 +165,15 @@ function switchButtons(hide, show) {
 
 function saveOptions() {
   var time = parseInt(document.querySelector("#minutes").value);
+  var breakTime = parseInt(document.querySelector("#break").value);
   var cycleNumber = parseInt(document.querySelector("#cycles").value);
+  var autoStartBox = document.querySelector("#auto-start").checked;
   chrome.storage.local.set(
     {
       minutes: time,
+      break: breakTime,
       totalCycles: cycleNumber,
+      autoStart: autoStartBox,
     },
     function () {
       // Update status to let user know options were saved.
@@ -186,11 +190,15 @@ function restoreOptions() {
   chrome.storage.local.get(
     {
       minutes: 25,
+      break: 5,
       totalCycles: 4,
+      autoStart: true,
     },
     function (items) {
       document.querySelector("#minutes").value = items.minutes;
+      document.querySelector("#break").value = items.break;
       document.querySelector("#cycles").value = items.totalCycles;
+      document.querySelector("#auto-start").checked = items.autoStart;
     }
   );
 }

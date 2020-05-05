@@ -4,16 +4,21 @@
 var port = null;
 var uiUpdater = null;
 var cycleTimer = null;
+var breakTimer = null;
 var popUpOpen = false;
 
 // Defaults
 const defaultTime = 25 * 60000;
+const defaultBreak = 5 * 60000;
 const defaultCycles = 4;
+var defaultAutoStart = true;
 const notificationID = "cycle-complete-notification";
 
 // Default overrides
 let userMinutes = null;
+let userBreak = null;
 let userCycles = null;
+let userAutoStart = null;
 
 // Listen for "install" or "update" event
 chrome.runtime.onInstalled.addListener((details) => {
@@ -21,12 +26,8 @@ chrome.runtime.onInstalled.addListener((details) => {
     console.log("Extension installed");
   } else if (details.reason === "update") {
     // Future release: Open new tab with changes for this version
-    let i = 1;
-    while (i <= Timer.totalCycles) {
-      chrome.notifications.clear(notificationID + i);
-      i++;
-    }
-    console.log("Extension updated or reloaded - all notifications cleared");
+    console.log("Extension updated or reloaded");
+    clearAllNotifications(true);
   }
 });
 
@@ -61,24 +62,29 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (key === "minutes") {
       userMinutes = storageChange.newValue * 60000;
       optionsChange = true;
+    } else if (key === "break") {
+      userBreak = storageChange.newValue * 60000;
+      optionsChange = true;
     } else if (key === "totalCycles") {
       userCycles = storageChange.newValue;
+      optionsChange = true;
+    } else if (key === "autoStart") {
+      userAutoStart = storageChange.newValue;
       optionsChange = true;
     }
   }
   if (optionsChange) {
     clearInterval(uiUpdater);
     clearTimeout(cycleTimer);
+    clearTimeout(breakTimer);
+    clearAllNotifications(true);
     Timer.remaining = userMinutes;
+    Timer.break = userBreak;
     Timer.totalCycles = userCycles;
+    Timer.autoStart = userAutoStart;
     Timer.status = "initial";
     Timer.cycle = 1;
-    // Clear all notifications
-    let i = 1;
-    while (i <= Timer.totalCycles) {
-      chrome.notifications.clear(notificationID + i);
-      i++;
-    }
+
     // Message PopUp to update timer UI with new changes
     messageUI();
   }
@@ -88,8 +94,10 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 var Timer = {
   target: null,
   remaining: null, // Time remaining
+  break: null,
   cycle: 1,
   totalCycles: null, // Will replace with a number read from file / storage / etc
+  autoStart: null,
   status: "initial",
   remainingStr: function () {
     // Use a time library for better ms-to-minutes-seconds in the future
@@ -125,9 +133,11 @@ var Timer = {
 };
 
 // Will run in init
-chrome.storage.local.get(["minutes", "totalCycles"], function (result) {
+chrome.storage.local.get(["minutes", "totalCycles", "break"], function (
+  result
+) {
   console.log(
-    `Init - minutes: ${result.minutes}, cycles: ${result.totalCycles}`
+    `Init - minutes: ${result.minutes}, cycles: ${result.totalCycles}, break: ${result.break}`
   );
 
   if (result.minutes === undefined) {
@@ -135,29 +145,44 @@ chrome.storage.local.get(["minutes", "totalCycles"], function (result) {
   } else {
     userMinutes = result.minutes * 60000;
   }
+  if (result.break === undefined) {
+    userBreak = defaultBreak;
+  } else {
+    userBreak = result.break * 60000;
+  }
   if (result.totalCycles === undefined) {
     userCycles = defaultCycles;
   } else {
     userCycles = result.totalCycles;
   }
+  if (result.autoStart === undefined) {
+    userAutoStart = defaultAutoStart;
+  } else {
+    userAutoStart = result.autoStart;
+  }
 
   Timer.remaining = userMinutes;
+  Timer.break = userBreak;
   Timer.totalCycles = userCycles;
+  Timer.autoStart = userAutoStart;
 });
 
 function handleInput(message) {
   console.log("Command:", message.command, "Status:", Timer.status);
   switch (message.command) {
     case "start":
+      clearTimeout(breakTimer); // In case a user wants to start before userBreak
       if (Timer.status === "initial") {
         Timer.remaining = userMinutes;
       }
       Timer.target = Timer.remaining + Date.now();
       Timer.status = "running";
       cycleTimer = setTimeout(completeCycle, Timer.remaining);
-      console.log("completeCycle will run in:", Timer.remainingStr());
-      uiUpdater = setInterval(updateUI, 1000);
-      console.log("running updateUI");
+      console.log("completeCycle() will run in:", Timer.remainingStr());
+      if (popUpOpen) {
+        uiUpdater = setInterval(updateUI, 1000);
+        console.log("running updateUI");
+      }
       break;
     case "pause":
       clearInterval(uiUpdater);
@@ -167,13 +192,14 @@ function handleInput(message) {
     case "reset-cycle":
       clearInterval(uiUpdater);
       clearTimeout(cycleTimer);
+      clearTimeout(breakTimer);
       // Go back to the previous cycle and clear relevant notification
       if (
         Timer.status === "complete" ||
         (Timer.status === "initial" && Timer.cycle > 1)
       ) {
         Timer.cycle = Timer.cycle - 1;
-        chrome.notifications.clear(notificationID + Timer.cycle);
+        clearAllNotifications(false); // false = clear notifications for current cycle only
       }
       Timer.remaining = userMinutes;
       Timer.status = "initial";
@@ -182,12 +208,8 @@ function handleInput(message) {
     case "reset-all":
       clearInterval(uiUpdater);
       clearTimeout(cycleTimer);
-      // Clear all notifications
-      let i = 1;
-      while (i <= Timer.totalCycles) {
-        chrome.notifications.clear(notificationID + i);
-        i++;
-      }
+      clearTimeout(breakTimer);
+      clearAllNotifications(true);
       Timer.remaining = userMinutes;
       Timer.status = "initial";
       Timer.cycle = 1;
@@ -209,21 +231,35 @@ function completeCycle() {
   console.log(
     `Cycle completed: ${Timer.cycle}, Total cycles: ${Timer.totalCycles}`
   );
-  if (Timer.cycle === Timer.totalCycles) {
-    notify(Timer.cycle, true);
-    Timer.status = "complete";
-  } else if (Timer.cycle < Timer.totalCycles) {
-    notify(Timer.cycle, false);
-    Timer.status = "initial";
-    Timer.remaining = userMinutes;
-  }
   // if (popUpOpen) {
   // }
   // Clear the interval
   clearInterval(uiUpdater);
+  if (Timer.cycle === Timer.totalCycles) {
+    notify("timer-complete");
+    Timer.status = "complete";
+  } else if (Timer.cycle < Timer.totalCycles) {
+    notify("cycle-complete");
+    Timer.status = "initial";
+    Timer.remaining = userMinutes;
+    // Start the break timer
+    breakTimer = setTimeout(completeBreak, Timer.break);
+    console.log("completeBreak() will run in:", Timer.break);
+  }
   // Increment the cycle counter
   Timer.cycle = Timer.cycle + 1;
   messageUI();
+}
+
+function completeBreak() {
+  if (Timer.autoStart) {
+    console.log("auto-start enabled - next cycle is starting ...");
+    notify("autostart");
+    handleInput({ command: "start" });
+  } else {
+    console.log("auto-start disabled - notifying break is over");
+    notify("break-complete");
+  }
 }
 
 function updateUI() {
@@ -247,18 +283,56 @@ function messageUI() {
   }
 }
 
-function notify(cycle, complete) {
+function notify(type) {
+  let id = notificationID;
+  let title = "";
   let message = "";
-  if (complete) {
-    message = "take a long break :)";
-  } else {
-    message = "great job. everyone, take 5";
+  switch (type) {
+    case "cycle-complete":
+      id = `${id}-${Timer.cycle}`;
+      title = `cycle ${Timer.cycle} complete!`;
+      message = `great job. everyone, take ${Timer.break / 60000}`;
+      break;
+    case "timer-complete":
+      id = `${id}-${Timer.cycle}`;
+      title = "all cycles complete!";
+      message = "take a long break :)";
+      break;
+    case "autostart":
+      id = `${id}-${Timer.cycle}-break`;
+      title = `cycle ${Timer.cycle} starting`;
+      message = "time to grind, friend";
+      break;
+    case "break-complete":
+      id = `${id}-${Timer.cycle}-break`;
+      title = `don't forget to start cycle ${Timer.cycle}`;
+      message = "time to grind, friend";
+      break;
   }
 
-  chrome.notifications.create(notificationID + cycle, {
+  chrome.notifications.create(id, {
     type: "basic",
     iconUrl: chrome.runtime.getURL("icons/time-512.png"),
-    title: "cycle " + cycle + " complete!",
+    title: title,
     message: message,
   });
+}
+
+function clearAllNotifications(clearAll) {
+  let id = null;
+  if (clearAll) {
+    let i = 1;
+    while (i <= Timer.totalCycles) {
+      id = `${notificationID}-${i}`;
+      chrome.notifications.clear(id);
+      chrome.notifications.clear(id + "-break");
+      i++;
+    }
+    console.log("All notifications cleared");
+  } else {
+    id = `${notificationID}-${Timer.cycle}`;
+    chrome.notifications.clear(id);
+    chrome.notifications.clear(id + "-break");
+    console.log(`Cycle ${Timer.cycle} notifications cleared`);
+  }
 }
