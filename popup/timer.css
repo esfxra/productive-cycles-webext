@@ -42,6 +42,10 @@ html {
   font-size: 20px;
 }
 
+.break {
+  animation: runningCycle 2s infinite;
+}
+
 .hidden {
   display: none;
 }
@@ -136,6 +140,7 @@ h1 {
 
 button {
   width: max-content;
+  height: fit-content;
   display: inline-block;
   font-family: inherit;
   cursor: pointer;

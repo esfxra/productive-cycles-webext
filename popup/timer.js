@@ -5,44 +5,61 @@ var port = chrome.runtime.connect({ name: "port-from-popup" });
 var statusChanged = false;
 var previousStatus = null;
 var resetRequested = false;
+var backgroundCommands = [
+  "start",
+  "pause",
+  "reset-cycle",
+  "reset-all",
+  "preload",
+];
 
 // Handle inputs
 document.addEventListener("click", (e) => {
   let selection = e.target.id;
-  port.postMessage({ command: selection });
-
-  // Switch buttons based on input
-  if (selection === "start") {
-    switchButtons("#start", "#pause");
-  } else if (selection === "pause") {
-    switchButtons("#pause", "#start");
-  } else if (selection === "reset-cycle" || selection === "reset-all") {
-    switchButtons("#pause", "#start");
-    resetRequested = true;
-  } else if (selection === "options") {
-    // if (chrome.runtime.openOptionsPage) {
-    //   chrome.runtime.openOptionsPage();
-    // } else {
-    //   window.open(chrome.runtime.getURL('../options/options.html'));
-    // }
-    restoreOptions();
-
-    let ui = document.querySelector(".timer-ui");
-    ui.classList.add("hidden");
-
-    ui = document.querySelector(".options-ui");
-    ui.classList.remove("hidden");
+  for (let command of backgroundCommands) {
+    if (selection === command) {
+      port.postMessage({ command: selection });
+    } else {
+      // For testing purposes
+      console.log(`command - ${selection} - not posted to background script`);
+    }
   }
-  // Options-related handlers
-  else if (selection === "back") {
-    let ui = document.querySelector(".options-ui");
-    ui.classList.add("hidden");
 
-    ui = document.querySelector(".timer-ui");
-    ui.classList.remove("hidden");
-  } else if (selection === "save") {
-    saveOptions();
-    resetRequested = true;
+  // Input actions... including switching buttons immediately
+  let ui = null;
+  switch (selection) {
+    case "start":
+      switchButtons("#start", "#pause");
+      break;
+    case "pause":
+      switchButtons("#pause", "#start");
+      break;
+    case "reset-cycle":
+    case "reset-all":
+      switchButtons("#pause", "#start");
+      resetRequested = true;
+      break;
+    case "options":
+      restoreOptions();
+      // hide .timer-ui
+      ui = document.querySelector(".timer-ui");
+      ui.classList.add("hidden");
+      // show .options-ui
+      ui = document.querySelector(".options-ui");
+      ui.classList.remove("hidden");
+      break;
+    case "back":
+      // hide .options-ui
+      ui = document.querySelector(".options-ui");
+      ui.classList.add("hidden");
+      // show .timer-ui
+      ui = document.querySelector(".timer-ui");
+      ui.classList.remove("hidden");
+      break;
+    case "save":
+      saveOptions();
+      resetRequested = true;
+      break;
   }
 });
 
@@ -68,34 +85,74 @@ port.onMessage.addListener((message) => {
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector("#time").textContent = message.time;
 
-  // Check if the timer is complete, and change time text to "complete"
-  // if (message.status === "complete" || message.cycle > message.totalCycles) {
-  if (message.status === "complete") {
-    document.querySelector("#time").textContent = "complete";
+  // Change UI based on message.status
+  let elt = null;
+  switch (message.status) {
+    case "initial":
+      switchButtons("#pause", "#start");
+      document.querySelector(".control").style.justifyContent = "space-between";
+      break;
+    case "running":
+      switchButtons("#start", "#pause");
+      break;
+    case "paused":
+      switchButtons("#pause", "#start");
+      break;
+    case "complete":
+      // change time text to "complete"
+      document.querySelector("#time").textContent = "complete";
 
-    // Hide "start" and "pause"
-    let elt = document.querySelector("#pause");
-    if (!elt.classList.contains("hidden")) {
-      elt.classList.add("hidden");
-    }
+      // hide "pause"
+      elt = document.querySelector("#pause");
+      if (!elt.classList.contains("hidden")) {
+        elt.classList.add("hidden");
+      }
 
-    elt = document.querySelector("#start");
-    if (!elt.classList.contains("hidden")) {
-      elt.classList.add("hidden");
-    }
+      // hide "start"
+      elt = document.querySelector("#start");
+      if (!elt.classList.contains("hidden")) {
+        elt.classList.add("hidden");
+      }
 
-    // Change CSS justify-content to space-around for .control
-    document.querySelector(".control").style.justifyContent = "space-around";
-  } else {
-    // Change CSS justify-content to space-around for .control
-    document.querySelector(".control").style.justifyContent = "space-between";
-  }
+      document.querySelector(".control").style.justifyContent = "space-around";
 
-  // Switch buttons based on status of the Timer
-  if (message.status === "initial" || message.status === "paused") {
-    switchButtons("#pause", "#start");
-  } else if (message.status === "running") {
-    switchButtons("#start", "#pause");
+      break;
+    case "break":
+      elt = document.querySelector("#time");
+      elt.textContent = "on break";
+      if (!elt.classList.contains("break")) {
+        elt.classList.add("break");
+      }
+
+      // hide "pause"
+      elt = document.querySelector("#pause");
+      if (!elt.classList.contains("hidden")) {
+        elt.classList.add("hidden");
+      }
+      // hide "start"
+      elt = document.querySelector("#start");
+      if (!elt.classList.contains("hidden")) {
+        elt.classList.add("hidden");
+      }
+      // hide "reset-cycle"
+      elt = document.querySelector("#reset-cycle");
+      if (!elt.classList.contains("hidden")) {
+        elt.classList.add("hidden");
+      }
+      // hide "reset-all"
+      elt = document.querySelector("#reset-all");
+      if (!elt.classList.contains("hidden")) {
+        elt.classList.add("hidden");
+      }
+      // show "skip"
+      elt = document.querySelector("#skip");
+      if (elt.classList.contains("hidden")) {
+        elt.classList.remove("hidden");
+      }
+
+      document.querySelector(".control").style.justifyContent = "center";
+
+      break;
   }
 
   // Tracker
