@@ -166,10 +166,12 @@ function switchButtons(hide, show) {
 function saveOptions() {
   var time = parseInt(document.querySelector("#minutes").value);
   var cycleNumber = parseInt(document.querySelector("#cycles").value);
+  var breakTime = parseInt(document.querySelector("#break").value);
   chrome.storage.local.set(
     {
       minutes: time,
       totalCycles: cycleNumber,
+      break: breakTime,
     },
     function () {
       // Update status to let user know options were saved.
@@ -187,10 +189,12 @@ function restoreOptions() {
     {
       minutes: 25,
       totalCycles: 4,
+      break: 5,
     },
     function (items) {
       document.querySelector("#minutes").value = items.minutes;
       document.querySelector("#cycles").value = items.totalCycles;
+      document.querySelector("#break").value = items.break;
     }
   );
 }
