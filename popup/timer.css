@@ -120,6 +120,10 @@ html {
 }
 
 /* Options UI */
+h1 {
+  margin-bottom: var(--margin-elements);
+}
+
 .options-ui {
   width: 170px;
   font-size: 12px;
