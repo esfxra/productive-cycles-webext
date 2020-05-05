@@ -4,15 +4,18 @@
 var port = null;
 var uiUpdater = null;
 var cycleTimer = null;
+var breakTimer = null;
 var popUpOpen = false;
 
 // Defaults
 const defaultTime = 25 * 60000;
+const defaultBreak = (1 / 2) * 60000; // Test purposes
 const defaultCycles = 4;
 const notificationID = "cycle-complete-notification";
 
 // Default overrides
 let userMinutes = null;
+let userBreak = null;
 let userCycles = null;
 
 // Listen for "install" or "update" event
@@ -61,6 +64,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     if (key === "minutes") {
       userMinutes = storageChange.newValue * 60000;
       optionsChange = true;
+    } else if (key === "break") {
+      userBreak = storageChange.newValue * 60000;
+      optionsChange = true;
     } else if (key === "totalCycles") {
       userCycles = storageChange.newValue;
       optionsChange = true;
@@ -69,7 +75,9 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
   if (optionsChange) {
     clearInterval(uiUpdater);
     clearTimeout(cycleTimer);
+    clearTimeout(breakTimer);
     Timer.remaining = userMinutes;
+    Timer.break = userBreak;
     Timer.totalCycles = userCycles;
     Timer.status = "initial";
     Timer.cycle = 1;
@@ -88,6 +96,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
 var Timer = {
   target: null,
   remaining: null, // Time remaining
+  break: null,
   cycle: 1,
   totalCycles: null, // Will replace with a number read from file / storage / etc
   status: "initial",
@@ -125,9 +134,11 @@ var Timer = {
 };
 
 // Will run in init
-chrome.storage.local.get(["minutes", "totalCycles"], function (result) {
+chrome.storage.local.get(["minutes", "totalCycles", "break"], function (
+  result
+) {
   console.log(
-    `Init - minutes: ${result.minutes}, cycles: ${result.totalCycles}`
+    `Init - minutes: ${result.minutes}, cycles: ${result.totalCycles}, break: ${result.break}`
   );
 
   if (result.minutes === undefined) {
@@ -140,15 +151,22 @@ chrome.storage.local.get(["minutes", "totalCycles"], function (result) {
   } else {
     userCycles = result.totalCycles;
   }
+  if (result.break === undefined) {
+    userBreak = defaultBreak;
+  } else {
+    userBreak = result.break;
+  }
 
   Timer.remaining = userMinutes;
   Timer.totalCycles = userCycles;
+  Timer.break = userBreak;
 });
 
 function handleInput(message) {
   console.log("Command:", message.command, "Status:", Timer.status);
   switch (message.command) {
     case "start":
+      clearTimeout(breakTimer); // In case a user wants to start before userBreak
       if (Timer.status === "initial") {
         Timer.remaining = userMinutes;
       }
@@ -167,6 +185,7 @@ function handleInput(message) {
     case "reset-cycle":
       clearInterval(uiUpdater);
       clearTimeout(cycleTimer);
+      clearTimeout(breakTimer);
       // Go back to the previous cycle and clear relevant notification
       if (
         Timer.status === "complete" ||
@@ -182,6 +201,7 @@ function handleInput(message) {
     case "reset-all":
       clearInterval(uiUpdater);
       clearTimeout(cycleTimer);
+      clearTimeout(breakTimer);
       // Clear all notifications
       let i = 1;
       while (i <= Timer.totalCycles) {
@@ -210,10 +230,10 @@ function completeCycle() {
     `Cycle completed: ${Timer.cycle}, Total cycles: ${Timer.totalCycles}`
   );
   if (Timer.cycle === Timer.totalCycles) {
-    notify(Timer.cycle, true);
+    notify("timer-complete");
     Timer.status = "complete";
   } else if (Timer.cycle < Timer.totalCycles) {
-    notify(Timer.cycle, false);
+    notify("cycle-complete");
     Timer.status = "initial";
     Timer.remaining = userMinutes;
   }
@@ -224,6 +244,16 @@ function completeCycle() {
   // Increment the cycle counter
   Timer.cycle = Timer.cycle + 1;
   messageUI();
+  // Start the break timer
+  breakTimer = setTimeout(autoStart, Timer.break);
+}
+
+function autoStart() {
+  console.log(
+    `${Timer.break / 60000} minutes passed - Autostarting next cycle`
+  );
+  notify("autostart");
+  handleInput({ command: "start" });
 }
 
 function updateUI() {
@@ -247,18 +277,28 @@ function messageUI() {
   }
 }
 
-function notify(cycle, complete) {
+function notify(type) {
+  let title = "";
   let message = "";
-  if (complete) {
-    message = "take a long break :)";
-  } else {
-    message = "great job. everyone, take 5";
+  switch (type) {
+    case "cycle-complete":
+      title = `cycle ${Timer.cycle} complete!`;
+      message = "great job. everyone, take 5";
+      break;
+    case "timer-complete":
+      title = "all cycles complete!";
+      message = "take a long break :)";
+      break;
+    case "autostart":
+      title = `cycle ${Timer.cycle} starting`;
+      message = "time to grind my friend";
+      break;
   }
 
-  chrome.notifications.create(notificationID + cycle, {
+  chrome.notifications.create(notificationID + Timer.cycle, {
     type: "basic",
     iconUrl: chrome.runtime.getURL("icons/time-512.png"),
-    title: "cycle " + cycle + " complete!",
+    title: title,
     message: message,
   });
 }
