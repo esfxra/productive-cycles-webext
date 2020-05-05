@@ -174,8 +174,10 @@ function handleInput(message) {
       Timer.status = "running";
       cycleTimer = setTimeout(completeCycle, Timer.remaining);
       console.log("completeCycle will run in:", Timer.remainingStr());
-      uiUpdater = setInterval(updateUI, 1000);
-      console.log("running updateUI");
+      if (popUpOpen) {
+        uiUpdater = setInterval(updateUI, 1000);
+        console.log("running updateUI");
+      }
       break;
     case "pause":
       clearInterval(uiUpdater);
