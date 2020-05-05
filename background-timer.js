@@ -6,18 +6,19 @@ var uiUpdater = null;
 var cycleTimer = null;
 var breakTimer = null;
 var popUpOpen = false;
-var autoStartEnabled = true;
 
 // Defaults
 const defaultTime = 25 * 60000;
-const defaultBreak = (1 / 2) * 60000; // Test purposes
+const defaultBreak = 5 * 60000;
 const defaultCycles = 4;
+var defaultAutoStart = true;
 const notificationID = "cycle-complete-notification";
 
 // Default overrides
 let userMinutes = null;
 let userBreak = null;
 let userCycles = null;
+let userAutoStart = null;
 
 // Listen for "install" or "update" event
 chrome.runtime.onInstalled.addListener((details) => {
@@ -67,23 +68,23 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     } else if (key === "totalCycles") {
       userCycles = storageChange.newValue;
       optionsChange = true;
+    } else if (key === "autoStart") {
+      userAutoStart = storageChange.newValue;
+      optionsChange = true;
     }
   }
   if (optionsChange) {
     clearInterval(uiUpdater);
     clearTimeout(cycleTimer);
     clearTimeout(breakTimer);
+    clearAllNotifications(true);
     Timer.remaining = userMinutes;
     Timer.break = userBreak;
     Timer.totalCycles = userCycles;
+    Timer.autoStart = userAutoStart;
     Timer.status = "initial";
     Timer.cycle = 1;
-    // Clear all notifications
-    let i = 1;
-    while (i <= Timer.totalCycles) {
-      chrome.notifications.clear(notificationID + i);
-      i++;
-    }
+
     // Message PopUp to update timer UI with new changes
     messageUI();
   }
@@ -96,6 +97,7 @@ var Timer = {
   break: null,
   cycle: 1,
   totalCycles: null, // Will replace with a number read from file / storage / etc
+  autoStart: null,
   status: "initial",
   remainingStr: function () {
     // Use a time library for better ms-to-minutes-seconds in the future
@@ -143,20 +145,26 @@ chrome.storage.local.get(["minutes", "totalCycles", "break"], function (
   } else {
     userMinutes = result.minutes * 60000;
   }
+  if (result.break === undefined) {
+    userBreak = defaultBreak;
+  } else {
+    userBreak = result.break * 60000;
+  }
   if (result.totalCycles === undefined) {
     userCycles = defaultCycles;
   } else {
     userCycles = result.totalCycles;
   }
-  if (result.break === undefined) {
-    userBreak = defaultBreak;
+  if (result.autoStart === undefined) {
+    userAutoStart = defaultAutoStart;
   } else {
-    userBreak = result.break;
+    userAutoStart = result.autoStart;
   }
 
   Timer.remaining = userMinutes;
-  Timer.totalCycles = userCycles;
   Timer.break = userBreak;
+  Timer.totalCycles = userCycles;
+  Timer.autoStart = userAutoStart;
 });
 
 function handleInput(message) {
@@ -244,7 +252,7 @@ function completeCycle() {
 }
 
 function completeBreak() {
-  if (autoStartEnabled) {
+  if (Timer.autoStart) {
     console.log("auto-start enabled - next cycle is starting ...");
     notify("autostart");
     handleInput({ command: "start" });
@@ -283,7 +291,7 @@ function notify(type) {
     case "cycle-complete":
       id = `${id}-${Timer.cycle}`;
       title = `cycle ${Timer.cycle} complete!`;
-      message = "great job. everyone, take 5";
+      message = `great job. everyone, take ${Timer.break / 60000}`;
       break;
     case "timer-complete":
       id = `${id}-${Timer.cycle}`;

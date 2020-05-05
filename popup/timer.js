@@ -190,14 +190,14 @@ function restoreOptions() {
   chrome.storage.local.get(
     {
       minutes: 25,
-      totalCycles: 4,
       break: 5,
+      totalCycles: 4,
       autoStart: true,
     },
     function (items) {
       document.querySelector("#minutes").value = items.minutes;
-      document.querySelector("#cycles").value = items.totalCycles;
       document.querySelector("#break").value = items.break;
+      document.querySelector("#cycles").value = items.totalCycles;
       document.querySelector("#auto-start").checked = items.autoStart;
     }
   );
