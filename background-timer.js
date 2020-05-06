@@ -2,7 +2,7 @@
 
 // background-timer.js globals
 var port = null;
-var uiUpdater = null;
+var uiTimer = null;
 var cycleTimer = null;
 var breakTimer = null;
 var popUpOpen = false;
@@ -38,7 +38,7 @@ chrome.runtime.onConnect.addListener((portFromPopUp) => {
 
   port.onDisconnect.addListener(() => {
     popUpOpen = false;
-    clearInterval(uiUpdater);
+    clearInterval(uiTimer);
     console.log("PopUp port disconnected; interval cleared");
   });
 
@@ -74,7 +74,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     }
   }
   if (optionsChange) {
-    clearInterval(uiUpdater);
+    clearInterval(uiTimer);
     clearTimeout(cycleTimer);
     clearTimeout(breakTimer);
     clearAllNotifications(true);
@@ -133,39 +133,40 @@ var Timer = {
 };
 
 // Will run in init
-chrome.storage.local.get(["minutes", "totalCycles", "break"], function (
-  result
-) {
-  console.log(
-    `Init - minutes: ${result.minutes}, cycles: ${result.totalCycles}, break: ${result.break}`
-  );
+chrome.storage.local.get(
+  ["minutes", "totalCycles", "break", "autoStart"],
+  function (result) {
+    console.log(
+      `Init - minutes: ${result.minutes}, break: ${result.break}, cycles: ${result.totalCycles}, autoStart: ${result.autoStart}`
+    );
 
-  if (result.minutes === undefined) {
-    userMinutes = defaultTime;
-  } else {
-    userMinutes = result.minutes * 60000;
-  }
-  if (result.break === undefined) {
-    userBreak = defaultBreak;
-  } else {
-    userBreak = result.break * 60000;
-  }
-  if (result.totalCycles === undefined) {
-    userCycles = defaultCycles;
-  } else {
-    userCycles = result.totalCycles;
-  }
-  if (result.autoStart === undefined) {
-    userAutoStart = defaultAutoStart;
-  } else {
-    userAutoStart = result.autoStart;
-  }
+    if (result.minutes === undefined) {
+      userMinutes = defaultTime;
+    } else {
+      userMinutes = result.minutes * 60000;
+    }
+    if (result.break === undefined) {
+      userBreak = defaultBreak;
+    } else {
+      userBreak = result.break * 60000;
+    }
+    if (result.totalCycles === undefined) {
+      userCycles = defaultCycles;
+    } else {
+      userCycles = result.totalCycles;
+    }
+    if (result.autoStart === undefined) {
+      userAutoStart = defaultAutoStart;
+    } else {
+      userAutoStart = result.autoStart;
+    }
 
-  Timer.remaining = userMinutes;
-  Timer.break = userBreak;
-  Timer.totalCycles = userCycles;
-  Timer.autoStart = userAutoStart;
-});
+    Timer.remaining = userMinutes;
+    Timer.break = userBreak;
+    Timer.totalCycles = userCycles;
+    Timer.autoStart = userAutoStart;
+  }
+);
 
 function handleInput(message) {
   console.log("Command:", message.command, "Status:", Timer.status);
@@ -177,20 +178,20 @@ function handleInput(message) {
       }
       Timer.target = Timer.remaining + Date.now();
       Timer.status = "running";
-      cycleTimer = setTimeout(completeCycle, Timer.remaining);
+      cycleTimer = setTimeout(completeCycle, Timer.remaining + 1000);
       console.log("completeCycle() will run in:", Timer.remainingStr());
       if (popUpOpen) {
-        uiUpdater = setInterval(updateUI, 1000);
-        console.log("running updateUI");
+        uiTimer = setInterval(processRemaining, 1000);
+        console.log("running processRemaining for cycle", Timer.cycle);
       }
       break;
     case "pause":
-      clearInterval(uiUpdater);
+      clearInterval(uiTimer);
       clearTimeout(cycleTimer);
       Timer.status = "paused";
       break;
     case "reset-cycle":
-      clearInterval(uiUpdater);
+      clearInterval(uiTimer);
       clearTimeout(cycleTimer);
       clearTimeout(breakTimer);
       // Go back to the previous cycle and clear relevant notification
@@ -206,7 +207,7 @@ function handleInput(message) {
       messageUI();
       break;
     case "reset-all":
-      clearInterval(uiUpdater);
+      clearInterval(uiTimer);
       clearTimeout(cycleTimer);
       clearTimeout(breakTimer);
       clearAllNotifications(true);
@@ -218,9 +219,17 @@ function handleInput(message) {
     case "preload":
       if (Timer.status === "running") {
         Timer.remaining = Timer.target - Date.now();
-        uiUpdater = setInterval(updateUI, 1000);
+        uiTimer = setInterval(processRemaining, 1000);
+      } else if (Timer.status === "break") {
+        Timer.remaining = Timer.target - Date.now();
+        uiTimer = setInterval(processRemaining, 1000);
       }
       messageUI();
+      break;
+    case "skip":
+      clearInterval(uiTimer);
+      clearTimeout(breakTimer);
+      completeBreak();
       break;
     default:
       console.log(message, "is not a known input");
@@ -234,16 +243,22 @@ function completeCycle() {
   // if (popUpOpen) {
   // }
   // Clear the interval
-  clearInterval(uiUpdater);
+  clearInterval(uiTimer);
   if (Timer.cycle === Timer.totalCycles) {
     notify("timer-complete");
     Timer.status = "complete";
   } else if (Timer.cycle < Timer.totalCycles) {
     notify("cycle-complete");
-    Timer.status = "initial";
-    Timer.remaining = userMinutes;
-    // Start the break timer
-    breakTimer = setTimeout(completeBreak, Timer.break);
+    Timer.status = "break";
+    Timer.remaining = Timer.break;
+    Timer.target = Timer.remaining + Date.now();
+    // Start the break timer in the UI
+    if (popUpOpen) {
+      uiTimer = setInterval(processRemaining, 1000);
+      console.log("running processRemaining for break", Timer.cycle);
+    }
+    // Start the break timer (background)
+    breakTimer = setTimeout(completeBreak, Timer.break + 1000);
     console.log("completeBreak() will run in:", Timer.break);
   }
   // Increment the cycle counter
@@ -252,6 +267,10 @@ function completeCycle() {
 }
 
 function completeBreak() {
+  clearInterval(uiTimer);
+  Timer.status = "initial";
+  Timer.remaining = userMinutes;
+  messageUI();
   if (Timer.autoStart) {
     console.log("auto-start enabled - next cycle is starting ...");
     notify("autostart");
@@ -262,12 +281,12 @@ function completeBreak() {
   }
 }
 
-function updateUI() {
+function processRemaining() {
   // Make calculations to find remaining time (ms to minutes-seconds)
   Timer.remaining = Timer.remaining - 1000;
   messageUI();
   if (Timer.remainingStr() === "00:00") {
-    clearInterval(uiUpdater);
+    clearInterval(uiTimer);
     console.log("Interval was cleared");
   }
 }
@@ -332,7 +351,9 @@ function clearAllNotifications(clearAll) {
   } else {
     id = `${notificationID}-${Timer.cycle}`;
     chrome.notifications.clear(id);
+    id = `${notificationID}-${Timer.cycle + 1}`;
     chrome.notifications.clear(id + "-break");
-    console.log(`Cycle ${Timer.cycle} notifications cleared`);
+    console.log(`Cycle ${Timer.cycle} complete notification cleared`);
+    console.log(`Cycle ${Timer.cycle + 1} starting notification cleared`);
   }
 }

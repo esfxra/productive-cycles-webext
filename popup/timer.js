@@ -5,44 +5,59 @@ var port = chrome.runtime.connect({ name: "port-from-popup" });
 var statusChanged = false;
 var previousStatus = null;
 var resetRequested = false;
+var backgroundCommands = [
+  "start",
+  "pause",
+  "reset-cycle",
+  "reset-all",
+  "preload",
+  "skip",
+];
 
 // Handle inputs
 document.addEventListener("click", (e) => {
   let selection = e.target.id;
-  port.postMessage({ command: selection });
-
-  // Switch buttons based on input
-  if (selection === "start") {
-    switchButtons("#start", "#pause");
-  } else if (selection === "pause") {
-    switchButtons("#pause", "#start");
-  } else if (selection === "reset-cycle" || selection === "reset-all") {
-    switchButtons("#pause", "#start");
-    resetRequested = true;
-  } else if (selection === "options") {
-    // if (chrome.runtime.openOptionsPage) {
-    //   chrome.runtime.openOptionsPage();
-    // } else {
-    //   window.open(chrome.runtime.getURL('../options/options.html'));
-    // }
-    restoreOptions();
-
-    let ui = document.querySelector(".timer-ui");
-    ui.classList.add("hidden");
-
-    ui = document.querySelector(".options-ui");
-    ui.classList.remove("hidden");
+  for (let command of backgroundCommands) {
+    if (selection === command) {
+      port.postMessage({ command: selection });
+    } else {
+      // For testing purposes
+      console.log(`command - ${selection} - not posted to background script`);
+    }
   }
-  // Options-related handlers
-  else if (selection === "back") {
-    let ui = document.querySelector(".options-ui");
-    ui.classList.add("hidden");
 
-    ui = document.querySelector(".timer-ui");
-    ui.classList.remove("hidden");
-  } else if (selection === "save") {
-    saveOptions();
-    resetRequested = true;
+  // Input actions... including switching buttons immediately
+  let ui = null;
+  switch (selection) {
+    case "start":
+      hideElement("#start");
+      showElement("#pause");
+      break;
+    case "pause":
+      hideElement("#pause");
+      showElement("#start");
+      break;
+    case "skip":
+      break;
+    case "reset-cycle":
+    case "reset-all":
+      hideElement("#pause");
+      showElement("#start");
+      resetRequested = true;
+      break;
+    case "options":
+      restoreOptions();
+      hideElement(".timer-ui");
+      showElement(".options-ui");
+      break;
+    case "back":
+      hideElement(".options-ui");
+      showElement(".timer-ui");
+      break;
+    case "save":
+      saveOptions();
+      resetRequested = true;
+      break;
   }
 });
 
@@ -68,41 +83,69 @@ port.onMessage.addListener((message) => {
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector("#time").textContent = message.time;
 
-  // Check if the timer is complete, and change time text to "complete"
-  // if (message.status === "complete" || message.cycle > message.totalCycles) {
-  if (message.status === "complete") {
-    document.querySelector("#time").textContent = "complete";
+  // Change UI based on message.status
+  let elt = null;
+  switch (message.status) {
+    case "initial":
+      elt = document.querySelector(".time-container");
+      if (elt.classList.contains("break")) {
+        elt.classList.remove("break");
+      }
+      // Adjust .control spacing
+      document.querySelector(".control").style.justifyContent = "space-between";
+      hideElement("#skip");
+      hideElement("#break-text");
+      hideElement("#pause");
+      showElement("#start");
+      showElement("#reset-cycle");
+      showElement("#reset-all");
+      break;
+    case "running":
+      elt = document.querySelector(".time-container");
+      if (elt.classList.contains("break")) {
+        elt.classList.remove("break");
+      }
+      // Adjust .control spacing
+      document.querySelector(".control").style.justifyContent = "space-between";
+      hideElement("#skip");
+      hideElement("#break-text");
+      hideElement("#start");
+      showElement("#pause");
+      showElement("#reset-cycle");
+      showElement("#reset-all");
+      break;
+    case "paused":
+      hideElement("#pause");
+      showElement("#start");
+      break;
+    case "complete":
+      // change time text to "complete"
+      document.querySelector("#time").textContent = "complete";
+      document.querySelector(".control").style.justifyContent = "space-around";
+      hideElement("#pause");
+      hideElement("#start");
+      break;
+    case "break":
+      elt = document.querySelector(".time-container");
+      if (!elt.classList.contains("break")) {
+        elt.classList.add("break");
+      }
+      document.querySelector(".control").style.justifyContent = "center";
+      hideElement("#pause");
+      hideElement("#start");
+      hideElement("#reset-cycle");
+      hideElement("#reset-all");
+      showElement("#break-text");
+      showElement("#skip");
 
-    // Hide "start" and "pause"
-    let elt = document.querySelector("#pause");
-    if (!elt.classList.contains("hidden")) {
-      elt.classList.add("hidden");
-    }
-
-    elt = document.querySelector("#start");
-    if (!elt.classList.contains("hidden")) {
-      elt.classList.add("hidden");
-    }
-
-    // Change CSS justify-content to space-around for .control
-    document.querySelector(".control").style.justifyContent = "space-around";
-  } else {
-    // Change CSS justify-content to space-around for .control
-    document.querySelector(".control").style.justifyContent = "space-between";
-  }
-
-  // Switch buttons based on status of the Timer
-  if (message.status === "initial" || message.status === "paused") {
-    switchButtons("#pause", "#start");
-  } else if (message.status === "running") {
-    switchButtons("#start", "#pause");
+      break;
   }
 
   // Tracker
   // Compute the number of cycles to display, which one is running, and which are complete
   if (statusChanged || resetRequested) {
     console.log("Rebuilding the tracker ...");
-    console.log(previousStatus);
+    console.log(`previousStatus: ${previousStatus}`);
     let cyclesNode = document.querySelector(".cycles");
 
     // Reset cyclesNode
@@ -129,7 +172,7 @@ port.onMessage.addListener((message) => {
       dotNode.setAttribute("title", "cycle " + i);
       dotNode.classList.add("dot");
       if (i === message.cycle) {
-        if (message.status === "initial") {
+        if (message.status === "initial" || message.status === "break") {
           dotNode.classList.add("pending");
           // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
         } else if (
@@ -155,12 +198,18 @@ port.onMessage.addListener((message) => {
   }
 });
 
-function switchButtons(hide, show) {
-  let elt = document.querySelector(hide);
-  elt.classList.add("hidden");
+function hideElement(element) {
+  let elt = document.querySelector(element);
+  if (!elt.classList.contains("hidden")) {
+    elt.classList.add("hidden");
+  }
+}
 
-  elt = document.querySelector(show);
-  elt.classList.remove("hidden");
+function showElement(element) {
+  let elt = document.querySelector(element);
+  if (elt.classList.contains("hidden")) {
+    elt.classList.remove("hidden");
+  }
 }
 
 function saveOptions() {

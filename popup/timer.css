@@ -35,11 +35,24 @@ html {
   cursor: pointer;
 }
 
-#time {
-  min-height: 25px;
+.time-container {
   margin-bottom: var(--margin-elements);
   text-align: center;
+}
+
+#time {
+  min-height: 25px;
   font-size: 20px;
+}
+
+.break {
+  color: gray;
+  animation: runningCycle 4s infinite;
+}
+
+#break-text {
+  color: gray;
+  /* margin-bottom: var(--margin-elements); */
 }
 
 .hidden {
@@ -56,10 +69,13 @@ html {
 
 .control img {
   max-width: 13px;
-  margin-bottom: var(--margin-elements);
   padding: 4px;
   border-radius: 3px;
   cursor: pointer;
+}
+
+.control > * {
+  margin-bottom: calc(var(--margin-elements) + 2px);
 }
 
 #start {
@@ -121,7 +137,7 @@ html {
 
 /* Options UI */
 h1 {
-  margin-bottom: var(--margin-elements);
+  /* margin-bottom: var(--margin-elements); */
 }
 
 .options-ui {
@@ -136,6 +152,7 @@ h1 {
 
 button {
   width: max-content;
+  height: fit-content;
   display: inline-block;
   font-family: inherit;
   cursor: pointer;
@@ -166,7 +183,7 @@ input[type="number"] {
 
 p {
   color: gray;
-  margin-bottom: 14px;
+  margin-bottom: var(--margin-elements);
 }
 
 p span {
@@ -176,7 +193,7 @@ p span {
 .option {
   display: grid;
   grid-template-columns: 1fr 0.35fr;
-  margin-bottom: 14px;
+  margin-bottom: var(--margin-elements);
 }
 
 #back {
@@ -234,6 +251,7 @@ p span {
 .container input:checked ~ .checkmark {
   background-color: black;
   border-bottom: 1px solid black;
+  border-radius: 2px;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */
