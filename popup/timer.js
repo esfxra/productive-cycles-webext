@@ -11,6 +11,7 @@ var backgroundCommands = [
   "reset-cycle",
   "reset-all",
   "preload",
+  "skip",
 ];
 
 // Handle inputs
@@ -29,32 +30,29 @@ document.addEventListener("click", (e) => {
   let ui = null;
   switch (selection) {
     case "start":
-      switchButtons("#start", "#pause");
+      hideElement("#start");
+      showElement("#pause");
       break;
     case "pause":
-      switchButtons("#pause", "#start");
+      hideElement("#pause");
+      showElement("#start");
+      break;
+    case "skip":
       break;
     case "reset-cycle":
     case "reset-all":
-      switchButtons("#pause", "#start");
+      hideElement("#pause");
+      showElement("#start");
       resetRequested = true;
       break;
     case "options":
       restoreOptions();
-      // hide .timer-ui
-      ui = document.querySelector(".timer-ui");
-      ui.classList.add("hidden");
-      // show .options-ui
-      ui = document.querySelector(".options-ui");
-      ui.classList.remove("hidden");
+      hideElement(".timer-ui");
+      showElement(".options-ui");
       break;
     case "back":
-      // hide .options-ui
-      ui = document.querySelector(".options-ui");
-      ui.classList.add("hidden");
-      // show .timer-ui
-      ui = document.querySelector(".timer-ui");
-      ui.classList.remove("hidden");
+      hideElement(".options-ui");
+      showElement(".timer-ui");
       break;
     case "save":
       saveOptions();
@@ -89,68 +87,56 @@ port.onMessage.addListener((message) => {
   let elt = null;
   switch (message.status) {
     case "initial":
-      switchButtons("#pause", "#start");
+      elt = document.querySelector(".time-container");
+      if (elt.classList.contains("break")) {
+        elt.classList.remove("break");
+      }
+      // Adjust .control spacing
       document.querySelector(".control").style.justifyContent = "space-between";
+      hideElement("#skip");
+      hideElement("#break-text");
+      hideElement("#pause");
+      showElement("#start");
+      showElement("#reset-cycle");
+      showElement("#reset-all");
       break;
     case "running":
-      switchButtons("#start", "#pause");
+      elt = document.querySelector(".time-container");
+      if (elt.classList.contains("break")) {
+        elt.classList.remove("break");
+      }
+      // Adjust .control spacing
+      document.querySelector(".control").style.justifyContent = "space-between";
+      hideElement("#skip");
+      hideElement("#break-text");
+      hideElement("#start");
+      showElement("#pause");
+      showElement("#reset-cycle");
+      showElement("#reset-all");
       break;
     case "paused":
-      switchButtons("#pause", "#start");
+      hideElement("#pause");
+      showElement("#start");
       break;
     case "complete":
       // change time text to "complete"
       document.querySelector("#time").textContent = "complete";
-
-      // hide "pause"
-      elt = document.querySelector("#pause");
-      if (!elt.classList.contains("hidden")) {
-        elt.classList.add("hidden");
-      }
-
-      // hide "start"
-      elt = document.querySelector("#start");
-      if (!elt.classList.contains("hidden")) {
-        elt.classList.add("hidden");
-      }
-
       document.querySelector(".control").style.justifyContent = "space-around";
-
+      hideElement("#pause");
+      hideElement("#start");
       break;
     case "break":
-      elt = document.querySelector("#time");
-      elt.textContent = "on break";
+      elt = document.querySelector(".time-container");
       if (!elt.classList.contains("break")) {
         elt.classList.add("break");
       }
-
-      // hide "pause"
-      elt = document.querySelector("#pause");
-      if (!elt.classList.contains("hidden")) {
-        elt.classList.add("hidden");
-      }
-      // hide "start"
-      elt = document.querySelector("#start");
-      if (!elt.classList.contains("hidden")) {
-        elt.classList.add("hidden");
-      }
-      // hide "reset-cycle"
-      elt = document.querySelector("#reset-cycle");
-      if (!elt.classList.contains("hidden")) {
-        elt.classList.add("hidden");
-      }
-      // hide "reset-all"
-      elt = document.querySelector("#reset-all");
-      if (!elt.classList.contains("hidden")) {
-        elt.classList.add("hidden");
-      }
-      // show "skip"
-      elt = document.querySelector("#skip");
-      if (elt.classList.contains("hidden")) {
-        elt.classList.remove("hidden");
-      }
-
       document.querySelector(".control").style.justifyContent = "center";
+      hideElement("#pause");
+      hideElement("#start");
+      hideElement("#reset-cycle");
+      hideElement("#reset-all");
+      showElement("#break-text");
+      showElement("#skip");
 
       break;
   }
@@ -159,7 +145,7 @@ port.onMessage.addListener((message) => {
   // Compute the number of cycles to display, which one is running, and which are complete
   if (statusChanged || resetRequested) {
     console.log("Rebuilding the tracker ...");
-    console.log(previousStatus);
+    console.log(`previousStatus: ${previousStatus}`);
     let cyclesNode = document.querySelector(".cycles");
 
     // Reset cyclesNode
@@ -186,7 +172,7 @@ port.onMessage.addListener((message) => {
       dotNode.setAttribute("title", "cycle " + i);
       dotNode.classList.add("dot");
       if (i === message.cycle) {
-        if (message.status === "initial") {
+        if (message.status === "initial" || message.status === "break") {
           dotNode.classList.add("pending");
           // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
         } else if (
@@ -212,12 +198,18 @@ port.onMessage.addListener((message) => {
   }
 });
 
-function switchButtons(hide, show) {
-  let elt = document.querySelector(hide);
-  elt.classList.add("hidden");
+function hideElement(element) {
+  let elt = document.querySelector(element);
+  if (!elt.classList.contains("hidden")) {
+    elt.classList.add("hidden");
+  }
+}
 
-  elt = document.querySelector(show);
-  elt.classList.remove("hidden");
+function showElement(element) {
+  let elt = document.querySelector(element);
+  if (elt.classList.contains("hidden")) {
+    elt.classList.remove("hidden");
+  }
 }
 
 function saveOptions() {
