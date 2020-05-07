@@ -1,5 +1,10 @@
 "use strict";
 
+// prototype-only ...
+var timeObjectStart = null;
+var timeObjectMiddle = null;
+var timeObjectEnd = null;
+
 // background-timer.js globals
 var port = null;
 var uiTimer = null;
@@ -30,6 +35,16 @@ chrome.runtime.onInstalled.addListener((details) => {
     clearAllNotifications(true);
   }
 });
+
+function newState(state) {
+  timeObjectMiddle = new Date();
+  console.debug(`New state: ${state}`);
+  console.debug(
+    `current time is ${timeObjectMiddle.getHours()}:${timeObjectMiddle.getMinutes()}:${timeObjectMiddle.getSeconds()}`
+  );
+}
+
+chrome.idle.onStateChanged.addListener(newState);
 
 // Listen for communications from PopUp
 chrome.runtime.onConnect.addListener((portFromPopUp) => {
@@ -178,7 +193,11 @@ function handleInput(message) {
       }
       Timer.target = Timer.remaining + Date.now();
       Timer.status = "running";
+      timeObjectStart = new Date(Timer.target); // Represents the target time (and date)
       cycleTimer = setTimeout(completeCycle, Timer.remaining + 1000);
+      console.debug(
+        `the cycle will be complete at ${timeObjectStart.getHours()}:${timeObjectStart.getMinutes()}:${timeObjectStart.getSeconds()}`
+      );
       console.log("completeCycle() will run in:", Timer.remainingStr());
       if (popUpOpen) {
         uiTimer = setInterval(processRemaining, 1000);
@@ -237,6 +256,13 @@ function handleInput(message) {
 }
 
 function completeCycle() {
+  timeObjectEnd = new Date(); // Represents the target time (and date)
+  console.debug(
+    `cycle was supposed to complete at ${timeObjectStart.getHours()}:${timeObjectStart.getMinutes()}:${timeObjectStart.getSeconds()}`
+  );
+  console.debug(
+    `cycle completed at ${timeObjectEnd.getHours()}:${timeObjectEnd.getMinutes()}:${timeObjectEnd.getSeconds()}`
+  );
   console.log(
     `Cycle completed: ${Timer.cycle}, Total cycles: ${Timer.totalCycles}`
   );

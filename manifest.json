@@ -22,5 +22,5 @@
     "scripts": ["background-timer.js"]
   },
 
-  "permissions": ["notifications", "storage"]
+  "permissions": ["notifications", "storage", "idle"]
 }
