@@ -181,6 +181,8 @@ port.onMessage.addListener((message) => {
         ) {
           dotNode.classList.add("running");
           // html += '<span id="cycle-' + i + '" class="dot running"></span>';
+        } else if (message.status === "complete") {
+          dotNode.classList.add("complete");
         }
       } else if (i < message.cycle) {
         dotNode.classList.add("complete");

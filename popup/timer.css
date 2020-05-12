@@ -84,7 +84,8 @@ html {
 
 #pause,
 #reset-cycle,
-#reset-all {
+#reset-all,
+#skip {
   background-color: gray;
 }
 
