@@ -84,66 +84,69 @@ port.onMessage.addListener((message) => {
   document.querySelector("#time").textContent = message.time;
 
   // Change UI based on message.status
-  let elt = null;
-  switch (message.status) {
-    case "initial":
-      elt = document.querySelector(".time-container");
-      if (elt.classList.contains("break")) {
-        elt.classList.remove("break");
-      }
-      // Adjust .control spacing
-      document.querySelector(".control").style.justifyContent = "space-between";
-      hideElement("#skip");
-      // hideElement("#break-text");
-      hideElement("#pause");
-      showElement("#start");
-      showElement("#reset-cycle");
-      showElement("#reset-all");
-      break;
-    case "running":
-      elt = document.querySelector(".time-container");
-      if (elt.classList.contains("break")) {
-        elt.classList.remove("break");
-      }
-      // Adjust .control spacing
-      document.querySelector(".control").style.justifyContent = "space-between";
-      hideElement("#skip");
-      // hideElement("#break-text");
-      hideElement("#start");
-      showElement("#pause");
-      showElement("#reset-cycle");
-      showElement("#reset-all");
-      break;
-    case "paused":
-      hideElement("#pause");
-      showElement("#start");
-      break;
-    case "complete":
-      // change time text to "complete"
-      document.querySelector("#time").textContent = "complete";
-      document.querySelector(".control").style.justifyContent = "space-around";
-      hideElement("#pause");
-      hideElement("#start");
-      break;
-    case "break":
-      elt = document.querySelector(".time-container");
-      if (!elt.classList.contains("break")) {
-        elt.classList.add("break");
-      }
-      document.querySelector(".control").style.justifyContent = "center";
-      hideElement("#pause");
-      hideElement("#start");
-      hideElement("#reset-cycle");
-      hideElement("#reset-all");
-      // showElement("#break-text");
-      showElement("#skip");
-
-      break;
-  }
-
-  // Tracker
-  // Compute the number of cycles to display, which one is running, and which are complete
   if (statusChanged || resetRequested) {
+    let elt = null;
+    switch (message.status) {
+      case "initial":
+        elt = document.querySelector(".time-container");
+        if (elt.classList.contains("break")) {
+          elt.classList.remove("break");
+        }
+        // Adjust .control spacing
+        document.querySelector(".control").style.justifyContent =
+          "space-between";
+        hideElement("#skip");
+        // hideElement("#break-text");
+        hideElement("#pause");
+        showElement("#start");
+        showElement("#reset-cycle");
+        showElement("#reset-all");
+        break;
+      case "running":
+        elt = document.querySelector(".time-container");
+        if (elt.classList.contains("break")) {
+          elt.classList.remove("break");
+        }
+        // Adjust .control spacing
+        document.querySelector(".control").style.justifyContent =
+          "space-between";
+        hideElement("#skip");
+        // hideElement("#break-text");
+        hideElement("#start");
+        showElement("#pause");
+        showElement("#reset-cycle");
+        showElement("#reset-all");
+        break;
+      case "paused":
+        hideElement("#pause");
+        showElement("#start");
+        break;
+      case "complete":
+        // change time text to "complete"
+        document.querySelector("#time").textContent = "complete";
+        document.querySelector(".control").style.justifyContent =
+          "space-around";
+        hideElement("#pause");
+        hideElement("#start");
+        break;
+      case "break":
+        elt = document.querySelector(".time-container");
+        if (!elt.classList.contains("break")) {
+          elt.classList.add("break");
+        }
+        document.querySelector(".control").style.justifyContent = "center";
+        hideElement("#pause");
+        hideElement("#start");
+        hideElement("#reset-cycle");
+        hideElement("#reset-all");
+        // showElement("#break-text");
+        showElement("#skip");
+
+        break;
+    }
+
+    // Tracker
+    // Compute the number of cycles to display, which one is running, and which are complete
     console.log("Rebuilding the tracker ...");
     console.log(`previousStatus: ${previousStatus}`);
     let cyclesNode = document.querySelector(".cycles");
@@ -201,6 +204,7 @@ port.onMessage.addListener((message) => {
 });
 
 function hideElement(element) {
+  console.debug("Hiding element");
   let elt = document.querySelector(element);
   if (!elt.classList.contains("hidden")) {
     elt.classList.add("hidden");
@@ -208,6 +212,7 @@ function hideElement(element) {
 }
 
 function showElement(element) {
+  console.debug("Showing element");
   let elt = document.querySelector(element);
   if (elt.classList.contains("hidden")) {
     elt.classList.remove("hidden");
