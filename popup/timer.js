@@ -92,6 +92,8 @@ port.onMessage.addListener((message) => {
         if (elt.classList.contains("break")) {
           elt.classList.remove("break");
         }
+        // Adjust "time"
+        document.querySelector("#time").classList.remove("complete-text");
         // Adjust .control spacing
         document.querySelector(".control").style.justifyContent =
           "space-between";
@@ -103,6 +105,8 @@ port.onMessage.addListener((message) => {
         showElement("#reset-all");
         break;
       case "running":
+        // Adjust "time"
+        document.querySelector("#time").classList.remove("complete-text");
         elt = document.querySelector(".time-container");
         if (elt.classList.contains("break")) {
           elt.classList.remove("break");
@@ -122,8 +126,9 @@ port.onMessage.addListener((message) => {
         showElement("#start");
         break;
       case "complete":
-        // change time text to "complete"
+        // Adjust "time"
         document.querySelector("#time").textContent = "complete";
+        document.querySelector("#time").classList.add("complete-text");
         document.querySelector(".control").style.justifyContent =
           "space-around";
         hideElement("#pause");
@@ -164,6 +169,12 @@ port.onMessage.addListener((message) => {
         "repeat(" + message.totalCycles + ", auto)";
     } else {
       cyclesNode.style.gridTemplateColumns = "repeat(4, auto)";
+    }
+
+    if (message.totalCycles < 3) {
+      cyclesNode.style.justifyContent = "space-evenly";
+    } else {
+      cyclesNode.style.justifyContent = "space-between";
     }
 
     // Build cyclesNode

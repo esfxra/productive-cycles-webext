@@ -31,7 +31,7 @@ body {
   /* padding: 8px; */
 
 
-  --margin-elements: 20px;
+  --margin-elements: 18px;
   /* padding: 5px; */
 }
 
@@ -57,8 +57,12 @@ body {
 }
 
 #time {
-  min-height: 25px;
-  font-size: 25px;
+  min-height: 22px;
+  font-size: 22px;
+}
+
+.complete-text {
+  font-size: 20px !important;
 }
 
 .break {
@@ -134,7 +138,6 @@ body {
   grid-auto-rows: 14px;
   gap: 14px;
   /* justify-content: space-evenly; */
-  justify-content: space-between;
 }
 
 .dot {
