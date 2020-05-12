@@ -94,7 +94,7 @@ port.onMessage.addListener((message) => {
       // Adjust .control spacing
       document.querySelector(".control").style.justifyContent = "space-between";
       hideElement("#skip");
-      hideElement("#break-text");
+      // hideElement("#break-text");
       hideElement("#pause");
       showElement("#start");
       showElement("#reset-cycle");
@@ -108,7 +108,7 @@ port.onMessage.addListener((message) => {
       // Adjust .control spacing
       document.querySelector(".control").style.justifyContent = "space-between";
       hideElement("#skip");
-      hideElement("#break-text");
+      // hideElement("#break-text");
       hideElement("#start");
       showElement("#pause");
       showElement("#reset-cycle");
@@ -135,7 +135,7 @@ port.onMessage.addListener((message) => {
       hideElement("#start");
       hideElement("#reset-cycle");
       hideElement("#reset-all");
-      showElement("#break-text");
+      // showElement("#break-text");
       showElement("#skip");
 
       break;
