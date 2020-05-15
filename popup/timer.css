@@ -12,7 +12,7 @@
 body,
 html {
   /* min-width: 110px; */
-  min-width:  fit-content;
+  min-width: fit-content;
   /* min-height: 165px; */
   /* padding-bottom: 10px; */
   font-family: robotoMono, monospace;
@@ -24,13 +24,11 @@ body {
   padding: 16px;
   padding-bottom: 20px;
   margin: 0;
-
 }
 
 .popup-container {
   min-width: 110px;
   /* padding: 8px; */
-
 
   --margin-elements: 18px;
   /* padding: 5px; */
@@ -183,13 +181,21 @@ h1 {
 }
 
 .options-ui {
-  width: 170px;
+  width: 200px;
   font-size: 12px;
 }
 
 .options-ui h1 {
   font-size: 14px;
   font-weight: bold;
+}
+
+.theme-option {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  cursor: pointer;
 }
 
 button {

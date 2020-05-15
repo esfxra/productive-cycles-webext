@@ -64,6 +64,21 @@ document.addEventListener("click", (e) => {
 // Register the UI has been loaded and let the background script know
 window.addEventListener("DOMContentLoaded", (event) => {
   port.postMessage({ command: "preload" });
+
+  // Register listener for theme toggle (light / dark)
+  let stylesheet = document.querySelector("#theme");
+  let light = document.querySelector(".option-light");
+  let dark = document.querySelector(".option-dark");
+  light.addEventListener("click", () => {
+    if (!stylesheet.href.includes("timer-light")) {
+      stylesheet.href = "timer-light.css";
+    }
+  });
+  dark.addEventListener("click", () => {
+    if (!stylesheet.href.includes("timer-dark")) {
+      stylesheet.href = "timer-dark.css";
+    }
+  });
 });
 
 // Make UI changes based on Timer details messaged by the background script
