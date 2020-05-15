@@ -5,6 +5,8 @@ var port = chrome.runtime.connect({ name: "port-from-popup" });
 var statusChanged = false;
 var previousStatus = null;
 var resetRequested = false;
+var lightTheme = false;
+var darkTheme = false;
 var backgroundCommands = [
   "start",
   "pause",
@@ -65,18 +67,66 @@ document.addEventListener("click", (e) => {
 window.addEventListener("DOMContentLoaded", (event) => {
   port.postMessage({ command: "preload" });
 
-  // Register listener for theme toggle (light / dark)
+  // Check what is the theme saved in storage
   let stylesheet = document.querySelector("#theme");
+
+  chrome.storage.local.get({ theme: "light" }, function (items) {
+    if (items.theme === "light") {
+      lightTheme = true;
+      darkTheme = false;
+
+      if (!stylesheet.href.includes("timer-light")) {
+        stylesheet.href = "timer-light.css";
+      }
+    } else {
+      darkTheme = true;
+      lightTheme = false;
+
+      if (!stylesheet.href.includes("timer-dark")) {
+        stylesheet.href = "timer-dark.css";
+      }
+    }
+  });
+
+  // Register listeners for theme toggle (light / dark)
   let light = document.querySelector(".option-light");
   let dark = document.querySelector(".option-dark");
   light.addEventListener("click", () => {
     if (!stylesheet.href.includes("timer-light")) {
       stylesheet.href = "timer-light.css";
     }
+
+    // Check if it this is the theme saved
+    if (!lightTheme) {
+      chrome.storage.local.set(
+        {
+          theme: "light",
+        },
+        function () {
+          console.log("Theme set to light");
+        }
+      );
+    } else {
+      console.log("Theme was already set to light - keeping it");
+    }
   });
   dark.addEventListener("click", () => {
     if (!stylesheet.href.includes("timer-dark")) {
       stylesheet.href = "timer-dark.css";
+    }
+
+    // Check if it this is the theme saved
+    if (!darkTheme) {
+      chrome.storage.local.set(
+        {
+          theme: "dark",
+        },
+        function () {
+          console.log("Theme set to dark");
+        }
+      );
+    } else {
+      console.log("Theme was already set to dark - keeping it");
     }
   });
 });
