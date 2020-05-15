@@ -50,6 +50,12 @@ body {
 }
 
 /* Options UI */
+.dp1 {
+  /* background-color: #2a2b2f; */
+  /* border-radius: 5px; */
+  border-bottom: 1px dashed #808080;
+}
+
 #back {
   background-image: url(../icons/back-512-dark.png);
 }

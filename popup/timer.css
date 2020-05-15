@@ -176,8 +176,14 @@ body {
 }
 
 /* Options UI */
+.dp1 {
+  padding-bottom: var(--margin-elements);
+  margin-bottom: var(--margin-elements);
+}
+
 h1 {
-  /* margin-bottom: var(--margin-elements); */
+  margin: 0;
+  margin-bottom: calc(var(--margin-elements) - 5px);
 }
 
 .options-ui {
@@ -231,6 +237,7 @@ input[type="number"] {
 
 p {
   color: gray;
+  margin: 0;
   margin-bottom: var(--margin-elements);
 }
 
