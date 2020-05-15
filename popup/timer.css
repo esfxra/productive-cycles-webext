@@ -16,6 +16,7 @@ html {
   /* min-height: 165px; */
   /* padding-bottom: 10px; */
   font-family: robotoMono, monospace;
+  overflow: hidden;
 }
 
 body {
@@ -38,17 +39,19 @@ body {
 /* Main UI */
 .top {
   width: 100%;
-  /* height: 8px; */
   height: 15px;
-  margin-bottom: calc(var(--margin-elements) - 3px);
+  margin-bottom: calc(var(--margin-elements) - 5px);
 }
 
 #options {
-  /* max-width: 13px; */
-  max-width: 15px;
-  padding: 0 3.5px;
+  width: 15px;
+  height: 15px;
+  margin-right: 3.5px;
   float: right;
   cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .time-container {
@@ -236,9 +239,13 @@ p span {
 }
 
 #back {
-  max-width: 13px;
+  width: 13px;
+  height: 13px;
   float: right;
   cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
 }
 
 #status {

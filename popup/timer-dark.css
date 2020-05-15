@@ -2,6 +2,10 @@ body {
     background-color: #202124;
 }
 
+#options {
+    background-image: url(../icons/options-512-dark.png);
+  }
+
 #time {
     color: #F5F5F5;
 }
@@ -30,6 +34,7 @@ body {
   }
 
   #skip {
+      color: #F5F5F5;
     border-bottom: 1px dashed #F5F5F5;
   }
 
@@ -46,6 +51,10 @@ body {
   }
 
     /* Options UI */
+    #back {
+        background-image: url(../icons/back-512-dark.png);
+    }
+
 h1 {
     color: #F5F5F5;  }
 
@@ -67,6 +76,10 @@ h1 {
   p {
     color: #808080;
   }
+
+  #status {
+        color: #f5f5f5;
+    }
 
   /* Checkmark (from w3schoools) */
 /* Customize the label (the container) */

@@ -2,6 +2,10 @@ body {
     background-color: white;
 }
 
+#options {
+    background-image: url(../icons/options-512.png);
+  }
+
 #time {
     color: black;
 }
@@ -29,6 +33,7 @@ body {
   }
 
   #skip {
+      color: black;
     border-bottom: 1px dashed black;
   }
 
@@ -45,6 +50,10 @@ body {
   }
 
   /* Options UI */
+#back {
+    background-image: url(../icons/back-512.png);
+}
+
 h1 {
 color: black  }
 
@@ -64,6 +73,10 @@ color: black  }
 
   p {
     color: gray;
+  }
+
+  #status {
+      color: black;
   }
 
   /* Checkmark (from w3schoools) */
