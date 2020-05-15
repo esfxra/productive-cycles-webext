@@ -4,18 +4,14 @@
   <head>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="timer.css" />
+    <link id="theme" rel="stylesheet" type="text/css" href="timer-dark.css" />
   </head>
 
   <body>
     <div class="popup-container">
       <div class="timer-ui">
         <div class="top">
-          <img
-            id="options"
-            alt="options icon"
-            title="options"
-            src="../icons/options-512.png"
-          />
+          <div id="options" alt="options icon" title="options"></div>
         </div>
         <div class="time-container">
           <!-- <div id="break-text" class="hidden">
@@ -55,42 +51,56 @@
       </div>
       <div class="options-ui hidden">
         <div class="top">
-          <img
-            id="back"
-            alt="back icon"
-            title="back"
-            src="../icons/back-512.png"
-          />
-        </div>
-        <h1>options</h1>
-
-        <p><span>note:</span> changes will reset the timer</p>
-
-        <div class="option">
-          <label for="minutes">timer minutes</label>
-          <input type="number" id="minutes" name="minutes" min="1" max="60" />
+          <div id="back" alt="back icon" title="back"></div>
         </div>
 
-        <div class="option">
-          <label for="break">break minutes</label>
-          <input type="number" id="break" name="break" min="1" max="20" />
+        <h1>theme</h1>
+        <div class="dp1">
+          <div
+            alt="light mode"
+            title="light mode"
+            class="theme-option option-light"
+          ></div>
+          <div
+            alt="dark mode"
+            title="dark mode"
+            class="theme-option option-dark"
+          ></div>
         </div>
 
-        <div class="option">
-          <label for="cycles">total cycles</label>
-          <input type="number" id="cycles" name="cycles" min="1" max="8" />
-        </div>
+        <h1>timer options</h1>
+        <div
+          class="dp1"
+          style="border-bottom: none; padding-bottom: 0; margin-bottom: 0;"
+        >
+          <p><span>note:</span> changes below will reset the timer</p>
 
-        <div class="option">
-          <label for="auto-start">cycle auto-start</label>
-          <label class="container">
-            <input type="checkbox" id="auto-start" />
-            <span class="checkmark"></span>
-          </label>
-        </div>
+          <div class="option">
+            <label for="minutes">timer minutes</label>
+            <input type="number" id="minutes" name="minutes" min="1" max="60" />
+          </div>
 
-        <button id="save">save</button>
-        <div id="status"></div>
+          <div class="option">
+            <label for="break">break minutes</label>
+            <input type="number" id="break" name="break" min="1" max="20" />
+          </div>
+
+          <div class="option">
+            <label for="cycles">total cycles</label>
+            <input type="number" id="cycles" name="cycles" min="1" max="8" />
+          </div>
+
+          <div class="option">
+            <label for="auto-start">cycle auto-start</label>
+            <label class="container">
+              <input type="checkbox" id="auto-start" />
+              <span class="checkmark"></span>
+            </label>
+          </div>
+
+          <button id="save">save</button>
+          <div id="status"></div>
+        </div>
       </div>
     </div>
     <script src="timer.js"></script>
