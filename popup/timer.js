@@ -1,24 +1,24 @@
-"use strict";
+'use strict';
 
 // timer.js globals
-var port = chrome.runtime.connect({ name: "port-from-popup" });
-var statusChanged = false;
-var previousStatus = null;
-var resetRequested = false;
-var lightTheme = false;
-var darkTheme = false;
-var backgroundCommands = [
-  "start",
-  "pause",
-  "reset-cycle",
-  "reset-all",
-  "preload",
-  "skip",
+let port = chrome.runtime.connect({ name: 'port-from-popup' });
+let statusChanged = false;
+let previousStatus = null;
+let resetRequested = false;
+let lightTheme = false;
+let darkTheme = false;
+let backgroundCommands = [
+  'start',
+  'pause',
+  'reset-cycle',
+  'reset-all',
+  'preload',
+  'skip',
 ];
 
 // Handle inputs
-document.addEventListener("click", (e) => {
-  let selection = e.target.id;
+document.addEventListener('click', (e) => {
+  const selection = e.target.id;
   for (let command of backgroundCommands) {
     if (selection === command) {
       port.postMessage({ command: selection });
@@ -29,34 +29,33 @@ document.addEventListener("click", (e) => {
   }
 
   // Input actions... including switching buttons immediately
-  let ui = null;
   switch (selection) {
-    case "start":
-      hideElement("#start");
-      showElement("#pause");
+    case 'start':
+      hideElement('#start');
+      showElement('#pause');
       break;
-    case "pause":
-      hideElement("#pause");
-      showElement("#start");
+    case 'pause':
+      hideElement('#pause');
+      showElement('#start');
       break;
-    case "skip":
+    case 'skip':
       break;
-    case "reset-cycle":
-    case "reset-all":
-      hideElement("#pause");
-      showElement("#start");
+    case 'reset-cycle':
+    case 'reset-all':
+      hideElement('#pause');
+      showElement('#start');
       resetRequested = true;
       break;
-    case "options":
+    case 'options':
       restoreOptions();
-      hideElement(".timer-ui");
-      showElement(".options-ui");
+      hideElement('.timer-ui');
+      showElement('.options-ui');
       break;
-    case "back":
-      hideElement(".options-ui");
-      showElement(".timer-ui");
+    case 'back':
+      hideElement('.options-ui');
+      showElement('.timer-ui');
       break;
-    case "save":
+    case 'save':
       saveOptions();
       resetRequested = true;
       break;
@@ -64,69 +63,69 @@ document.addEventListener("click", (e) => {
 });
 
 // Register the UI has been loaded and let the background script know
-window.addEventListener("DOMContentLoaded", (event) => {
-  port.postMessage({ command: "preload" });
+window.addEventListener('DOMContentLoaded', (event) => {
+  port.postMessage({ command: 'preload' });
 
   // Check what is the theme saved in storage
-  let stylesheet = document.querySelector("#theme");
+  let stylesheet = document.querySelector('#theme');
 
-  chrome.storage.local.get({ theme: "light" }, function (items) {
-    if (items.theme === "light") {
+  chrome.storage.local.get({ theme: 'light' }, function (items) {
+    if (items.theme === 'light') {
       lightTheme = true;
       darkTheme = false;
 
-      if (!stylesheet.href.includes("timer-light")) {
-        stylesheet.href = "timer-light.css";
+      if (!stylesheet.href.includes('timer-light')) {
+        stylesheet.href = 'timer-light.css';
       }
     } else {
       darkTheme = true;
       lightTheme = false;
 
-      if (!stylesheet.href.includes("timer-dark")) {
-        stylesheet.href = "timer-dark.css";
+      if (!stylesheet.href.includes('timer-dark')) {
+        stylesheet.href = 'timer-dark.css';
       }
     }
   });
 
   // Register listeners for theme toggle (light / dark)
-  let light = document.querySelector(".option-light");
-  let dark = document.querySelector(".option-dark");
-  light.addEventListener("click", () => {
-    if (!stylesheet.href.includes("timer-light")) {
-      stylesheet.href = "timer-light.css";
+  const light = document.querySelector('.option-light');
+  const dark = document.querySelector('.option-dark');
+  light.addEventListener('click', () => {
+    if (!stylesheet.href.includes('timer-light')) {
+      stylesheet.href = 'timer-light.css';
     }
 
     // Check if it this is the theme saved
     if (!lightTheme) {
       chrome.storage.local.set(
         {
-          theme: "light",
+          theme: 'light',
         },
         function () {
-          console.log("Theme set to light");
+          console.log('Theme set to light');
         }
       );
     } else {
-      console.log("Theme was already set to light - keeping it");
+      console.log('Theme was already set to light - keeping it');
     }
   });
-  dark.addEventListener("click", () => {
-    if (!stylesheet.href.includes("timer-dark")) {
-      stylesheet.href = "timer-dark.css";
+  dark.addEventListener('click', () => {
+    if (!stylesheet.href.includes('timer-dark')) {
+      stylesheet.href = 'timer-dark.css';
     }
 
     // Check if it this is the theme saved
     if (!darkTheme) {
       chrome.storage.local.set(
         {
-          theme: "dark",
+          theme: 'dark',
         },
         function () {
-          console.log("Theme set to dark");
+          console.log('Theme set to dark');
         }
       );
     } else {
-      console.log("Theme was already set to dark - keeping it");
+      console.log('Theme was already set to dark - keeping it');
     }
   });
 });
@@ -146,80 +145,80 @@ port.onMessage.addListener((message) => {
   }
 
   // Change the text in the #time element with the updated time coming from the background script
-  document.querySelector("#time").textContent = message.time;
+  document.querySelector('#time').textContent = message.time;
 
   // Change UI based on message.status
   if (statusChanged || resetRequested) {
     let elt = null;
     switch (message.status) {
-      case "initial":
-        elt = document.querySelector(".time-container");
-        if (elt.classList.contains("break")) {
-          elt.classList.remove("break");
+      case 'initial':
+        elt = document.querySelector('.time-container');
+        if (elt.classList.contains('break')) {
+          elt.classList.remove('break');
         }
         // Adjust "time"
-        document.querySelector("#time").classList.remove("complete-text");
+        document.querySelector('#time').classList.remove('complete-text');
         // Adjust .control spacing
-        document.querySelector(".control").style.justifyContent =
-          "space-between";
-        hideElement("#skip");
+        document.querySelector('.control').style.justifyContent =
+          'space-between';
+        hideElement('#skip');
         // hideElement("#break-text");
-        hideElement("#pause");
-        showElement("#start");
-        showElement("#reset-cycle");
-        showElement("#reset-all");
+        hideElement('#pause');
+        showElement('#start');
+        showElement('#reset-cycle');
+        showElement('#reset-all');
         break;
-      case "running":
+      case 'running':
         // Adjust "time"
-        document.querySelector("#time").classList.remove("complete-text");
-        elt = document.querySelector(".time-container");
-        if (elt.classList.contains("break")) {
-          elt.classList.remove("break");
+        document.querySelector('#time').classList.remove('complete-text');
+        elt = document.querySelector('.time-container');
+        if (elt.classList.contains('break')) {
+          elt.classList.remove('break');
         }
         // Adjust .control spacing
-        document.querySelector(".control").style.justifyContent =
-          "space-between";
-        hideElement("#skip");
+        document.querySelector('.control').style.justifyContent =
+          'space-between';
+        hideElement('#skip');
         // hideElement("#break-text");
-        hideElement("#start");
-        showElement("#pause");
-        showElement("#reset-cycle");
-        showElement("#reset-all");
+        hideElement('#start');
+        showElement('#pause');
+        showElement('#reset-cycle');
+        showElement('#reset-all');
         break;
-      case "paused":
-        hideElement("#pause");
-        showElement("#start");
+      case 'paused':
+        hideElement('#pause');
+        showElement('#start');
         break;
-      case "complete":
+      case 'complete':
         // Adjust "time"
-        document.querySelector("#time").textContent = "complete";
-        document.querySelector("#time").classList.add("complete-text");
-        document.querySelector(".control").style.justifyContent =
-          "space-around";
-        hideElement("#pause");
-        hideElement("#start");
+        document.querySelector('#time').textContent = 'complete';
+        document.querySelector('#time').classList.add('complete-text');
+        document.querySelector('.control').style.justifyContent =
+          'space-around';
+        hideElement('#pause');
+        hideElement('#start');
         break;
-      case "break":
-        elt = document.querySelector(".time-container");
-        if (!elt.classList.contains("break")) {
-          elt.classList.add("break");
+      case 'break':
+        elt = document.querySelector('.time-container');
+        if (!elt.classList.contains('break')) {
+          elt.classList.add('break');
         }
-        document.querySelector(".control").style.justifyContent = "center";
-        hideElement("#pause");
-        hideElement("#start");
-        hideElement("#reset-cycle");
-        hideElement("#reset-all");
+        document.querySelector('.control').style.justifyContent = 'center';
+        hideElement('#pause');
+        hideElement('#start');
+        hideElement('#reset-cycle');
+        hideElement('#reset-all');
         // showElement("#break-text");
-        showElement("#skip");
+        showElement('#skip');
 
         break;
     }
 
     // Tracker
     // Compute the number of cycles to display, which one is running, and which are complete
-    console.log("Rebuilding the tracker ...");
+    console.log('Rebuilding the tracker ...');
     console.log(`previousStatus: ${previousStatus}`);
-    let cyclesNode = document.querySelector(".cycles");
+    const cyclesNode = document.querySelector('.cycles');
 
     // Reset cyclesNode
     let node = cyclesNode.lastElementChild;
@@ -231,44 +230,44 @@ port.onMessage.addListener((message) => {
     // Adjust CSS for < 4 cycles
     if (message.totalCycles < 4) {
       cyclesNode.style.gridTemplateColumns =
-        "repeat(" + message.totalCycles + ", auto)";
+        'repeat(' + message.totalCycles + ', auto)';
     } else {
-      cyclesNode.style.gridTemplateColumns = "repeat(4, auto)";
+      cyclesNode.style.gridTemplateColumns = 'repeat(4, auto)';
     }
 
     if (message.totalCycles < 3) {
-      cyclesNode.style.justifyContent = "space-evenly";
+      cyclesNode.style.justifyContent = 'space-evenly';
     } else {
-      cyclesNode.style.justifyContent = "space-between";
+      cyclesNode.style.justifyContent = 'space-between';
     }
 
     // Build cyclesNode
     let dotNode = null;
     let i = 1;
     while (i <= message.totalCycles) {
-      dotNode = document.createElement("span");
-      dotNode.id = "cycle-" + i;
-      dotNode.setAttribute("title", "cycle " + i);
-      dotNode.classList.add("dot");
+      dotNode = document.createElement('span');
+      dotNode.id = 'cycle-' + i;
+      dotNode.setAttribute('title', 'cycle ' + i);
+      dotNode.classList.add('dot');
       if (i === message.cycle) {
-        if (message.status === "initial" || message.status === "break") {
-          dotNode.classList.add("pending");
+        if (message.status === 'initial' || message.status === 'break') {
+          dotNode.classList.add('pending');
           // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
         } else if (
-          message.status === "running" ||
-          message.status === "paused"
+          message.status === 'running' ||
+          message.status === 'paused'
         ) {
-          dotNode.classList.add("running");
+          dotNode.classList.add('running');
           // html += '<span id="cycle-' + i + '" class="dot running"></span>';
-        } else if (message.status === "complete") {
-          dotNode.classList.add("complete");
+        } else if (message.status === 'complete') {
+          dotNode.classList.add('complete');
         }
       } else if (i < message.cycle) {
-        dotNode.classList.add("complete");
+        dotNode.classList.add('complete');
         // html += '<span id="cycle-' + i + '" class="dot complete"></span>';
       } else {
         // This should affect all cycles that are past the current (i.e. i > message.cycle)
-        dotNode.classList.add("pending");
+        dotNode.classList.add('pending');
         // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
       }
       cyclesNode.appendChild(dotNode);
@@ -280,26 +279,26 @@ port.onMessage.addListener((message) => {
 });
 
 function hideElement(element) {
-  console.debug("Hiding element");
-  let elt = document.querySelector(element);
-  if (!elt.classList.contains("hidden")) {
-    elt.classList.add("hidden");
+  console.debug('Hiding element');
+  const elt = document.querySelector(element);
+  if (!elt.classList.contains('hidden')) {
+    elt.classList.add('hidden');
   }
 }
 
 function showElement(element) {
-  console.debug("Showing element");
-  let elt = document.querySelector(element);
-  if (elt.classList.contains("hidden")) {
-    elt.classList.remove("hidden");
+  console.debug('Showing element');
+  const elt = document.querySelector(element);
+  if (elt.classList.contains('hidden')) {
+    elt.classList.remove('hidden');
   }
 }
 
 function saveOptions() {
-  var time = parseInt(document.querySelector("#minutes").value);
-  var breakTime = parseInt(document.querySelector("#break").value);
-  var cycleNumber = parseInt(document.querySelector("#cycles").value);
-  var autoStartBox = document.querySelector("#auto-start").checked;
+  const time = parseInt(document.querySelector('#minutes').value);
+  const breakTime = parseInt(document.querySelector('#break').value);
+  const cycleNumber = parseInt(document.querySelector('#cycles').value);
+  const autoStartBox = document.querySelector('#auto-start').checked;
   chrome.storage.local.set(
     {
       minutes: time,
@@ -309,10 +308,10 @@ function saveOptions() {
     },
     function () {
       // Update status to let user know options were saved.
-      var status = document.querySelector("#status");
-      status.textContent = "saved 🎉";
+      const status = document.querySelector('#status');
+      status.textContent = 'saved 🎉';
       setTimeout(function () {
-        status.textContent = "";
+        status.textContent = '';
       }, 5000);
     }
   );
@@ -327,10 +326,10 @@ function restoreOptions() {
       autoStart: true,
     },
     function (items) {
-      document.querySelector("#minutes").value = items.minutes;
-      document.querySelector("#break").value = items.break;
-      document.querySelector("#cycles").value = items.totalCycles;
-      document.querySelector("#auto-start").checked = items.autoStart;
+      document.querySelector('#minutes').value = items.minutes;
+      document.querySelector('#break').value = items.break;
+      document.querySelector('#cycles').value = items.totalCycles;
+      document.querySelector('#auto-start').checked = items.autoStart;
     }
   );
 }
