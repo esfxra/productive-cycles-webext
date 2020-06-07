@@ -19,7 +19,7 @@
   },
 
   "background": {
-    "scripts": ["background-timer.js"]
+    "scripts": ["Timer.js", "background-timer.js"]
   },
 
   "permissions": ["notifications", "storage", "idle"]
