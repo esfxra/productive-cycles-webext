@@ -1,11 +1,21 @@
 'use strict';
 
-// background-timer.js globals
+/*
+    Declarations and init() call
+
+    - Properties of Settings and Timer are declared as null
+    - True assignments follow in init() call ... Which accesses chrome.storage
+
+    Future: Include part or all of the consts in 'Defaults' into Settings
+*/
+
+// Globals
 let port = null;
 let popUpOpen = false;
 let uiInterval = null;
 let cycleTimeout = null;
 let breakTimeout = null;
+
 // Defaults
 const defaultTime = 25 * 60000;
 const defaultBreak = 5 * 60000;
@@ -13,9 +23,11 @@ const defaultCycles = 4;
 const defaultAutoStart = true;
 const cycleNotification = 'cycle-complete-notification';
 const breakNotification = 'break-complete-notification';
-// developer
+
+// Developer
 const devOffset = 0;
 
+// Settings object
 let Settings = {
   time: null,
   breakTime: null,
@@ -24,6 +36,7 @@ let Settings = {
   autoStart: null,
 };
 
+// Timer object
 let Timer = {
   targetCycles: [],
   targetBreaks: [],
@@ -42,7 +55,18 @@ let Timer = {
   },
 };
 
+// Initialize the program; see below for init() description
 init();
+
+/*  
+    Register all listeners
+
+    - runtime.onInstalled
+    - runtime.onConnect
+    - idle.onStateChanged
+    - storage.onChanged
+
+*/
 
 // Listen for "install" or "update" event
 chrome.runtime.onInstalled.addListener(install);
@@ -102,6 +126,31 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
   }
 });
 
+/* 
+    Function definitions
+
+    These are organized based on a predetermined canonical user
+    Rough definition of the actions taken by such caninocal user: User installs the extension, opens the popup, and starts a cycle
+
+    - init
+    - install
+    - connect
+    - disconnect
+    - handleMessage
+    - start
+    - endCycle
+    - startBreak
+    - endBreak
+    - uiTime
+    - translateTimer
+    - syncTimer
+    - messageUI
+    - notify
+    - clearNotifications
+
+*/
+
+// Initialize the Settings object from chrome.storage and call Timer.reset
 function init() {
   chrome.storage.local.get(
     ['minutes', 'totalCycles', 'break', 'autoStart'],
@@ -255,6 +304,7 @@ function handleMessage(message) {
   }
 }
 
+// Sets Timer.status to 'running', calculates target times, and starts cycleTimeout
 function start() {
   console.debug(`start()`);
   console.debug(`Timer.remaining: ${Timer.remaining}`);
@@ -301,6 +351,7 @@ function start() {
   }
 }
 
+// Sets Timer.status to 'complete' or calls startBreak()
 function endCycle() {
   // Error reporting if current time does not align with target time in array
   console.debug('endCycle');
@@ -342,6 +393,7 @@ function endCycle() {
   }
 }
 
+// Sets Timer.status to 'break', sets Timer.remaining to break, and starts breakTimeout
 function startBreak() {
   console.debug(`startBreak()`);
   Timer.status = 'break';
@@ -355,6 +407,7 @@ function startBreak() {
   }
 }
 
+// Sets Timer.status to 'initial', sets Timer.remaining to cycle, and autostarts (if enabled)
 function endBreak() {
   // Error reporting if current time does not align with target time in array
   console.debug('endBreak()');
@@ -402,6 +455,8 @@ function endBreak() {
   }
 }
 
+// Starts uiInterval, and decreases Timer.remaining by 1000ms every second
+// The function process() is called as an IIFE (Immediately Invoked Function Expression)
 function uiTime() {
   clearInterval(uiInterval);
   // uiInterval runs as an IIFE (the code executes right away, and then intervals):
