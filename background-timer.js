@@ -44,15 +44,25 @@ let Timer = {
   cycle: null,
   break: null,
   status: null,
-  reset: function (time) {
-    this.targetCycles = [];
-    this.targetBreaks = [];
-    this.remaining = time;
-    this.cycle = 1;
-    this.break = 1;
-    this.status = 'initial';
-    console.log('Timer reset - Cycle: 1, Break: 1');
-  },
+  // reset: function (time) {
+  //   this.targetCycles = [];
+  //   this.targetBreaks = [];
+  //   this.remaining = time;
+  //   this.cycle = 1;
+  //   this.break = 1;
+  //   this.status = 'initial';
+  //   console.log('Timer reset - Cycle: 1, Break: 1');
+  // },
+};
+
+Timer.reset = function (time) {
+  this.targetCycles = [];
+  this.targetBreaks = [];
+  this.remaining = time;
+  this.cycle = 1;
+  this.break = 1;
+  this.status = 'initial';
+  console.log('Timer reset - Cycle: 1, Break: 1');
 };
 
 // Initialize the program; see below for init() description
@@ -173,7 +183,7 @@ function disconnect() {
   console.log(`Disconnected - popUpOpen: ${popUpOpen} - uiInterval cleared`);
 }
 
-// Handle messages send through the port from PopUp view for onMessage
+// Handle messages sent through the port from PopUp view for onMessage
 function handleMessage(message) {
   console.log(`Input received: ${message.command}`);
   switch (message.command) {
@@ -261,38 +271,29 @@ function handleMessage(message) {
 
 // Sets Timer.status to 'running', calculates target times, and starts cycleTimeout
 function start() {
-  console.debug(`start()`);
+  console.debug(`start():`);
   console.debug(`Timer.remaining: ${Timer.remaining}`);
 
   Timer.status = 'running';
 
   const reference = Date.now();
 
-  // targetCycles[] array
+  // Fill targetCycles[] array
   let i = Timer.cycle - 1;
   let j = 0;
   while (i < Settings.totalCycles) {
     Timer.targetCycles[i] = new Date(
-      // reference + Settings.time * (j + 1) + Settings.breakTime * j
       reference + Timer.remaining * (j + 1) + Settings.breakTime * j
     );
     i++;
     j++;
   }
-  console.log(
-    `Timer.targetCycles[${Timer.cycle - 1}]: ${
-      Timer.targetCycles[Timer.cycle - 1]
-    }`
-  );
-  // targetBreaks[] array
+
+  // Fill targetBreaks[] array
   i = Timer.break - 1;
   j = 0;
   while (i < Settings.totalBreaks) {
-    // Target for the current cycle
     Timer.targetBreaks[i] = new Date(
-      // reference +
-      //   Settings.time * (j + 1) +
-      //   Settings.breakTime * (j + 1)
       reference + Timer.remaining * (j + 1) + Settings.breakTime * (j + 1)
     );
     i++;
@@ -308,40 +309,14 @@ function start() {
 
 // Sets Timer.status to 'complete' or calls startBreak()
 function endCycle() {
-  // Error reporting if current time does not align with target time in array
-  console.debug('endCycle');
-  // const testTime = new Date(Date.now());
-  // const difference = testTime - Timer.targetCycles[Timer.cycle - 1];
-  // if (Math.abs(difference) > 1000) {
-  //   console.debug('Current time:', testTime.valueOf());
-  //   console.debug(
-  //     'Target time:',
-  //     Timer.targetCycles[Timer.cycle - 1].valueOf()
-  //   );
-  //   console.debug(
-  //     'endCycle(): There might be an issue with targetCycles, difference is:',
-  //     difference,
-  //     'ms'
-  //   );
-  // } else {
-  //   console.debug('Current time:', testTime.valueOf());
-  //   console.debug(
-  //     'Target time:',
-  //     Timer.targetCycles[Timer.cycle - 1].valueOf()
-  //   );
-  //   console.debug(
-  //     'endCycle(): targetCycles did great, difference is:',
-  //     difference,
-  //     'ms'
-  //   );
-  // }
+  console.debug(`endCycle()`);
   compareTargets();
   // endCycle code
   if (Timer.cycle === Settings.totalCycles) {
     Timer.status = 'complete';
     messageUI();
     notify('timer-complete');
-    console.log('Timer complete. New status:', Timer.status);
+    console.log(`Timer complete. New status: ${Timer.status}`);
   } else {
     notify('cycle-complete');
     Timer.cycle++;
@@ -365,34 +340,7 @@ function startBreak() {
 
 // Sets Timer.status to 'initial', sets Timer.remaining to cycle, and autostarts (if enabled)
 function endBreak() {
-  // Error reporting if current time does not align with target time in array
   console.debug('endBreak()');
-  // Debug
-  // const testTime = new Date(Date.now());
-  // const difference = testTime - Timer.targetBreaks[Timer.break - 1];
-  // if (Math.abs(difference) > 1000) {
-  //   console.debug('Current time:', testTime.valueOf());
-  //   console.debug(
-  //     'Target time:',
-  //     Timer.targetBreaks[Timer.break - 1].valueOf()
-  //   );
-  //   console.debug(
-  //     'endBreak(): There might be an issue with targetBreaks, difference is:',
-  //     difference,
-  //     'ms'
-  //   );
-  // } else {
-  //   console.debug('Current time:', testTime.valueOf());
-  //   console.debug(
-  //     'Target time:',
-  //     Timer.targetBreaks[Timer.break - 1].valueOf()
-  //   );
-  //   console.debug(
-  //     'endBreak(): targetBreaks did great, difference is:',
-  //     difference,
-  //     'ms'
-  //   );
-  // }
   compareTargets();
   // endBreak() code
   clearInterval(uiInterval);
@@ -420,12 +368,11 @@ function uiTime() {
   uiInterval = setInterval(
     (function process() {
       Timer.remaining = Timer.remaining - 1000;
-      // console.log(Timer.remaining);
       messageUI();
       if (Timer.remaining < 1000) {
         console.log(
-          'uiTime(): Clearing interval - Timer.remaining:',
-          Timer.remaining
+          `uiTime(): Clearing interval - Timer.remaining:',
+          ${Timer.remaining}`
         );
         clearInterval(uiInterval);
       }
@@ -468,9 +415,12 @@ function translateTime(milliseconds) {
   return minStr + ':' + secStr;
 }
 
+// Locate expected cycle or break, and make adjustments to the timeline arrays
 function syncTimer(state) {
   console.debug(`syncTimer() - New state is ${state}`);
 
+  // Sync time only if the timer has started
+  // ... Consider replacing these conditions by simply checking for 'running'
   if (
     Timer.targetCycles.length >= 1 &&
     Timer.status !== 'paused' &&
@@ -478,10 +428,11 @@ function syncTimer(state) {
   ) {
     const reference = Date.now();
 
-    // index counters
+    // Index counters
     let cyclesCompleted = 0;
     let breaksCompleted = 0;
 
+    // Count the number of cycles completed comparing target to current time
     let target = 0;
     while (target < Settings.totalCycles) {
       if (reference > Timer.targetCycles[target]) {
@@ -489,8 +440,8 @@ function syncTimer(state) {
       }
       target++;
     }
-    // console.debug(`cycle location - ${Timer.targetCycles[cycleIndexSaved]}`);
 
+    // Count the number of breaks completed comparing target to current time
     target = 0;
     while (target < Settings.totalBreaks) {
       if (reference > Timer.targetBreaks[target]) {
@@ -498,17 +449,31 @@ function syncTimer(state) {
       }
       target++;
     }
-    // console.debug(`break location - ${Timer.targetBreaks[breakIndexSaved]}`);
-    // console.debug(`cyclesCompleted: ${cyclesCompleted}`);
-    // console.debug(`breaksCompleted: ${breaksCompleted}`);
+
+    const locator = cyclesCompleted - breaksCompleted;
 
     clearTimeout(cycleTimeout);
     clearTimeout(breakTimeout);
     // clearInterval(uiInterval); - Not used because the interval is cleared by preload ...
-    const locator = cyclesCompleted - breaksCompleted;
+
+    /* 
+
+      Description for the code below
+
+      If autoStart is enabled: Correct the following ...
+
+      - status
+      - cycle
+      - break
+      - timeline arrays
+
+      If not: Simply end the current break or current cycle
+
+    */
+
     if (Settings.autoStart) {
       if (cyclesCompleted >= Settings.totalCycles) {
-        // Complete
+        // Timer has completed all cycles
         console.debug(
           'Timer complete - Setting Timer.status, Timer.cycle, Timer.break '
         );
@@ -516,58 +481,60 @@ function syncTimer(state) {
         Timer.cycle = Settings.totalCycles;
         Timer.break = Settings.totalBreaks;
       } else if (locator === 1) {
-        // On Break
+        // Timer is on break
         console.debug(`locator: 1 -> on break ...`);
         console.debug(
           `Identified cycle: ${cyclesCompleted + 1}, Identified break: ${
             breaksCompleted + 1
           }`
         );
+
         Timer.status = 'break';
         Timer.cycle = cyclesCompleted + 1;
         Timer.break = breaksCompleted + 1;
-        // Resetting the Timeout for "On Break"
+
         const newTarget = Timer.targetBreaks[breaksCompleted] - Date.now();
         breakTimeout = setTimeout(endBreak, newTarget);
+
         console.debug(
           'On Break - endBreak() will run at:',
           Timer.targetBreaks[breaksCompleted]
         );
       } else if (locator === 0) {
-        // Running
+        // Timer is running
         console.debug(`locator: 0 -> running ...`);
         console.debug(
           `Identified cycle: ${cyclesCompleted + 1}, Identified break: ${
             breaksCompleted + 1
           }`
         );
+
         Timer.status = 'running';
         Timer.cycle = cyclesCompleted + 1;
         Timer.break = breaksCompleted + 1;
-        // Resetting the Timeout for "Running"
+
         const newTarget = Timer.targetCycles[cyclesCompleted] - Date.now();
         cycleTimeout = setTimeout(endCycle, newTarget);
+
         console.debug(
           'Running - endCycle() will run at:',
           Timer.targetCycles[cyclesCompleted]
         );
       }
     } else {
-      // Checking if the current cycle or break target has passed
-      // for Settings.autostart: 'false'
-      let difference = 0;
       if (Timer.status === 'running') {
         console.debug(
           `Adjusting current cycle - Timer.status: '${Timer.status}'`
         );
-        difference = Timer.targetCycles[Timer.cycle - 1] - reference; // reference = Date.now
+        const difference = Timer.targetCycles[Timer.cycle - 1] - reference;
         if (difference < 0) {
-          // Next state ... break
+          // End cycle right away
           const newTarget = Settings.breakTime + Date.now();
           Timer.targetBreaks[Timer.break - 1] = newTarget; // For autostart = false
           clearInterval(uiInterval);
           endCycle();
         } else {
+          // End cycle after the ms defined in 'difference'
           if (popUpOpen) {
             uiTime();
           }
@@ -578,12 +545,13 @@ function syncTimer(state) {
         console.debug(
           `Adjusting current break - Timer.status: '${Timer.status}'`
         );
-        difference = Timer.targetBreaks[Timer.break - 1] - reference; // reference = Date.now
+        const difference = Timer.targetBreaks[Timer.break - 1] - reference;
         if (difference < 0) {
-          // Next state ... cycle
+          // End break right away
           clearInterval(uiInterval);
           endBreak();
         } else {
+          // End break after the ms defined in 'difference'
           if (popUpOpen) {
             uiTime();
           }
@@ -630,12 +598,12 @@ function notify(type) {
     case 'autostart':
       id = `${breakNotification}-${Timer.break - 1}`;
       title = `cycle ${Timer.cycle} starting`;
-      message = 'time to grind, friend';
+      message = 'time to grind';
       break;
     case 'break-complete':
       id = `${breakNotification}-${Timer.break - 1}`;
       title = `don't forget to start cycle ${Timer.cycle}`;
-      message = 'time to grind, friend';
+      message = 'time to grind';
       break;
   }
 
@@ -659,41 +627,42 @@ function clearNotifications(clearAll) {
     while (i <= Settings.totalCycles) {
       id = `${cycleNotification}-${i}`;
       chrome.notifications.clear(id);
-      // console.debug(`id: '${id}' cleared`);
       i++;
     }
-    console.log('All cycle-complete notifications cleared');
+    console.log(`All cycle-complete notifications cleared`);
     i = 1;
     while (i <= Settings.totalBreaks) {
       id = `${breakNotification}-${i}`;
       chrome.notifications.clear(id);
-      // console.debug(`id: '${id}' cleared`);
       i++;
     }
-    console.log('All break-complete notifications cleared');
+    console.log(`All break-complete notifications cleared`);
   } else {
+    // Clear notifications for the current cycle and current break only
     id = `${cycleNotification}-${Timer.cycle}`;
     chrome.notifications.clear(id);
-    // console.debug(`id: '${id}' cleared`);
     id = `${breakNotification}-${Timer.break}`;
     chrome.notifications.clear(id);
-    // console.debug(`id: '${id}' cleared`);
   }
 }
 
 // Identify changes in the user settings through storage.onChanged listener
 function newSettings(changes, namespace) {
+  console.log(`newSettings():`);
   let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
     console.log(
-      'Storage key "%s" in namespace "%s" changed. ' +
-        'Old value was "%s", new value is "%s".',
-      key,
-      namespace,
-      storageChange.oldValue,
-      storageChange.newValue
+      `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
     );
+    // console.log(
+    //   'Storage key "%s" in namespace "%s" changed. ' +
+    //     'Old value was "%s", new value is "%s".',
+    //   key,
+    //   namespace,
+    //   storageChange.oldValue,
+    //   storageChange.newValue
+    // );
 
     // Update Settings
     switch (key) {
@@ -732,6 +701,7 @@ function newSettings(changes, namespace) {
 
 // Debug purposes: Compare target times
 function compareTargets() {
+  console.debug(`compareTargets()`);
   let targetTime = null;
   if (Timer.status === 'running') {
     targetTime = Timer.targetCycles[Timer.cycle - 1];
@@ -743,20 +713,14 @@ function compareTargets() {
   const difference = testTime - targetTime;
 
   if (Math.abs(difference) > 1000) {
-    console.debug('Expected time:', testTime);
-    console.debug('Target time:', targetTime);
+    console.debug(`Expected time: ${testTime}`);
+    console.debug(`Target time: ${targetTime}`);
     console.debug(
-      'compareTargets(): There might be an issue with the target, difference is:',
-      difference,
-      'ms'
+      `Potential issue with target time, difference is: ${difference} ms`
     );
   } else {
-    console.debug('Expected time:', testTime);
-    console.debug('Target time:', targetTime);
-    console.debug(
-      'compareTargets(): target did great, difference is:',
-      difference,
-      'ms'
-    );
+    console.debug(`Expected time: ${testTime}`);
+    console.debug(`Target time: ${targetTime}`);
+    console.debug(`Target did great, difference is: ${difference} ms`);
   }
 }
