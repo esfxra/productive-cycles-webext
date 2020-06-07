@@ -78,53 +78,7 @@ chrome.runtime.onConnect.addListener(connect);
 chrome.idle.onStateChanged.addListener(syncTimer);
 
 // Listen for changes in the options, report and reload
-chrome.storage.onChanged.addListener(function (changes, namespace) {
-  let settingsChanged = false;
-  for (let key in changes) {
-    let storageChange = changes[key];
-    console.log(
-      'Storage key "%s" in namespace "%s" changed. ' +
-        'Old value was "%s", new value is "%s".',
-      key,
-      namespace,
-      storageChange.oldValue,
-      storageChange.newValue
-    );
-
-    // Update Settings
-    switch (key) {
-      case 'minutes':
-        Settings.time = storageChange.newValue * 60000;
-        settingsChanged = true;
-        break;
-      case 'break':
-        Settings.breakTime = storageChange.newValue * 60000;
-        settingsChanged = true;
-        break;
-      case 'totalCycles':
-        Settings.totalCycles = storageChange.newValue;
-        Settings.totalBreaks = storageChange.newValue - 1;
-        settingsChanged = true;
-        break;
-      case 'autoStart':
-        Settings.autoStart = storageChange.newValue;
-        settingsChanged = true;
-        break;
-    }
-  }
-  if (settingsChanged) {
-    // Clear all intervals and Timeouts
-    clearInterval(uiInterval);
-    clearTimeout(cycleTimeout);
-    clearTimeout(breakTimeout);
-    // Clear all notifciations
-    clearNotifications(true);
-    // Set runtime properties to defaults
-    Timer.reset(Settings.time);
-    // Message PopUp to update timer UI with new changes
-    messageUI(Timer.remaining, Settings.totalCycles, Timer.cycle, Timer.status);
-  }
-});
+chrome.storage.onChanged.addListener(newSettings);
 
 /* 
     Function definitions
@@ -147,6 +101,7 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     - messageUI
     - notify
     - clearNotifications
+    - newSettings
 
 */
 
@@ -721,5 +676,54 @@ function clearNotifications(clearAll) {
     id = `${breakNotification}-${Timer.break}`;
     chrome.notifications.clear(id);
     // console.debug(`id: '${id}' cleared`);
+  }
+}
+
+// Identify changes in the user settings through storage.onChanged listener
+function newSettings(changes, namespace) {
+  let settingsChanged = false;
+  for (let key in changes) {
+    let storageChange = changes[key];
+    console.log(
+      'Storage key "%s" in namespace "%s" changed. ' +
+        'Old value was "%s", new value is "%s".',
+      key,
+      namespace,
+      storageChange.oldValue,
+      storageChange.newValue
+    );
+
+    // Update Settings
+    switch (key) {
+      case 'minutes':
+        Settings.time = storageChange.newValue * 60000;
+        settingsChanged = true;
+        break;
+      case 'break':
+        Settings.breakTime = storageChange.newValue * 60000;
+        settingsChanged = true;
+        break;
+      case 'totalCycles':
+        Settings.totalCycles = storageChange.newValue;
+        Settings.totalBreaks = storageChange.newValue - 1;
+        settingsChanged = true;
+        break;
+      case 'autoStart':
+        Settings.autoStart = storageChange.newValue;
+        settingsChanged = true;
+        break;
+    }
+  }
+  if (settingsChanged) {
+    // Clear all intervals and Timeouts
+    clearInterval(uiInterval);
+    clearTimeout(cycleTimeout);
+    clearTimeout(breakTimeout);
+    // Clear all notifications
+    clearNotifications(true);
+    // Set runtime properties to defaults
+    Timer.reset(Settings.time);
+    // Message PopUp to update timer UI with new changes
+    messageUI(Timer.remaining, Settings.totalCycles, Timer.cycle, Timer.status);
   }
 }
