@@ -246,12 +246,12 @@ function handleMessage(message) {
       console.debug(
         `Break skipped - Cycle: '${Timer.cycle}' Break: '${Timer.break}'`
       );
-      // The following is done to prevent syncTimer to identify this as
-      // a break that has not been completed
-      // consider it a timeline correction ...
+
+      // Timeline correction for syncTimer()
       console.debug(`Target was - ${Timer.targetBreaks[Timer.break - 1]}`);
       Timer.targetBreaks[Timer.break - 1] = Date.now();
       console.debug(`Target now is - ${Timer.targetBreaks[Timer.break - 1]}`);
+
       endBreak();
       break;
     default:
@@ -310,31 +310,32 @@ function start() {
 function endCycle() {
   // Error reporting if current time does not align with target time in array
   console.debug('endCycle');
-  const testTime = new Date(Date.now());
-  const difference = testTime - Timer.targetCycles[Timer.cycle - 1];
-  if (Math.abs(difference) > 1000) {
-    console.debug('Current time:', testTime.valueOf());
-    console.debug(
-      'Target time:',
-      Timer.targetCycles[Timer.cycle - 1].valueOf()
-    );
-    console.debug(
-      'endCycle(): There might be an issue with targetCycles, difference is:',
-      difference,
-      'ms'
-    );
-  } else {
-    console.debug('Current time:', testTime.valueOf());
-    console.debug(
-      'Target time:',
-      Timer.targetCycles[Timer.cycle - 1].valueOf()
-    );
-    console.debug(
-      'endCycle(): targetCycles did great, difference is:',
-      difference,
-      'ms'
-    );
-  }
+  // const testTime = new Date(Date.now());
+  // const difference = testTime - Timer.targetCycles[Timer.cycle - 1];
+  // if (Math.abs(difference) > 1000) {
+  //   console.debug('Current time:', testTime.valueOf());
+  //   console.debug(
+  //     'Target time:',
+  //     Timer.targetCycles[Timer.cycle - 1].valueOf()
+  //   );
+  //   console.debug(
+  //     'endCycle(): There might be an issue with targetCycles, difference is:',
+  //     difference,
+  //     'ms'
+  //   );
+  // } else {
+  //   console.debug('Current time:', testTime.valueOf());
+  //   console.debug(
+  //     'Target time:',
+  //     Timer.targetCycles[Timer.cycle - 1].valueOf()
+  //   );
+  //   console.debug(
+  //     'endCycle(): targetCycles did great, difference is:',
+  //     difference,
+  //     'ms'
+  //   );
+  // }
+  compareTargets();
   // endCycle code
   if (Timer.cycle === Settings.totalCycles) {
     Timer.status = 'complete';
@@ -367,31 +368,32 @@ function endBreak() {
   // Error reporting if current time does not align with target time in array
   console.debug('endBreak()');
   // Debug
-  let testTime = new Date(Date.now());
-  let difference = testTime - Timer.targetBreaks[Timer.break - 1];
-  if (Math.abs(difference) > 1000) {
-    console.debug('Current time:', testTime.valueOf());
-    console.debug(
-      'Target time:',
-      Timer.targetBreaks[Timer.break - 1].valueOf()
-    );
-    console.debug(
-      'endBreak(): There might be an issue with targetBreaks, difference is:',
-      difference,
-      'ms'
-    );
-  } else {
-    console.debug('Current time:', testTime.valueOf());
-    console.debug(
-      'Target time:',
-      Timer.targetBreaks[Timer.break - 1].valueOf()
-    );
-    console.debug(
-      'endBreak(): targetBreaks did great, difference is:',
-      difference,
-      'ms'
-    );
-  }
+  // const testTime = new Date(Date.now());
+  // const difference = testTime - Timer.targetBreaks[Timer.break - 1];
+  // if (Math.abs(difference) > 1000) {
+  //   console.debug('Current time:', testTime.valueOf());
+  //   console.debug(
+  //     'Target time:',
+  //     Timer.targetBreaks[Timer.break - 1].valueOf()
+  //   );
+  //   console.debug(
+  //     'endBreak(): There might be an issue with targetBreaks, difference is:',
+  //     difference,
+  //     'ms'
+  //   );
+  // } else {
+  //   console.debug('Current time:', testTime.valueOf());
+  //   console.debug(
+  //     'Target time:',
+  //     Timer.targetBreaks[Timer.break - 1].valueOf()
+  //   );
+  //   console.debug(
+  //     'endBreak(): targetBreaks did great, difference is:',
+  //     difference,
+  //     'ms'
+  //   );
+  // }
+  compareTargets();
   // endBreak() code
   clearInterval(uiInterval);
   Timer.status = 'initial';
@@ -725,5 +727,36 @@ function newSettings(changes, namespace) {
     Timer.reset(Settings.time);
     // Message PopUp to update timer UI with new changes
     messageUI(Timer.remaining, Settings.totalCycles, Timer.cycle, Timer.status);
+  }
+}
+
+// Debug purposes: Compare target times
+function compareTargets() {
+  let targetTime = null;
+  if (Timer.status === 'running') {
+    targetTime = Timer.targetCycles[Timer.cycle - 1];
+  } else if (Timer.status === 'break') {
+    targetTime = Timer.targetBreaks[Timer.break - 1];
+  }
+
+  const testTime = new Date(Date.now());
+  const difference = testTime - targetTime;
+
+  if (Math.abs(difference) > 1000) {
+    console.debug('Expected time:', testTime);
+    console.debug('Target time:', targetTime);
+    console.debug(
+      'compareTargets(): There might be an issue with the target, difference is:',
+      difference,
+      'ms'
+    );
+  } else {
+    console.debug('Expected time:', testTime);
+    console.debug('Target time:', targetTime);
+    console.debug(
+      'compareTargets(): target did great, difference is:',
+      difference,
+      'ms'
+    );
   }
 }
