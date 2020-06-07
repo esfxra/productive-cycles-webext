@@ -79,7 +79,7 @@ chrome.idle.onStateChanged.addListener(syncTimer);
 
 // Listen for changes in the options, report and reload
 chrome.storage.onChanged.addListener(function (changes, namespace) {
-  let optionsChanged = false;
+  let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
     console.log(
@@ -95,24 +95,24 @@ chrome.storage.onChanged.addListener(function (changes, namespace) {
     switch (key) {
       case 'minutes':
         Settings.time = storageChange.newValue * 60000;
-        optionsChanged = true;
+        settingsChanged = true;
         break;
       case 'break':
         Settings.breakTime = storageChange.newValue * 60000;
-        optionsChanged = true;
+        settingsChanged = true;
         break;
       case 'totalCycles':
         Settings.totalCycles = storageChange.newValue;
         Settings.totalBreaks = storageChange.newValue - 1;
-        optionsChanged = true;
+        settingsChanged = true;
         break;
       case 'autoStart':
         Settings.autoStart = storageChange.newValue;
-        optionsChanged = true;
+        settingsChanged = true;
         break;
     }
   }
-  if (optionsChanged) {
+  if (settingsChanged) {
     // Clear all intervals and Timeouts
     clearInterval(uiInterval);
     clearTimeout(cycleTimeout);
