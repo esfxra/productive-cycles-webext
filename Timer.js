@@ -8,6 +8,14 @@ let Timer = {
   cycle: null,
   break: null,
   status: null,
+
+  settings: {
+    time: null,
+    breakTime: null,
+    totalCycles: null,
+    totalBreaks: null,
+    autoStart: null,
+  },
 };
 
 // Timer properties are set to reflect an initial state
@@ -51,9 +59,9 @@ Timer.startCycle = function () {
   // Fill targetCycles[] array
   let i = this.cycle - 1;
   let j = 0;
-  while (i < Settings.totalCycles) {
+  while (i < this.settings.totalCycles) {
     this.targetCycles[i] = new Date(
-      reference + this.remaining * (j + 1) + Settings.breakTime * j
+      reference + this.remaining * (j + 1) + this.settings.breakTime * j
     );
     i++;
     j++;
@@ -62,16 +70,16 @@ Timer.startCycle = function () {
   // Fill targetBreaks[] array
   i = this.break - 1;
   j = 0;
-  while (i < Settings.totalBreaks) {
+  while (i < this.settings.totalBreaks) {
     this.targetBreaks[i] = new Date(
-      reference + this.remaining * (j + 1) + Settings.breakTime * (j + 1)
+      reference + this.remaining * (j + 1) + this.settings.breakTime * (j + 1)
     );
     i++;
     j++;
   }
 
   // Call endCycle in 'remaining' seconds
-  // ... 'remaining' will start as Settings.time
+  // ... 'remaining' will start as this.settings.time
   // ... consider changing the timeout parameter to that
   // The arrow function is used to keep the object's context
   cycleTimeout = setTimeout(() => {
@@ -88,7 +96,7 @@ Timer.startCycle = function () {
 Timer.endCycle = function () {
   // this.compareTargets();
 
-  if (this.cycle === Settings.totalCycles) {
+  if (this.cycle === this.settings.totalCycles) {
     this.status = 'complete';
     messageUI();
     notify('timer-complete');
@@ -104,7 +112,7 @@ Timer.endCycle = function () {
 // Sets Timer.status to 'break', sets Timer.remaining to break, and starts breakTimeout
 Timer.startBreak = function () {
   this.status = 'break';
-  this.remaining = Settings.breakTime;
+  this.remaining = this.settings.breakTime;
 
   messageUI();
 
@@ -126,12 +134,12 @@ Timer.endBreak = function () {
   clearInterval(uiInterval);
 
   this.status = 'initial';
-  this.remaining = Settings.time;
+  this.remaining = this.settings.time;
   this.break += 1;
 
   messageUI();
 
-  if (Settings.autoStart) {
+  if (this.settings.autoStart) {
     notify('autostart');
     this.startCycle();
   } else {

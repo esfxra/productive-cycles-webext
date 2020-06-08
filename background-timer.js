@@ -28,13 +28,13 @@ const breakNotification = 'break-complete-notification';
 const devOffset = 50000;
 
 // Settings object
-let Settings = {
-  time: null,
-  breakTime: null,
-  totalCycles: null,
-  totalBreaks: null - 1,
-  autoStart: null,
-};
+// let Settings = {
+//   time: null,
+//   breakTime: null,
+//   totalCycles: null,
+//   totalBreaks: null - 1,
+//   autoStart: null,
+// };
 
 // Initialize the program; see below for init() description
 init();
@@ -92,37 +92,37 @@ function init() {
     ['minutes', 'totalCycles', 'break', 'autoStart'],
     (storage) => {
       if (storage.minutes === undefined) {
-        Settings.time = defaultTime;
+        Timer.settings.time = defaultTime;
       } else {
-        Settings.time = storage.minutes * 60000;
+        Timer.settings.time = storage.minutes * 60000;
       }
       if (storage.break === undefined) {
-        Settings.breakTime = defaultBreak;
+        Timer.settings.breakTime = defaultBreak;
       } else {
-        Settings.breakTime = storage.break * 60000;
+        Timer.settings.breakTime = storage.break * 60000;
       }
       if (storage.totalCycles === undefined) {
-        Settings.totalCycles = defaultCycles;
-        Settings.totalBreaks = defaultCycles - 1;
+        Timer.settings.totalCycles = defaultCycles;
+        Timer.settings.totalBreaks = defaultCycles - 1;
       } else {
-        Settings.totalCycles = storage.totalCycles;
-        Settings.totalBreaks = storage.totalCycles - 1;
+        Timer.settings.totalCycles = storage.totalCycles;
+        Timer.settings.totalBreaks = storage.totalCycles - 1;
       }
       if (storage.autoStart === undefined) {
-        Settings.autoStart = defaultAutoStart;
+        Timer.settings.autoStart = defaultAutoStart;
       } else {
-        Settings.autoStart = storage.autoStart;
+        Timer.settings.autoStart = storage.autoStart;
       }
-      Settings.time = Settings.time - devOffset; // developer
-      Settings.breakTime = Settings.breakTime - devOffset; // developer
+      Timer.settings.time = Timer.settings.time - devOffset; // developer
+      Timer.settings.breakTime = Timer.settings.breakTime - devOffset; // developer
       console.debug(
         `Init`,
-        `\n\ntimer: ${Settings.time}`,
-        `\nbreak: ${Settings.breakTime}`,
-        `\ntotal cycles: ${Settings.totalCycles}`,
-        `\nauto-start: ${Settings.autoStart}`
+        `\n\ntimer: ${Timer.settings.time}`,
+        `\nbreak: ${Timer.settings.breakTime}`,
+        `\ntotal cycles: ${Timer.settings.totalCycles}`,
+        `\nauto-start: ${Timer.settings.autoStart}`
       );
-      Timer.reset(Settings.time);
+      Timer.reset(Timer.settings.time);
     }
   );
 }
@@ -174,7 +174,7 @@ function handleMessage(message) {
           `Cycle reset - Cycle: '${Timer.cycle}' Break: '${Timer.break}'.`
         );
       } else if (Timer.status === 'complete') {
-        Timer.cycle = Settings.totalCycles;
+        Timer.cycle = Timer.settings.totalCycles;
         Timer.break = Timer.cycle;
         clearNotifications(false); // false = clear notifications for current cycle only
 
@@ -184,7 +184,7 @@ function handleMessage(message) {
       }
 
       Timer.status = 'initial';
-      Timer.remaining = Settings.time;
+      Timer.remaining = Timer.settings.time;
 
       messageUI();
 
@@ -194,7 +194,7 @@ function handleMessage(message) {
       clearTimeout(cycleTimeout);
       // clearTimeout(breakTimeout);
 
-      Timer.reset(Settings.time);
+      Timer.reset(Timer.settings.time);
 
       clearNotifications(true);
       messageUI();
@@ -291,7 +291,7 @@ function syncTimer(state) {
 
     // Count the number of cycles completed comparing target to current time
     let target = 0;
-    while (target < Settings.totalCycles) {
+    while (target < Timer.settings.totalCycles) {
       if (reference > Timer.targetCycles[target]) {
         cyclesCompleted++;
       }
@@ -300,7 +300,7 @@ function syncTimer(state) {
 
     // Count the number of breaks completed comparing target to current time
     target = 0;
-    while (target < Settings.totalBreaks) {
+    while (target < Timer.settings.totalBreaks) {
       if (reference > Timer.targetBreaks[target]) {
         breaksCompleted++;
       }
@@ -328,12 +328,12 @@ function syncTimer(state) {
 
     */
 
-    if (Settings.autoStart) {
-      if (cyclesCompleted >= Settings.totalCycles) {
+    if (Timer.settings.autoStart) {
+      if (cyclesCompleted >= Timer.settings.totalCycles) {
         // Adjust timer to: all cycles completed
         Timer.status = 'complete';
-        Timer.cycle = Settings.totalCycles;
-        Timer.break = Settings.totalBreaks;
+        Timer.cycle = Timer.settings.totalCycles;
+        Timer.break = Timer.settings.totalBreaks;
       } else if (locator === 1) {
         // Adjust timer to: break
         Timer.status = 'break';
@@ -354,7 +354,7 @@ function syncTimer(state) {
         const difference = Timer.targetCycles[Timer.cycle - 1] - reference;
         if (difference < 0) {
           // End the cycle right away
-          const newTarget = Settings.breakTime + Date.now();
+          const newTarget = Timer.settings.breakTime + Date.now();
           Timer.targetBreaks[Timer.break - 1] = newTarget;
           clearInterval(uiInterval);
           Timer.endCycle();
@@ -393,7 +393,7 @@ function messageUI() {
   if (popUpOpen) {
     port.postMessage({
       time: translateTime(Timer.remaining),
-      totalCycles: Settings.totalCycles,
+      totalCycles: Timer.settings.totalCycles,
       cycle: Timer.cycle,
       status: Timer.status,
     });
@@ -409,7 +409,7 @@ function notify(type) {
     case 'cycle-complete':
       id = `${cycleNotification}-${Timer.cycle}`;
       title = `cycle ${Timer.cycle} complete!`;
-      message = `great job. everyone, take ${Settings.breakTime / 60000}`;
+      message = `great job. everyone, take ${Timer.settings.breakTime / 60000}`;
       break;
     case 'timer-complete':
       id = `${cycleNotification}-${Timer.cycle}`;
@@ -443,13 +443,13 @@ function clearNotifications(clearAll) {
   let id = '';
   if (clearAll) {
     let i = 1;
-    while (i <= Settings.totalCycles) {
+    while (i <= Timer.settings.totalCycles) {
       id = `${cycleNotification}-${i}`;
       chrome.notifications.clear(id);
       i++;
     }
     i = 1;
-    while (i <= Settings.totalBreaks) {
+    while (i <= Timer.settings.totalBreaks) {
       id = `${breakNotification}-${i}`;
       chrome.notifications.clear(id);
       i++;
@@ -477,32 +477,24 @@ function newSettings(changes, namespace) {
     console.debug(
       `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
     );
-    // console.log(
-    //   'Storage key "%s" in namespace "%s" changed. ' +
-    //     'Old value was "%s", new value is "%s".',
-    //   key,
-    //   namespace,
-    //   storageChange.oldValue,
-    //   storageChange.newValue
-    // );
 
     // Update Settings
     switch (key) {
       case 'minutes':
-        Settings.time = storageChange.newValue * 60000;
+        Timer.settings.time = storageChange.newValue * 60000;
         settingsChanged = true;
         break;
       case 'break':
-        Settings.breakTime = storageChange.newValue * 60000;
+        Timer.settings.breakTime = storageChange.newValue * 60000;
         settingsChanged = true;
         break;
       case 'totalCycles':
-        Settings.totalCycles = storageChange.newValue;
-        Settings.totalBreaks = storageChange.newValue - 1;
+        Timer.settings.totalCycles = storageChange.newValue;
+        Timer.settings.totalBreaks = storageChange.newValue - 1;
         settingsChanged = true;
         break;
       case 'autoStart':
-        Settings.autoStart = storageChange.newValue;
+        Timer.settings.autoStart = storageChange.newValue;
         settingsChanged = true;
         break;
     }
@@ -517,9 +509,9 @@ function newSettings(changes, namespace) {
     clearNotifications(true);
 
     // Set runtime properties to defaults
-    Timer.reset(Settings.time);
+    Timer.reset(Timer.settings.time);
 
     // Message PopUp to update timer UI with new changes
-    messageUI(Timer.remaining, Settings.totalCycles, Timer.cycle, Timer.status);
+    messageUI();
   }
 }
