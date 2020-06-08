@@ -25,7 +25,7 @@ const cycleNotification = 'cycle-complete-notification';
 const breakNotification = 'break-complete-notification';
 
 // Developer
-const devOffset = 0;
+const devOffset = 50000;
 
 // Settings object
 let Settings = {
@@ -106,7 +106,7 @@ chrome.storage.onChanged.addListener(newSettings);
     - startBreak
     - endBreak
     - uiTime
-    - translateTimer
+    - translateTime
     - syncTimer
     - messageUI
     - notify
@@ -188,7 +188,7 @@ function handleMessage(message) {
   console.log(`Input received: ${message.command}`);
   switch (message.command) {
     case 'start':
-      start();
+      Timer.start();
       break;
     case 'pause':
       clearInterval(uiInterval);
@@ -262,101 +262,10 @@ function handleMessage(message) {
       Timer.targetBreaks[Timer.break - 1] = Date.now();
       console.debug(`Target now is - ${Timer.targetBreaks[Timer.break - 1]}`);
 
-      endBreak();
+      Timer.endBreak();
       break;
     default:
       console.log(message, 'is not a known input');
-  }
-}
-
-// Sets Timer.status to 'running', calculates target times, and starts cycleTimeout
-function start() {
-  console.debug(`start():`);
-  console.debug(`Timer.remaining: ${Timer.remaining}`);
-
-  Timer.status = 'running';
-
-  const reference = Date.now();
-
-  // Fill targetCycles[] array
-  let i = Timer.cycle - 1;
-  let j = 0;
-  while (i < Settings.totalCycles) {
-    Timer.targetCycles[i] = new Date(
-      reference + Timer.remaining * (j + 1) + Settings.breakTime * j
-    );
-    i++;
-    j++;
-  }
-
-  // Fill targetBreaks[] array
-  i = Timer.break - 1;
-  j = 0;
-  while (i < Settings.totalBreaks) {
-    Timer.targetBreaks[i] = new Date(
-      reference + Timer.remaining * (j + 1) + Settings.breakTime * (j + 1)
-    );
-    i++;
-    j++;
-  }
-
-  console.log(`Cycle ${Timer.cycle} starting. New status: ${Timer.status}`);
-  cycleTimeout = setTimeout(endCycle, Timer.remaining);
-  if (popUpOpen) {
-    uiTime();
-  }
-}
-
-// Sets Timer.status to 'complete' or calls startBreak()
-function endCycle() {
-  console.debug(`endCycle()`);
-  compareTargets();
-  // endCycle code
-  if (Timer.cycle === Settings.totalCycles) {
-    Timer.status = 'complete';
-    messageUI();
-    notify('timer-complete');
-    console.log(`Timer complete. New status: ${Timer.status}`);
-  } else {
-    notify('cycle-complete');
-    Timer.cycle++;
-    startBreak();
-  }
-}
-
-// Sets Timer.status to 'break', sets Timer.remaining to break, and starts breakTimeout
-function startBreak() {
-  console.debug(`startBreak()`);
-  Timer.status = 'break';
-  Timer.remaining = Settings.breakTime;
-  console.debug(`Timer.remaining: ${Timer.remaining}`);
-  messageUI();
-  console.log(`Break ${Timer.break} starting. New status: ${Timer.status}`);
-  breakTimeout = setTimeout(endBreak, Timer.remaining);
-  if (popUpOpen) {
-    uiTime();
-  }
-}
-
-// Sets Timer.status to 'initial', sets Timer.remaining to cycle, and autostarts (if enabled)
-function endBreak() {
-  console.debug('endBreak()');
-  compareTargets();
-  // endBreak() code
-  clearInterval(uiInterval);
-  Timer.status = 'initial';
-  Timer.remaining = Settings.time;
-  Timer.break++;
-  console.debug(`Timer.break incremented: ${Timer.break}`);
-  messageUI();
-  console.log('Break ended. New status:', Timer.status);
-  if (Settings.autoStart) {
-    notify('autostart');
-    console.log(`Autostart: ${Settings.autoStart}, calling start()`);
-    start();
-  } else {
-    notify('break-complete');
-    console.log(`Autostart disabled, nothing to see here`);
   }
 }
 
