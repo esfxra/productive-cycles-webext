@@ -521,7 +521,7 @@ function notify(type) {
 
   chrome.notifications.create(id, {
     type: 'basic',
-    iconUrl: chrome.runtime.getURL('icons/time-512.png'),
+    iconUrl: chrome.runtime.getURL('icons/progress-512.png'),
     title: title,
     message: message,
   });
