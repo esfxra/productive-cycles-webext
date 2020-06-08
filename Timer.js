@@ -10,6 +10,7 @@ let Timer = {
   status: null,
 };
 
+// Timer properties are set to reflect an initial state
 Timer.reset = function (time) {
   this.targetCycles = [];
   this.targetBreaks = [];
@@ -18,6 +19,19 @@ Timer.reset = function (time) {
   this.break = 1;
   this.status = 'initial';
   console.debug('Timer reset.');
+};
+
+// Break is skipped by clearing timeout and calling endBreak() ahead of time
+Timer.skip = function () {
+  clearInterval(uiInterval);
+  clearTimeout(breakTimeout);
+
+  // Timeline correction for syncTimer()
+  this.targetBreaks[this.break - 1] = Date.now();
+
+  this.endBreak();
+
+  console.debug(`Break skipped.`);
 };
 
 // Sets Timer.status to 'running', calculates target times, and starts cycleTimeout

@@ -246,16 +246,7 @@ function handleMessage(message) {
 
       break;
     case 'skip':
-      clearInterval(uiInterval);
-      clearTimeout(breakTimeout);
-
-      // Timeline correction for syncTimer()
-      Timer.targetBreaks[Timer.break - 1] = Date.now();
-
-      Timer.endBreak();
-
-      console.debug(`Break skipped.`);
-
+      Timer.skip();
       break;
     default:
       console.debug(`Unknown input: '${message}'.`);
