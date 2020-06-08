@@ -101,10 +101,10 @@ chrome.storage.onChanged.addListener(newSettings);
     - connect
     - disconnect
     - handleMessage
-    - start
-    - endCycle
-    - startBreak
-    - endBreak
+    - Timer.start
+    - Timer.endCycle
+    - Timer.startBreak
+    - Timer.endBreak
     - uiTime
     - translateTime
     - syncTimer
@@ -144,7 +144,7 @@ function init() {
       }
       Settings.time = Settings.time - devOffset; // developer
       Settings.breakTime = Settings.breakTime - devOffset; // developer
-      console.log(
+      console.debug(
         `Init`,
         `\n\ntimer: ${Settings.time}`,
         `\nbreak: ${Settings.breakTime}`,
@@ -159,10 +159,8 @@ function init() {
 // Handle install and reload/update events for onInstalled
 function install(details) {
   if (details.reason === 'install') {
-    console.log('Extension installed');
   } else if (details.reason === 'update') {
     // Future release: Open new tab with changes for this version
-    console.log('Extension updated or reloaded');
     clearNotifications(true);
   }
 }
@@ -173,19 +171,16 @@ function connect(portFromPopUp) {
   popUpOpen = true;
   port.onDisconnect.addListener(disconnect);
   port.onMessage.addListener(handleMessage);
-  console.log(`Connected - popUpOpen: ${popUpOpen}`);
 }
 
 // Handle port disconnection from PopUp view for onDisconnect
 function disconnect() {
   popUpOpen = false;
   clearInterval(uiInterval);
-  console.log(`Disconnected - popUpOpen: ${popUpOpen} - uiInterval cleared`);
 }
 
 // Handle messages sent through the port from PopUp view for onMessage
 function handleMessage(message) {
-  console.log(`Input received: ${message.command}`);
   switch (message.command) {
     case 'start':
       Timer.start();
@@ -199,73 +194,71 @@ function handleMessage(message) {
       clearInterval(uiInterval);
       clearTimeout(cycleTimeout);
       // clearTimeout(breakTimeout);
+
       // Go back to the previous cycle and clear relevant notification
       if (Timer.status === 'initial' && Timer.cycle > 1) {
         Timer.cycle--;
         Timer.break--;
-        console.debug(
-          `Cycle reset - Cycle: '${Timer.cycle}' Break: '${Timer.break}'`
-        );
         clearNotifications(false); // false = clear notifications for current cycle only
+
+        console.debug(
+          `Cycle reset - Cycle: '${Timer.cycle}' Break: '${Timer.break}'.`
+        );
       } else if (Timer.status === 'complete') {
         Timer.cycle = Settings.totalCycles;
         Timer.break = Timer.cycle;
-        console.debug(
-          `Cycle reset - Cycle: '${Timer.cycle}' Break: '${Timer.break}'`
-        );
         clearNotifications(false); // false = clear notifications for current cycle only
+
+        console.debug(
+          `Cycle reset - Cycle: '${Timer.cycle}' Break: '${Timer.break}'.`
+        );
       }
+
       Timer.status = 'initial';
       Timer.remaining = Settings.time;
+
       messageUI();
+
       break;
     case 'reset-all':
       clearInterval(uiInterval);
       clearTimeout(cycleTimeout);
       // clearTimeout(breakTimeout);
+
       Timer.reset(Settings.time);
+
       clearNotifications(true);
       messageUI();
+
       break;
     case 'preload':
       if (Timer.status === 'running') {
         Timer.remaining = Timer.targetCycles[Timer.cycle - 1] - Date.now();
-        console.debug(
-          `Preload - targetCycles[${Timer.cycle - 1}: '${
-            Timer.targetCycles[Timer.cycle - 1]
-          }'`
-        );
-        console.debug(`Timer.remaining: '${Timer.remaining}'`);
         uiTime();
       } else if (Timer.status === 'break') {
         Timer.remaining = Timer.targetBreaks[Timer.break - 1] - Date.now();
-        console.debug(
-          `Preload - targetBreaks[${Timer.break - 1}]: '${
-            Timer.targetBreaks[Timer.break - 1]
-          }'`
-        );
-        console.debug(`Timer.remaining: '${Timer.remaining}'`);
         uiTime();
       } else {
         messageUI();
       }
+
+      console.debug(`Preload. Timer status is '${Timer.status}'.`);
+
       break;
     case 'skip':
       clearInterval(uiInterval);
       clearTimeout(breakTimeout);
-      console.debug(
-        `Break skipped - Cycle: '${Timer.cycle}' Break: '${Timer.break}'`
-      );
 
       // Timeline correction for syncTimer()
-      console.debug(`Target was - ${Timer.targetBreaks[Timer.break - 1]}`);
       Timer.targetBreaks[Timer.break - 1] = Date.now();
-      console.debug(`Target now is - ${Timer.targetBreaks[Timer.break - 1]}`);
 
       Timer.endBreak();
+
+      console.debug(`Break skipped.`);
+
       break;
     default:
-      console.log(message, 'is not a known input');
+      console.debug(`Unknown input: '${message}'.`);
   }
 }
 
@@ -273,16 +266,13 @@ function handleMessage(message) {
 // The function process() is called as an IIFE (Immediately Invoked Function Expression)
 function uiTime() {
   clearInterval(uiInterval);
+
   // uiInterval runs as an IIFE (the code executes right away, and then intervals):
   uiInterval = setInterval(
     (function process() {
       Timer.remaining = Timer.remaining - 1000;
       messageUI();
       if (Timer.remaining < 1000) {
-        console.log(
-          `uiTime(): Clearing interval - Timer.remaining:',
-          ${Timer.remaining}`
-        );
         clearInterval(uiInterval);
       }
       return process;
@@ -326,8 +316,6 @@ function translateTime(milliseconds) {
 
 // Locate expected cycle or break, and make adjustments to the timeline arrays
 function syncTimer(state) {
-  console.debug(`syncTimer() - New state is ${state}`);
-
   // Sync time only if the timer has started
   // ... Consider replacing these conditions by simply checking for 'running'
   if (
@@ -382,78 +370,42 @@ function syncTimer(state) {
 
     if (Settings.autoStart) {
       if (cyclesCompleted >= Settings.totalCycles) {
-        // Timer has completed all cycles
-        console.debug(
-          'Timer complete - Setting Timer.status, Timer.cycle, Timer.break '
-        );
+        // Adjust timer to: all cycles completed
         Timer.status = 'complete';
         Timer.cycle = Settings.totalCycles;
         Timer.break = Settings.totalBreaks;
       } else if (locator === 1) {
-        // Timer is on break
-        console.debug(`locator: 1 -> on break ...`);
-        console.debug(
-          `Identified cycle: ${cyclesCompleted + 1}, Identified break: ${
-            breaksCompleted + 1
-          }`
-        );
-
+        // Adjust timer to: break
         Timer.status = 'break';
         Timer.cycle = cyclesCompleted + 1;
         Timer.break = breaksCompleted + 1;
-
         const newTarget = Timer.targetBreaks[breaksCompleted] - Date.now();
         breakTimeout = setTimeout(endBreak, newTarget);
-
-        console.debug(
-          'On Break - endBreak() will run at:',
-          Timer.targetBreaks[breaksCompleted]
-        );
       } else if (locator === 0) {
-        // Timer is running
-        console.debug(`locator: 0 -> running ...`);
-        console.debug(
-          `Identified cycle: ${cyclesCompleted + 1}, Identified break: ${
-            breaksCompleted + 1
-          }`
-        );
-
+        // Adjust timer to: running
         Timer.status = 'running';
         Timer.cycle = cyclesCompleted + 1;
         Timer.break = breaksCompleted + 1;
-
         const newTarget = Timer.targetCycles[cyclesCompleted] - Date.now();
         cycleTimeout = setTimeout(endCycle, newTarget);
-
-        console.debug(
-          'Running - endCycle() will run at:',
-          Timer.targetCycles[cyclesCompleted]
-        );
       }
     } else {
       if (Timer.status === 'running') {
-        console.debug(
-          `Adjusting current cycle - Timer.status: '${Timer.status}'`
-        );
         const difference = Timer.targetCycles[Timer.cycle - 1] - reference;
         if (difference < 0) {
-          // End cycle right away
+          // End the cycle right away
           const newTarget = Settings.breakTime + Date.now();
-          Timer.targetBreaks[Timer.break - 1] = newTarget; // For autostart = false
+          Timer.targetBreaks[Timer.break - 1] = newTarget;
           clearInterval(uiInterval);
           endCycle();
         } else {
-          // End cycle after the ms defined in 'difference'
+          // End the cycle after the milliseconds defined in 'difference'
           if (popUpOpen) {
             uiTime();
           }
-          console.debug(`Ending cycle '${Timer.cycle}'  in: '${difference}'`);
           cycleTimeout = setTimeout(endCycle, difference);
         }
       } else if (Timer.status === 'break') {
-        console.debug(
-          `Adjusting current break - Timer.status: '${Timer.status}'`
-        );
         const difference = Timer.targetBreaks[Timer.break - 1] - reference;
         if (difference < 0) {
           // End break right away
@@ -464,14 +416,14 @@ function syncTimer(state) {
           if (popUpOpen) {
             uiTime();
           }
-          console.debug(`Ending break '${Timer.break}' in: '${difference}'`);
           breakTimeout = setTimeout(endBreak, difference);
         }
       }
     }
+    console.debug('Timeline adjustment made.');
   } else {
     console.debug(
-      'syncTimer() - No adjustments, timer has not been started or is paused'
+      'No timeline adjustments, timer has not been started or is paused.'
     );
   }
 }
@@ -516,20 +468,18 @@ function notify(type) {
       break;
   }
 
-  console.log(`notify(type: ${type})`);
-  // console.debug(`id: '${id}' created`);
-
   chrome.notifications.create(id, {
     type: 'basic',
     iconUrl: chrome.runtime.getURL('icons/progress-512.png'),
     title: title,
     message: message,
   });
+
+  console.debug(`Notification sent.`);
 }
 
 // Clear all notifications or just a pair of cycle-break notification
 function clearNotifications(clearAll) {
-  console.log(`clearNotifications(clearAll: ${clearAll})`);
   let id = '';
   if (clearAll) {
     let i = 1;
@@ -538,30 +488,33 @@ function clearNotifications(clearAll) {
       chrome.notifications.clear(id);
       i++;
     }
-    console.log(`All cycle-complete notifications cleared`);
     i = 1;
     while (i <= Settings.totalBreaks) {
       id = `${breakNotification}-${i}`;
       chrome.notifications.clear(id);
       i++;
     }
-    console.log(`All break-complete notifications cleared`);
+
+    console.debug(`Cleared all notifications.`);
   } else {
     // Clear notifications for the current cycle and current break only
     id = `${cycleNotification}-${Timer.cycle}`;
     chrome.notifications.clear(id);
     id = `${breakNotification}-${Timer.break}`;
     chrome.notifications.clear(id);
+
+    console.debug(
+      `Cleared notification for cycle '${Timer.cycle}', break '${Timer.break}'.`
+    );
   }
 }
 
 // Identify changes in the user settings through storage.onChanged listener
 function newSettings(changes, namespace) {
-  console.log(`newSettings():`);
   let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
-    console.log(
+    console.debug(
       `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
     );
     // console.log(
@@ -599,10 +552,13 @@ function newSettings(changes, namespace) {
     clearInterval(uiInterval);
     clearTimeout(cycleTimeout);
     clearTimeout(breakTimeout);
+
     // Clear all notifications
     clearNotifications(true);
+
     // Set runtime properties to defaults
     Timer.reset(Settings.time);
+
     // Message PopUp to update timer UI with new changes
     messageUI(Timer.remaining, Settings.totalCycles, Timer.cycle, Timer.status);
   }
@@ -610,7 +566,6 @@ function newSettings(changes, namespace) {
 
 // Debug purposes: Compare target times
 function compareTargets() {
-  console.debug(`compareTargets()`);
   let targetTime = null;
   if (Timer.status === 'running') {
     targetTime = Timer.targetCycles[Timer.cycle - 1];
@@ -622,14 +577,14 @@ function compareTargets() {
   const difference = testTime - targetTime;
 
   if (Math.abs(difference) > 1000) {
-    console.debug(`Expected time: ${testTime}`);
-    console.debug(`Target time: ${targetTime}`);
+    console.debug(`Expected time: '${testTime}'.`);
+    console.debug(`Target time: '${targetTime}'.`);
     console.debug(
-      `Potential issue with target time, difference is: ${difference} ms`
+      `Potential issue with target time, difference is: '${difference}' ms.`
     );
   } else {
-    console.debug(`Expected time: ${testTime}`);
-    console.debug(`Target time: ${targetTime}`);
-    console.debug(`Target did great, difference is: ${difference} ms`);
+    console.debug(`Expected time: '${testTime}'.`);
+    console.debug(`Target time: '${targetTime}'.`);
+    console.debug(`Target did great, difference is: '${difference}' ms.`);
   }
 }
