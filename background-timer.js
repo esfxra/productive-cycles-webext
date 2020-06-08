@@ -183,7 +183,7 @@ function disconnect() {
 function handleMessage(message) {
   switch (message.command) {
     case 'start':
-      Timer.start();
+      Timer.startCycle();
       break;
     case 'pause':
       clearInterval(uiInterval);
@@ -397,7 +397,7 @@ function syncTimer(state) {
           const newTarget = Settings.breakTime + Date.now();
           Timer.targetBreaks[Timer.break - 1] = newTarget;
           clearInterval(uiInterval);
-          endCycle();
+          Timer.endCycle();
         } else {
           // End the cycle after the milliseconds defined in 'difference'
           if (popUpOpen) {
@@ -410,7 +410,7 @@ function syncTimer(state) {
         if (difference < 0) {
           // End break right away
           clearInterval(uiInterval);
-          endBreak();
+          Timer.endBreak();
         } else {
           // End break after the ms defined in 'difference'
           if (popUpOpen) {

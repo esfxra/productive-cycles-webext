@@ -21,7 +21,7 @@ Timer.reset = function (time) {
 };
 
 // Sets Timer.status to 'running', calculates target times, and starts cycleTimeout
-Timer.start = function () {
+Timer.startCycle = function () {
   this.status = 'running';
 
   const reference = Date.now();
