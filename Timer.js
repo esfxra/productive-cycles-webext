@@ -34,6 +34,14 @@ Timer.skip = function () {
   console.debug(`Break skipped.`);
 };
 
+Timer.pause = function () {
+  clearInterval(uiInterval);
+  clearTimeout(cycleTimeout);
+  this.status = 'paused';
+
+  console.debug(`Timer paused.`);
+};
+
 // Sets Timer.status to 'running', calculates target times, and starts cycleTimeout
 Timer.startCycle = function () {
   this.status = 'running';
