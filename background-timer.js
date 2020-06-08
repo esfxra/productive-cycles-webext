@@ -563,28 +563,3 @@ function newSettings(changes, namespace) {
     messageUI(Timer.remaining, Settings.totalCycles, Timer.cycle, Timer.status);
   }
 }
-
-// Debug purposes: Compare target times
-function compareTargets() {
-  let targetTime = null;
-  if (Timer.status === 'running') {
-    targetTime = Timer.targetCycles[Timer.cycle - 1];
-  } else if (Timer.status === 'break') {
-    targetTime = Timer.targetBreaks[Timer.break - 1];
-  }
-
-  const testTime = new Date(Date.now());
-  const difference = testTime - targetTime;
-
-  if (Math.abs(difference) > 1000) {
-    console.debug(`Expected time: '${testTime}'.`);
-    console.debug(`Target time: '${targetTime}'.`);
-    console.debug(
-      `Potential issue with target time, difference is: '${difference}' ms.`
-    );
-  } else {
-    console.debug(`Expected time: '${testTime}'.`);
-    console.debug(`Target time: '${targetTime}'.`);
-    console.debug(`Target did great, difference is: '${difference}' ms.`);
-  }
-}

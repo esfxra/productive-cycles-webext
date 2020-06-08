@@ -64,7 +64,7 @@ Timer.startCycle = function () {
 
 // Sets Timer.status to 'complete' or calls startBreak()
 Timer.endCycle = function () {
-  //   compareTargets();
+  // this.compareTargets();
 
   if (this.cycle === Settings.totalCycles) {
     this.status = 'complete';
@@ -99,7 +99,7 @@ Timer.startBreak = function () {
 
 // Sets Timer.status to 'initial', sets Timer.remaining to cycle, and autostarts (if enabled)
 Timer.endBreak = function () {
-  //   compareTargets();
+  // this.compareTargets();
 
   clearInterval(uiInterval);
 
@@ -111,10 +111,35 @@ Timer.endBreak = function () {
 
   if (Settings.autoStart) {
     notify('autostart');
-    this.start();
+    this.startCycle();
   } else {
     notify('break-complete');
   }
 
   console.debug(`Break ended.`);
+};
+
+// Debug purposes: Compare target times
+Timer.compareTargets = function () {
+  let targetTime = null;
+  if (this.status === 'running') {
+    targetTime = this.targetCycles[this.cycle - 1];
+  } else if (this.status === 'break') {
+    targetTime = this.targetBreaks[this.break - 1];
+  }
+
+  const testTime = new Date(Date.now());
+  const difference = testTime - targetTime;
+
+  if (Math.abs(difference) > 1000) {
+    console.debug(`Expected time: '${testTime}'.`);
+    console.debug(`Target time: '${targetTime}'.`);
+    console.debug(
+      `Potential issue with target time, difference is: '${difference}' ms.`
+    );
+  } else {
+    console.debug(`Expected time: '${testTime}'.`);
+    console.debug(`Target time: '${targetTime}'.`);
+    console.debug(`Target did great, difference is: '${difference}' ms.`);
+  }
 };
