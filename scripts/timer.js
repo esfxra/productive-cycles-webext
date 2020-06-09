@@ -323,7 +323,6 @@ class Timer {
 
       if (this.settings.autoStart) {
         console.debug(`sync(): autoStart enabled`);
-        // Figure out where it should be (autostart)
         // Index counters
         let cyclesCompleted = 0;
         let breaksCompleted = 0;
@@ -369,7 +368,9 @@ class Timer {
             _endBreak();
           }, newTarget);
           console.debug(
-            `sync(): adjusted timer, break will end in '${newTarget}'`
+            `sync(): adjusted timer, break will end in '${
+              newTarget / 60000
+            }' minutes`
           );
         } else if (locator === 0) {
           clearTimeout(this.timeouts.cycle);
@@ -382,7 +383,9 @@ class Timer {
             _endCycle();
           }, newTarget);
           console.debug(
-            `sync(): adjusted timer, cycle will end in '${newTarget}'`
+            `sync(): adjusted timer, cycle will end in '${
+              newTarget / 60000
+            }' minutes`
           );
         }
       } else {
@@ -395,12 +398,13 @@ class Timer {
             _endCycle();
             console.debug(`sync(): adjusted timer; cycle ended`);
           } else {
-            // this.countdown();
             this.timeouts.cycle = setTimeout(() => {
               _endCycle();
             }, difference);
             console.debug(
-              `sync(): adjusted timer; cycle will end in ${difference}`
+              `sync(): adjusted timer; cycle will end in ${
+                difference / 60000
+              } minutes`
             );
           }
         } else if (this.state === 'break') {
@@ -410,24 +414,29 @@ class Timer {
             _endBreak();
             console.debug(`sync(): adjusted timer; break ended`);
           } else {
-            // this.countdown();
             this.timeouts.break = setTimeout(() => {
               _endBreak();
             }, difference);
             console.debug(
-              `sync(): adjusted timer; break will end in ${difference}`
+              `sync(): adjusted timer; break will end in ${
+                difference / 60000
+              } minutes`
             );
           }
         }
 
-        // Fixes a bug where the displayed value would change from 'complete' to '00:00'
-        if (this.state !== 'complete') {
-          this.postStatus();
-        }
+        // // Fixes a bug where the displayed value would change from 'complete' to '00:00'
+        // if (this.state !== 'complete') {
+        //   this.postStatus();
+        // }
+      }
+      // Reset UI countdown
+      if (this.comms.portOpen) {
+        this.input('preload');
       }
     } else {
       console.debug(
-        `sync(): Conditions not met; state is '${this.state}' and length is `
+        `sync(): Conditions not met; state is '${this.state}'; array length could also be 0`
       );
     }
   }
