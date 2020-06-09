@@ -299,7 +299,6 @@ class Timer {
   }
 
   sync() {
-    console.debug(this.targetCycles.length);
     if (
       this.targetCycles.length >= 1 &&
       this.state !== 'paused' &&
