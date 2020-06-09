@@ -1,25 +1,25 @@
 {
   "manifest_version": 2,
   "name": "Productive Cycles",
-  "version": "0.0.8",
+  "version": "0.0.9",
 
-  "description": "Simple timer extension for web browsers inspired on the pomodoro technique",
+  "description": "Timer that keeps track of completed productivity cycles; it also sends break reminders",
   "homepage_url": "https://github.com/diegoserranor/productive-cycles",
   "icons": {
-    "16": "icons/time-16.png",
-    "48": "icons/time-48.png",
-    "128": "icons/time-128.png",
-    "512": "icons/time-512.png"
+    "16": "./icons/productive-cycles-16.png",
+    "48": "./icons/productive-cycles-48.png",
+    "128": "./icons/productive-cycles-128.png",
+    "512": "./icons/productive-cycles-512.png"
   },
 
   "browser_action": {
-    "default_icon": "icons/time-512.png",
+    "default_icon": "icons/productive-cycles-512.png",
     "default_title": "Productive Cycles",
-    "default_popup": "popup/timer.html"
+    "default_popup": "./views/popup/popup.html"
   },
 
   "background": {
-    "scripts": ["background-timer.js"]
+    "scripts": ["./scripts/timer.js", "./scripts/background.js"]
   },
 
   "permissions": ["notifications", "storage", "idle"]

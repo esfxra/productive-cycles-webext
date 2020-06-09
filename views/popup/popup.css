@@ -1,11 +1,11 @@
 @font-face {
   font-family: robotoMono;
-  src: url(../fonts/RobotoMono-Regular.ttf);
+  src: url(../../fonts/RobotoMono-Regular.ttf);
 }
 
 @font-face {
   font-family: robotoMono;
-  src: url(../fonts/RobotoMono-Bold.ttf);
+  src: url(../../fonts/RobotoMono-Bold.ttf);
   font-weight: bold;
 }
 
@@ -226,7 +226,7 @@ label {
   padding: 4px 0;
 }
 
-input[type="number"] {
+input[type='number'] {
   font-family: robotoMono;
   width: 75%;
   padding: 4px;
