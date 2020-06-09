@@ -1,9 +1,9 @@
 'use strict';
 
-// timer.js globals
+// popup.js globals
 let port = chrome.runtime.connect({ name: 'port-from-popup' });
-let statusChanged = false;
-let previousStatus = null;
+let stateChanged = false;
+let previousState = null;
 let resetRequested = false;
 let lightTheme = false;
 let darkTheme = false;
@@ -75,14 +75,14 @@ window.addEventListener('DOMContentLoaded', (event) => {
       darkTheme = false;
 
       if (!stylesheet.href.includes('timer-light')) {
-        stylesheet.href = 'timer-light.css';
+        stylesheet.href = 'light.css';
       }
     } else {
       darkTheme = true;
       lightTheme = false;
 
       if (!stylesheet.href.includes('timer-dark')) {
-        stylesheet.href = 'timer-dark.css';
+        stylesheet.href = 'dark.css';
       }
     }
   });
@@ -92,7 +92,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   const dark = document.querySelector('.option-dark');
   light.addEventListener('click', () => {
     if (!stylesheet.href.includes('timer-light')) {
-      stylesheet.href = 'timer-light.css';
+      stylesheet.href = 'light.css';
     }
 
     // Check if it this is the theme saved
@@ -111,7 +111,7 @@ window.addEventListener('DOMContentLoaded', (event) => {
   });
   dark.addEventListener('click', () => {
     if (!stylesheet.href.includes('timer-dark')) {
-      stylesheet.href = 'timer-dark.css';
+      stylesheet.href = 'dark.css';
     }
 
     // Check if it this is the theme saved
@@ -134,23 +134,23 @@ window.addEventListener('DOMContentLoaded', (event) => {
 port.onMessage.addListener((message) => {
   console.log(message);
 
-  // Check if there is a change in status
-  // Note: case "pause" does not send updated "paused" status to timer.js until after UI is opened again
+  // Check if there is a change in state
+  // Note: case "pause" does not send updated "paused" state to timer.js until after UI is opened again
   // That is when preload command runs again
-  if (previousStatus !== message.status) {
-    statusChanged = true;
-    previousStatus = message.status;
+  if (previousState !== message.state) {
+    stateChanged = true;
+    previousState = message.state;
   } else {
-    statusChanged = false;
+    stateChanged = false;
   }
 
   // Change the text in the #time element with the updated time coming from the background script
   document.querySelector('#time').textContent = message.time;
 
-  // Change UI based on message.status
-  if (statusChanged || resetRequested) {
+  // Change UI based on message.state
+  if (stateChanged || resetRequested) {
     let elt = null;
-    switch (message.status) {
+    switch (message.state) {
       case 'initial':
         elt = document.querySelector('.time-container');
         if (elt.classList.contains('break')) {
@@ -217,7 +217,7 @@ port.onMessage.addListener((message) => {
     // Tracker
     // Compute the number of cycles to display, which one is running, and which are complete
     console.log('Rebuilding the tracker ...');
-    console.log(`previousStatus: ${previousStatus}`);
+    console.log(`previousState: ${previousState}`);
     const cyclesNode = document.querySelector('.cycles');
 
     // Reset cyclesNode
@@ -250,16 +250,13 @@ port.onMessage.addListener((message) => {
       dotNode.setAttribute('title', 'cycle ' + i);
       dotNode.classList.add('dot');
       if (i === message.cycle) {
-        if (message.status === 'initial' || message.status === 'break') {
+        if (message.state === 'initial' || message.state === 'break') {
           dotNode.classList.add('pending');
           // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
-        } else if (
-          message.status === 'running' ||
-          message.status === 'paused'
-        ) {
+        } else if (message.state === 'running' || message.state === 'paused') {
           dotNode.classList.add('running');
           // html += '<span id="cycle-' + i + '" class="dot running"></span>';
-        } else if (message.status === 'complete') {
+        } else if (message.state === 'complete') {
           dotNode.classList.add('complete');
         }
       } else if (i < message.cycle) {
