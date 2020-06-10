@@ -27,7 +27,7 @@ body {
 }
 
 .popup-container {
-  min-width: 110px;
+  min-width: 115px;
   /* padding: 8px; */
 
   --margin-elements: 18px;
@@ -175,6 +175,29 @@ body {
   }
 }
 
+/* Updates UI */
+
+.updates-ui {
+  width: 225px;
+  font-size: 12px;
+}
+
+.updates-ui h1 {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.updates-ui span {
+  font-weight: bold;
+  color: gray;
+}
+
+.updates-ui ul {
+  padding-left: 10px;
+  list-style-position: inside;
+  color: gray;
+}
+
 /* Options UI */
 .dp1 {
   padding-bottom: var(--margin-elements);
@@ -187,7 +210,7 @@ h1 {
 }
 
 .options-ui {
-  width: 200px;
+  width: 225px;
   font-size: 12px;
 }
 

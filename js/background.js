@@ -18,6 +18,7 @@ cycles.init();
 let port = 0;
 let popUpOpen = false;
 let uiInterval = 0;
+let update = false;
 
 /*  
     Register all listeners
@@ -61,6 +62,8 @@ function install(details) {
   if (details.reason === 'install') {
   } else if (details.reason === 'update') {
     // Future release: Open new tab with changes for this version
+    update = true;
+    console.debug(`update set to ${update}`);
     cycles.clearNotifications(true);
   }
 }
@@ -81,7 +84,16 @@ function disconnect() {
 }
 
 function handleMessage(message) {
-  cycles.input(message.command);
+  console.debug(`update set to ${update}`);
+  if (message.command === 'preload' && update === true) {
+    update = false;
+    let message = cycles.status();
+    message.update = true;
+    console.debug(message);
+    port.postMessage(message);
+  } else {
+    cycles.input(message.command);
+  }
 }
 
 // Identify changes in the user settings through storage.onChanged listener
