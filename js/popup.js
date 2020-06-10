@@ -97,6 +97,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     // Check if it this is the theme saved
     if (!lightTheme) {
+      darkTheme = false;
+      lightTheme = true;
       chrome.storage.local.set(
         {
           theme: 'light',
@@ -116,6 +118,8 @@ window.addEventListener('DOMContentLoaded', (event) => {
 
     // Check if it this is the theme saved
     if (!darkTheme) {
+      darkTheme = true;
+      lightTheme = false;
       chrome.storage.local.set(
         {
           theme: 'dark',

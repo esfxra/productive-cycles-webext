@@ -132,16 +132,7 @@ class Timer {
 
   startCycle() {
     this.timeouts.cycle = setTimeout(() => {
-      this.compareTargets();
-      if (this.cycle < this.settings.totalCycles) {
-        this.notify('cycle-complete');
-        this.cycle += 1;
-        this.startBreak();
-      } else {
-        this.state = 'complete';
-        this.postStatus();
-        this.notify('timer-complete');
-      }
+      this.endCycle();
     }, this.remaining);
 
     this.state = 'running';
@@ -151,12 +142,23 @@ class Timer {
     this.countdown();
   }
 
+  endCycle() {
+    this.compareTargets();
+    if (this.cycle < this.settings.totalCycles) {
+      this.notify('cycle-complete');
+      this.cycle += 1;
+      this.startBreak();
+    } else {
+      this.state = 'complete';
+      this.postStatus();
+      this.notify('timer-complete');
+    }
+  }
+
   startBreak() {
     console.debug(`startBreak`);
     this.timeouts.break = setTimeout(() => {
-      this.compareTargets();
-      this.break += 1;
-      this.next();
+      this.endBreak();
     }, this.settings.breakTime);
 
     this.state = 'break';
@@ -165,8 +167,14 @@ class Timer {
     this.countdown();
   }
 
+  endBreak() {
+    this.compareTargets();
+    this.break += 1;
+    this.next();
+  }
+
   next() {
-    console.debug('next');
+    console.debug('next()');
     this.state = 'initial';
     this.remaining = this.settings.cycleTime;
     this.postStatus();
@@ -299,7 +307,6 @@ class Timer {
   }
 
   sync() {
-    console.debug(this.targetCycles.length);
     if (
       this.targetCycles.length >= 1 &&
       this.state !== 'paused' &&
@@ -308,23 +315,8 @@ class Timer {
       console.debug(`sync(): Met conditions for main IF statement`);
       const reference = Date.now();
 
-      const _endCycle = () => {
-        if (this.cycle < this.settings.totalCycles) {
-          this.cycle += 1;
-          this.startBreak();
-        } else {
-          this.state = 'complete';
-          this.postStatus();
-        }
-      };
-      const _endBreak = () => {
-        this.break += 1;
-        this.next();
-      };
-
       if (this.settings.autoStart) {
         console.debug(`sync(): autoStart enabled`);
-        // Figure out where it should be (autostart)
         // Index counters
         let cyclesCompleted = 0;
         let breaksCompleted = 0;
@@ -367,10 +359,12 @@ class Timer {
           this.break = breaksCompleted + 1;
           const newTarget = this.targetBreaks[breaksCompleted] - reference;
           this.timeouts.break = setTimeout(() => {
-            _endBreak();
+            this.endBreak();
           }, newTarget);
           console.debug(
-            `sync(): adjusted timer, break will end in '${newTarget}'`
+            `sync(): adjusted timer, break will end in '${
+              newTarget / 60000
+            }' minutes`
           );
         } else if (locator === 0) {
           clearTimeout(this.timeouts.cycle);
@@ -380,10 +374,12 @@ class Timer {
           this.break = breaksCompleted + 1;
           const newTarget = this.targetCycles[cyclesCompleted] - reference;
           this.timeouts.cycle = setTimeout(() => {
-            _endCycle();
+            this.endCycle();
           }, newTarget);
           console.debug(
-            `sync(): adjusted timer, cycle will end in '${newTarget}'`
+            `sync(): adjusted timer, cycle will end in '${
+              newTarget / 60000
+            }' minutes`
           );
         }
       } else {
@@ -393,42 +389,48 @@ class Timer {
           clearTimeout(this.timeouts.cycle);
           const difference = this.targetCycles[this.cycle - 1] - reference;
           if (difference < 0) {
-            _endCycle();
+            this.endCycle();
             console.debug(`sync(): adjusted timer; cycle ended`);
           } else {
-            // this.countdown();
             this.timeouts.cycle = setTimeout(() => {
-              _endCycle();
+              this.endCycle();
             }, difference);
             console.debug(
-              `sync(): adjusted timer; cycle will end in ${difference}`
+              `sync(): adjusted timer; cycle will end in ${
+                difference / 60000
+              } minutes`
             );
           }
         } else if (this.state === 'break') {
           clearTimeout(this.timeouts.break);
           const difference = this.targetBreaks[this.break - 1] - reference;
           if (difference < 0) {
-            _endBreak();
+            this.endBreak();
             console.debug(`sync(): adjusted timer; break ended`);
           } else {
-            // this.countdown();
             this.timeouts.break = setTimeout(() => {
-              _endBreak();
+              this.endBreak();
             }, difference);
             console.debug(
-              `sync(): adjusted timer; break will end in ${difference}`
+              `sync(): adjusted timer; break will end in ${
+                difference / 60000
+              } minutes`
             );
           }
         }
 
-        // Fixes a bug where the displayed value would change from 'complete' to '00:00'
-        if (this.state !== 'complete') {
-          this.postStatus();
-        }
+        // // Fixes a bug where the displayed value would change from 'complete' to '00:00'
+        // if (this.state !== 'complete') {
+        //   this.postStatus();
+        // }
+      }
+      // Reset UI countdown
+      if (this.comms.portOpen) {
+        this.input('preload');
       }
     } else {
       console.debug(
-        `sync(): Conditions not met; state is '${this.state}' and length is `
+        `sync(): Conditions not met; state is '${this.state}'; array length could also be 0`
       );
     }
   }
@@ -441,8 +443,8 @@ class Timer {
     switch (type) {
       case 'cycle-complete':
         id = `${this.comms.cycleNotification}-${this.cycle}`;
-        title = `cycle ${this.cycle} complete!`;
-        message = `great job. everyone, take ${
+        title = `cycle ${this.cycle} complete`;
+        message = `great job! everyone, take ${
           this.settings.breakTime / 60000
         }`;
         break;

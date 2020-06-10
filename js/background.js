@@ -36,7 +36,10 @@ chrome.runtime.onInstalled.addListener(install);
 chrome.runtime.onConnect.addListener(connect);
 
 // Listen for the system changing states, and update time
-chrome.idle.onStateChanged.addListener(cycles.sync());
+chrome.idle.onStateChanged.addListener((state) => {
+  console.debug(`System is '${state}'`);
+  cycles.sync();
+});
 
 // Listen for changes in the options, report and reload
 chrome.storage.onChanged.addListener(newSettings);
