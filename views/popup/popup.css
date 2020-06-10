@@ -27,7 +27,7 @@ body {
 }
 
 .popup-container {
-  min-width: 125px;
+  min-width: 115px;
   /* padding: 8px; */
 
   --margin-elements: 18px;
@@ -186,7 +186,8 @@ h1 {
   margin-bottom: calc(var(--margin-elements) - 5px);
 }
 
-.options-ui {
+.options-ui,
+.updates-ui {
   width: 225px;
   font-size: 12px;
 }
