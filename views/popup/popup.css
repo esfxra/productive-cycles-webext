@@ -175,6 +175,29 @@ body {
   }
 }
 
+/* Updates UI */
+
+.updates-ui {
+  width: 225px;
+  font-size: 12px;
+}
+
+.updates-ui h1 {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.updates-ui span {
+  font-weight: bold;
+  color: gray;
+}
+
+.updates-ui ul {
+  padding-left: 10px;
+  list-style-position: inside;
+  color: gray;
+}
+
 /* Options UI */
 .dp1 {
   padding-bottom: var(--margin-elements);
@@ -186,8 +209,7 @@ h1 {
   margin-bottom: calc(var(--margin-elements) - 5px);
 }
 
-.options-ui,
-.updates-ui {
+.options-ui {
   width: 225px;
   font-size: 12px;
 }

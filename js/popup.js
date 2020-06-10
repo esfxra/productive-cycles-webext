@@ -52,6 +52,7 @@ document.addEventListener('click', (e) => {
       showElement('.options-ui');
       break;
     case 'back':
+      hideElement('.updates-ui');
       hideElement('.options-ui');
       showElement('.timer-ui');
       break;
@@ -137,6 +138,13 @@ window.addEventListener('DOMContentLoaded', (event) => {
 // Make UI changes based on Timer details messaged by the background script
 port.onMessage.addListener((message) => {
   console.log(message);
+  console.log(message.update);
+
+  if (message.update === true) {
+    hideElement('.timer-ui');
+    hideElement('.options-ui');
+    showElement('.updates-ui');
+  }
 
   // Check if there is a change in state
   // Note: case "pause" does not send updated "paused" state to timer.js until after UI is opened again
