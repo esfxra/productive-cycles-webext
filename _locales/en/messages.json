@@ -1,0 +1,10 @@
+{
+  "appName": {
+    "message": "Productive Cycles",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Timer that keeps track of completed productivity cycles; it also sends break reminders.", 
+    "description":"The description of the application, displayed in the web store."
+  }
+}
