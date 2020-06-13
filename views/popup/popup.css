@@ -187,11 +187,6 @@ body {
   font-weight: bold;
 }
 
-.updates-ui span {
-  font-weight: bold;
-  color: gray;
-}
-
 .updates-ui ul {
   padding-left: 10px;
   list-style-position: inside;
@@ -264,9 +259,19 @@ p {
   margin-bottom: var(--margin-elements);
 }
 
-p span {
+/* .note-p {
+  display: contents;
+  margin-bottom: 10px;
+} */
+
+span {
   font-weight: bold;
+  color: gray;
 }
+
+/* .note-span {
+  display: inline-block;
+} */
 
 .option {
   display: grid;
