@@ -7,7 +7,7 @@ let previousState = null;
 let resetRequested = false;
 let lightTheme = false;
 let darkTheme = false;
-let backgroundCommands = [
+const backgroundCommands = [
   'start',
   'pause',
   'reset-cycle',
@@ -15,6 +15,54 @@ let backgroundCommands = [
   'preload',
   'skip',
 ];
+
+// Main UI titles for buttons
+document.querySelector('#start').title = chrome.i18n.getMessage('start');
+document.querySelector('#pause').title = chrome.i18n.getMessage('pause');
+document.querySelector('#reset-cycle').title = chrome.i18n.getMessage(
+  'resetCycle'
+);
+document.querySelector('#reset-all').title = chrome.i18n.getMessage('resetAll');
+
+document.querySelector('#options').title = chrome.i18n.getMessage('options');
+document.querySelector('#back').title = chrome.i18n.getMessage('back');
+
+// Title to cycle circles gets added when creating dotNote object
+
+// Set 'skip break' text
+document.querySelector('#skip').textContent = chrome.i18n.getMessage(
+  'skipBreak'
+);
+
+// Set h1 text
+const titles = document.querySelectorAll('h1');
+titles[0].textContent = chrome.i18n.getMessage('themeTitle');
+titles[1].textContent = chrome.i18n.getMessage('optionsTitle');
+titles[2].textContent = chrome.i18n.getMessage('updatesTitle');
+titles[3].textContent = chrome.i18n.getMessage('upcomingTitle');
+
+// Set title text for theme selection
+document.querySelector('.option-light').title = chrome.i18n.getMessage(
+  'themeLightTitle'
+);
+document.querySelector('.option-dark').title = chrome.i18n.getMessage(
+  'themeDarkTitle'
+);
+
+// Note
+const noteP = document.querySelector('.note-p');
+noteP.textContent = chrome.i18n.getMessage('optionsNote');
+
+// Options
+const labels = document.querySelectorAll('label');
+labels[0].textContent = chrome.i18n.getMessage('optionsMinutes');
+labels[1].textContent = chrome.i18n.getMessage('optionsBreak');
+labels[2].textContent = chrome.i18n.getMessage('optionsCycles');
+labels[3].textContent = chrome.i18n.getMessage('optionsAutoStart');
+
+// Save button
+const save = document.querySelector('#save');
+save.textContent = chrome.i18n.getMessage('saveButton');
 
 // Handle inputs
 document.addEventListener('click', (e) => {
@@ -254,12 +302,13 @@ port.onMessage.addListener((message) => {
     }
 
     // Build cyclesNode
+    const cycleTitleString = chrome.i18n.getMessage('cycle');
     let dotNode = null;
     let i = 1;
     while (i <= message.totalCycles) {
       dotNode = document.createElement('span');
       dotNode.id = 'cycle-' + i;
-      dotNode.setAttribute('title', 'cycle ' + i);
+      dotNode.setAttribute('title', `${cycleTitleString} ${i}`);
       dotNode.classList.add('dot');
       if (i === message.cycle) {
         if (message.state === 'initial' || message.state === 'break') {
@@ -318,7 +367,7 @@ function saveOptions() {
     function () {
       // Update status to let user know options were saved.
       const status = document.querySelector('#status');
-      status.textContent = 'saved 🎉';
+      status.textContent = `${chrome.i18n.getMessage('statusSaved')} 🎉`;
       setTimeout(function () {
         status.textContent = '';
       }, 5000);

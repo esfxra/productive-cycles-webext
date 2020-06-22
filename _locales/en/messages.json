@@ -1,0 +1,107 @@
+{
+  "appName": {
+    "message": "Productive Cycles",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Timer that keeps track of completed productivity cycles; it also sends break reminders.", 
+    "description":"The description of the application, displayed in the web store."
+  },
+
+  "start": {
+    "message": "start"
+  },
+  "pause": {
+    "message": "pause"
+  },
+  "resetCycle": {
+    "message":"reset cycle"
+  },
+  "resetAll": {
+    "message": "reset all"
+  },
+  "skipBreak": {
+    "message": "skip break"
+  },
+  "cycle": {
+    "message": "cycle"
+  },
+
+  "options": {
+    "message": "options"
+  },
+  "statistics": {
+    "message": "statistics"
+  },
+  "back": {
+    "message": "back"
+  },
+
+  "themeTitle": {
+    "message": "theme"
+  },
+  "themeLightTitle": {
+    "message": "light mode"
+  },
+  "themeDarkTitle": {
+    "message": "dark mode"
+  },
+
+  "optionsTitle": {
+    "message": "timer options"
+  },
+  "optionsNote": {
+    "message": "changes will reset the timer"
+  },
+  "optionsMinutes": {
+    "message": "timer minutes"
+  },
+  "optionsBreak": {
+    "message": "break minutes"
+  },
+  "optionsCycles": {
+    "message": "total cycles"
+  },
+  "optionsAutoStart": {
+    "message": "cycle auto-start"
+  },
+
+  "saveButton": {
+    "message": "save"
+  },
+  "statusSaved": {
+    "message": "saved"
+  },
+
+  "updatesTitle": {
+    "message": "updates"
+  },
+  "upcomingTitle": {
+    "message": "upcoming features"
+  },
+
+  "cycleCompleteTitle": {
+    "message": "cycle completed"
+  },
+  "cycleCompleteMessage": {
+    "message": "great job! everyone, take"
+  },
+  "timerCompleteTitle": {
+    "message": "all cycles complete!"
+  },
+  "timerCompleteMessage": {
+    "message": "take a long break :)"
+  },
+  "autoStartTitle": {
+    "message": "starting cycle"
+  },
+  "autoStartMessage": {
+    "message": "time to grind"
+  },
+  "breakCompleteTitle": {
+    "message": "don't forget to start cycle"
+  },
+  "breakCompleteMessage": {
+    "message": "time to grind"
+  }
+}

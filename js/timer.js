@@ -443,25 +443,26 @@ class Timer {
     switch (type) {
       case 'cycle-complete':
         id = `${this.comms.cycleNotification}-${this.cycle}`;
-        title = `cycle ${this.cycle} complete`;
-        message = `great job! everyone, take ${
-          this.settings.breakTime / 60000
-        }`;
+        title = chrome.i18n.getMessage('cycleCompleteTitle');
+        message = chrome.i18n.getMessage('cycleCompleteMessage');
+        message += ` ${this.settings.breakTime / 60000}`;
         break;
       case 'timer-complete':
         id = `${this.comms.cycleNotification}-${this.cycle}`;
-        title = 'all cycles complete!';
-        message = 'take a long break :)';
+        title = chrome.i18n.getMessage('timerCompleteTitle');
+        message = chrome.i18n.getMessage('timerCompleteMessage');
         break;
       case 'autostart':
         id = `${this.comms.breakNotification}-${this.break - 1}`;
-        title = `cycle ${this.cycle} starting`;
-        message = 'time to grind';
+        title = chrome.i18n.getMessage('autoStartTitle');
+        title += ` ${this.cycle}`;
+        message = chrome.i18n.getMessage('autoStartMessage');
         break;
       case 'break-complete':
         id = `${this.comms.breakNotification}-${this.break - 1}`;
-        title = `don't forget to start cycle ${this.cycle}`;
-        message = 'time to grind';
+        title = chrome.i18n.getMessage('breakCompleteTitle');
+        title += ` ${this.cycle}`;
+        message = chrome.i18n.getMessage('breakCompleteMessage');
         break;
     }
 
