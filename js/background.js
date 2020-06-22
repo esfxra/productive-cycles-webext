@@ -52,7 +52,6 @@ chrome.storage.onChanged.addListener(newSettings);
     - connect
     - disconnect
     - handleMessage
-    - notify
     - newSettings
 
 */
