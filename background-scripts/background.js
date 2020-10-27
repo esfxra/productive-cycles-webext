@@ -83,6 +83,7 @@ function disconnect() {
 }
 
 function handleMessage(message) {
+  console.log(message);
   console.debug(`update set to ${update}`);
   if (message.command === 'preload' && update === true) {
     update = false;

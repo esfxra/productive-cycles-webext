@@ -2,119 +2,16 @@
 
 // popup.js globals
 let port = chrome.runtime.connect({ name: 'port-from-popup' });
-let stateChanged = false;
 let previousState = null;
-let resetRequested = false;
+let stateChanged = false;
 let lightTheme = false;
 let darkTheme = false;
-const backgroundCommands = [
-  'start',
-  'pause',
-  'reset-cycle',
-  'reset-all',
-  'preload',
-  'skip',
-];
-
-// Main UI titles for buttons
-document.querySelector('#start').title = chrome.i18n.getMessage('start');
-document.querySelector('#pause').title = chrome.i18n.getMessage('pause');
-document.querySelector('#reset-cycle').title = chrome.i18n.getMessage(
-  'resetCycle'
-);
-document.querySelector('#reset-all').title = chrome.i18n.getMessage('resetAll');
-
-document.querySelector('#options').title = chrome.i18n.getMessage('options');
-document.querySelector('#back').title = chrome.i18n.getMessage('back');
-
-// Title to cycle circles gets added when creating dotNote object
-
-// Set 'skip break' text
-document.querySelector('#skip').textContent = chrome.i18n.getMessage(
-  'skipBreak'
-);
-
-// Set h1 text
-const titles = document.querySelectorAll('h1');
-titles[0].textContent = chrome.i18n.getMessage('themeTitle');
-titles[1].textContent = chrome.i18n.getMessage('optionsTitle');
-titles[2].textContent = chrome.i18n.getMessage('updatesTitle');
-titles[3].textContent = chrome.i18n.getMessage('upcomingTitle');
-
-// Set title text for theme selection
-document.querySelector('.option-light').title = chrome.i18n.getMessage(
-  'themeLightTitle'
-);
-document.querySelector('.option-dark').title = chrome.i18n.getMessage(
-  'themeDarkTitle'
-);
-
-// Note
-const noteP = document.querySelector('.note-p');
-noteP.textContent = chrome.i18n.getMessage('optionsNote');
-
-// Options
-const labels = document.querySelectorAll('label');
-labels[0].textContent = chrome.i18n.getMessage('optionsMinutes');
-labels[1].textContent = chrome.i18n.getMessage('optionsBreak');
-labels[2].textContent = chrome.i18n.getMessage('optionsCycles');
-labels[3].textContent = chrome.i18n.getMessage('optionsAutoStart');
-
-// Save button
-const save = document.querySelector('#save');
-save.textContent = chrome.i18n.getMessage('saveButton');
-
-// Handle inputs
-document.addEventListener('click', (e) => {
-  const selection = e.target.id;
-  for (let command of backgroundCommands) {
-    if (selection === command) {
-      port.postMessage({ command: selection });
-    } else {
-      // For testing purposes
-      console.log(`command - ${selection} - not posted to background script`);
-    }
-  }
-
-  // Input actions... including switching buttons immediately
-  switch (selection) {
-    case 'start':
-      hideElement('#start');
-      showElement('#pause');
-      break;
-    case 'pause':
-      hideElement('#pause');
-      showElement('#start');
-      break;
-    case 'skip':
-      break;
-    case 'reset-cycle':
-    case 'reset-all':
-      hideElement('#pause');
-      showElement('#start');
-      resetRequested = true;
-      break;
-    case 'options':
-      restoreOptions();
-      hideElement('.timer-ui');
-      showElement('.options-ui');
-      break;
-    case 'back':
-      hideElement('.updates-ui');
-      hideElement('.options-ui');
-      showElement('.timer-ui');
-      break;
-    case 'save':
-      saveOptions();
-      resetRequested = true;
-      break;
-  }
-});
 
 // Register the UI has been loaded and let the background script know
 window.addEventListener('DOMContentLoaded', (event) => {
   port.postMessage({ command: 'preload' });
 
+  // Theme operations
   // Check what is the theme saved in storage
   let stylesheet = document.querySelector('#theme');
 
@@ -135,68 +32,21 @@ window.addEventListener('DOMContentLoaded', (event) => {
       }
     }
   });
-
-  // Register listeners for theme toggle (light / dark)
-  const light = document.querySelector('.option-light');
-  const dark = document.querySelector('.option-dark');
-  light.addEventListener('click', () => {
-    if (!stylesheet.href.includes('timer-light')) {
-      stylesheet.href = 'light.css';
-    }
-
-    // Check if it this is the theme saved
-    if (!lightTheme) {
-      darkTheme = false;
-      lightTheme = true;
-      chrome.storage.local.set(
-        {
-          theme: 'light',
-        },
-        function () {
-          console.log('Theme set to light');
-        }
-      );
-    } else {
-      console.log('Theme was already set to light - keeping it');
-    }
-  });
-  dark.addEventListener('click', () => {
-    if (!stylesheet.href.includes('timer-dark')) {
-      stylesheet.href = 'dark.css';
-    }
-
-    // Check if it this is the theme saved
-    if (!darkTheme) {
-      darkTheme = true;
-      lightTheme = false;
-      chrome.storage.local.set(
-        {
-          theme: 'dark',
-        },
-        function () {
-          console.log('Theme set to dark');
-        }
-      );
-    } else {
-      console.log('Theme was already set to dark - keeping it');
-    }
-  });
 });
 
 // Make UI changes based on Timer details messaged by the background script
 port.onMessage.addListener((message) => {
+  // A myriad of actions ... including:
+  // Start interval at received time
+  // Make UI updates per the status
   console.log(message);
-  console.log(message.update);
 
-  if (message.update === true) {
-    hideElement('.timer-ui');
-    hideElement('.options-ui');
-    showElement('.updates-ui');
+  // Show update if extension was recently updated
+  if (message.update) {
+    window.location.href = '../updates/updates.html';
   }
 
-  // Check if there is a change in state
-  // Note: case "pause" does not send updated "paused" state to timer.js until after UI is opened again
-  // That is when preload command runs again
+  // Determine whether the state has changed
   if (previousState !== message.state) {
     stateChanged = true;
     previousState = message.state;
@@ -208,7 +58,7 @@ port.onMessage.addListener((message) => {
   document.querySelector('#time').textContent = message.time;
 
   // Change UI based on message.state
-  if (stateChanged || resetRequested) {
+  if (stateChanged) {
     let elt = null;
     switch (message.state) {
       case 'initial':
@@ -332,7 +182,6 @@ port.onMessage.addListener((message) => {
       i++;
     }
     // document.querySelector(".cycles").innerHTML = html;
-    resetRequested = false;
   }
 });
 
@@ -352,42 +201,70 @@ function showElement(element) {
   }
 }
 
-function saveOptions() {
-  const time = parseInt(document.querySelector('#minutes').value);
-  const breakTime = parseInt(document.querySelector('#break').value);
-  const cycleNumber = parseInt(document.querySelector('#cycles').value);
-  const autoStartBox = document.querySelector('#auto-start').checked;
-  chrome.storage.local.set(
-    {
-      minutes: time,
-      break: breakTime,
-      totalCycles: cycleNumber,
-      autoStart: autoStartBox,
-    },
-    function () {
-      // Update status to let user know options were saved.
-      const status = document.querySelector('#status');
-      status.textContent = `${chrome.i18n.getMessage('statusSaved')} 🎉`;
-      setTimeout(function () {
-        status.textContent = '';
-      }, 5000);
-    }
-  );
-}
+// Handle inputs
+// Register listeners for settings
+const settings = document.querySelector('#options');
 
-function restoreOptions() {
-  chrome.storage.local.get(
-    {
-      minutes: 25,
-      break: 5,
-      totalCycles: 4,
-      autoStart: true,
-    },
-    function (items) {
-      document.querySelector('#minutes').value = items.minutes;
-      document.querySelector('#break').value = items.break;
-      document.querySelector('#cycles').value = items.totalCycles;
-      document.querySelector('#auto-start').checked = items.autoStart;
-    }
-  );
-}
+settings.addEventListener('click', () => {
+  // Navigate to Settings
+  window.location.href = '../settings/settings.html';
+});
+
+// Register listeners for all buttons
+const startButton = document.querySelector('#start');
+const pauseButton = document.querySelector('#pause');
+const resetCycleButton = document.querySelector('#reset-cycle');
+const resetAllButton = document.querySelector('#reset-all');
+const skipButton = document.querySelector('#skip');
+
+startButton.addEventListener('click', () => {
+  // Background Timer actions
+  port.postMessage({ command: 'start' });
+  // Changes to UI / View
+  hideElement('#start');
+  showElement('#pause');
+});
+
+pauseButton.addEventListener('click', () => {
+  // Background Timer actions
+  port.postMessage({ command: 'pause' });
+  // Changes to UI / View
+  hideElement('#pause');
+  showElement('#start');
+});
+
+resetCycleButton.addEventListener('click', () => {
+  // Background Timer actions
+  port.postMessage({ command: 'reset-cycle' });
+  // Changes to UI / View
+  hideElement('#pause');
+  showElement('#start');
+});
+
+resetAllButton.addEventListener('click', () => {
+  // Stop timer in UI and in background
+  port.postMessage({ command: 'reset-all' });
+  // Changes to UI / View
+  hideElement('#pause');
+  showElement('#start');
+});
+
+skipButton.addEventListener('click', () => {
+  // Stop timer in UI and in background
+  port.postMessage({ command: 'skip' });
+});
+
+// i18n
+// Main UI titles for buttons
+startButton.title = chrome.i18n.getMessage('start');
+pauseButton.title = chrome.i18n.getMessage('pause');
+resetCycleButton.title = chrome.i18n.getMessage('resetCycle');
+resetAllButton.title = chrome.i18n.getMessage('resetAll');
+
+// document.querySelector('#options').title = chrome.i18n.getMessage('options');
+// document.querySelector('#back').title = chrome.i18n.getMessage('back');
+
+// Title to cycle circles gets added when creating dotNote object
+
+// Set 'skip break' text
+skipButton.textContent = chrome.i18n.getMessage('skipBreak');

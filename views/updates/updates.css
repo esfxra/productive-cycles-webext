@@ -1,0 +1,17 @@
+/* Updates UI */
+.updates-view {
+  --margin-elements: 18px;
+
+  width: 225px;
+  font-size: 12px;
+}
+
+.updates-view h1 {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.updates-view ul {
+  padding-left: 10px;
+  list-style-position: inside;
+}

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../common.css" />
+    <link rel="stylesheet" href="timer.css" />
+    <link id="theme" rel="stylesheet" type="text/css" href="light.css" />
+  </head>
+
+  <body>
+    <div class="timer-view">
+      <nav class="nav">
+        <div id="options">
+          <img
+            id="options-image"
+            alt="options icon"
+            title="options"
+            src="../../icons/nav-options.png"
+          />
+        </div>
+      </nav>
+      <div class="section-container">
+        <div class="time-container">
+          <div id="time"></div>
+        </div>
+        <div class="control">
+          <div id="start" class="control-button">
+            <img
+              alt="start button"
+              title="start"
+              src="../../icons/control-start.png"
+            />
+          </div>
+
+          <div id="pause" class="control-button hidden">
+            <img
+              alt="pause button"
+              title="pause"
+              src="../../icons/control-pause.png"
+            />
+          </div>
+
+          <div id="reset-cycle" class="control-button">
+            <img
+              alt="reset cycle button"
+              title="reset cycle"
+              src="../../icons/control-reset-cycle.png"
+            />
+          </div>
+
+          <div id="reset-all" class="control-button">
+            <img
+              alt="reset all button"
+              title="reset all"
+              src="../../icons/control-reset-all.png"
+            />
+          </div>
+
+          <div id="skip" class="hidden">skip break</div>
+        </div>
+        <div class="cycles"></div>
+      </div>
+    </div>
+    <script src="./timer.js"></script>
+  </body>
+</html>

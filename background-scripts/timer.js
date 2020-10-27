@@ -468,7 +468,7 @@ class Timer {
 
     chrome.notifications.create(id, {
       type: 'basic',
-      iconUrl: chrome.runtime.getURL('icons/productive-cycles-512.png'),
+      iconUrl: chrome.runtime.getURL('icons/icon-512.png'),
       title: title,
       message: message,
     });

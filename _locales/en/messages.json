@@ -4,7 +4,7 @@
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Timer that keeps track of completed productivity cycles; it also sends break reminders.", 
+    "message": "Maximize your productivity with this customizable Pomodoro timer. Track your effort and get reminded to take breaks.", 
     "description":"The description of the application, displayed in the web store."
   },
 

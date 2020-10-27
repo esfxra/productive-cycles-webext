@@ -1,0 +1,50 @@
+body {
+  background-color: #eeeeee;
+}
+
+.section-container {
+  background-color: #ffffff;
+}
+
+#time {
+  color: #666666;
+}
+
+.complete-text {
+  color: #666666;
+}
+
+.break {
+  color: gray;
+}
+
+#break-text {
+  color: gray;
+}
+
+#start {
+  background-color: #666666;
+}
+
+#pause,
+#reset-cycle,
+#reset-all {
+  background-color: #b3b3b3;
+}
+
+#skip {
+  color: black;
+  border-bottom: 1px dashed black;
+}
+
+.dot {
+  background-color: #b3b3b3;
+}
+
+.complete {
+  background-color: #666666;
+}
+
+.running {
+  background-color: #666666;
+}

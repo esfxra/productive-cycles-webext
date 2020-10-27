@@ -1,99 +1,47 @@
 body {
-  background-color: white;
-}
-
-#options {
-  background-image: url(../../icons/options-512.png);
-}
-
-#time {
-  color: black;
-}
-
-.complete-text {
-  color: black;
-}
-
-.break {
-  color: gray;
-}
-
-#break-text {
-  color: gray;
-}
-
-#start {
-  background-color: black;
-}
-
-#pause,
-#reset-cycle,
-#reset-all {
-  background-color: gray;
-}
-
-#skip {
-  color: black;
-  border-bottom: 1px dashed black;
-}
-
-.dot {
-  border: 0.75px solid black;
-}
-
-.complete {
-  background-color: black;
-}
-
-.running {
-  background-color: black;
-}
-
-/* Options UI */
-.dp1 {
-  /* background-color: #f5f5f5; */
-  /* border-radius: 5px; */
-  border-bottom: 1px dashed gray;
-}
-
-#back {
-  background-image: url(../../icons/back-512.png);
-}
-
-h1 {
-  color: black;
-}
-
-.option-light {
-  border: 1px solid gray;
-  background-color: #f5f5f5;
-}
-
-.option-dark {
-  border: 1px solid gray;
   background-color: #202124;
 }
 
+.section-container {
+  background-color: #282828;
+}
+
+h1 {
+  color: #f5f5f5;
+}
+
+.option-light {
+  background-color: #f5f5f5;
+  border: 1px solid #666666;
+  box-shadow: 1px 1px 1px #00000060;
+}
+
+.option-dark {
+  background-color: #202124;
+  border: 1px solid #666666;
+  box-shadow: 1px 1px 1px #00000060;
+}
+
 button {
-  color: white;
-  background-color: black;
+  color: #f5f5f5;
+  background-color: #808080;
 }
 
 label {
-  color: black;
+  color: #f5f5f5;
 }
 
 input[type='number'] {
-  border-bottom: 1px solid rgb(209, 209, 209);
-  background-color: #f2f2f2;
+  color: #f5f5f5;
+  background-color: #808080;
 }
 
 p {
-  color: gray;
+  color: #808080;
 }
 
 #status {
-  color: black;
+  color: #f5f5f5;
 }
 
 /* Checkmark (from w3schoools) */
@@ -103,7 +51,7 @@ p {
   position: relative;
   margin-top: 5px;
   /* padding-left: 35px;
-    margin-bottom: 12px; */
+      margin-bottom: 12px; */
   cursor: pointer;
   /* font-size: 22px; */
   -webkit-user-select: none;
@@ -128,20 +76,23 @@ p {
   left: 0;
   height: 14px;
   width: 15px;
-  background-color: #f2f2f2;
-  border-bottom: 1px solid rgb(209, 209, 209);
+  /* background-color: #f5f5f5; */
+  background-color: #808080;
+  border-radius: 2px;
+  box-shadow: 1px 1px 1px #00000040;
 }
 
 /* On mouse-over, add a grey background color */
 .container:hover input ~ .checkmark {
-  background-color: #ccc;
+  /* background-color: #808080; */
+  background-color: #f5f5f5;
 }
 
 /* When the checkbox is checked, add a blue background */
 .container input:checked ~ .checkmark {
-  background-color: black;
-  border-bottom: 1px solid black;
+  background-color: #808080;
   border-radius: 2px;
+  box-shadow: 1px 1px 1px #00000040;
 }
 
 /* Create the checkmark/indicator (hidden when not checked) */
@@ -162,7 +113,7 @@ p {
   top: 1px;
   width: 3px;
   height: 8px;
-  border: solid white;
+  border: solid #f5f5f5;
   border-width: 0 3px 3px 0;
   -webkit-transform: rotate(45deg);
   -ms-transform: rotate(45deg);
