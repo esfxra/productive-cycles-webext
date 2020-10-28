@@ -1,5 +1,8 @@
 'use strict';
 
+// Dev mode and debug messages
+// Debug function is defined in background-manager.js
+
 class Timer {
   constructor(cycleTime, breakTime, cycles, auto) {
     this.remaining = 0;
@@ -71,7 +74,7 @@ class Timer {
         // Register sound
         this.notification.audio = new Audio('../audio/metal-mallet.mp3');
 
-        console.debug(
+        debug(
           `Init`,
           `\n\ntimer: ${this.settings.cycleTime}`,
           `\nbreak: ${this.settings.breakTime}`,
@@ -173,7 +176,7 @@ class Timer {
   }
 
   startBreak() {
-    console.debug(`startBreak`);
+    debug(`startBreak`);
     this.timeouts.break = setTimeout(() => {
       this.endBreak();
     }, this.settings.breakTime);
@@ -191,7 +194,7 @@ class Timer {
   }
 
   next() {
-    console.debug('next()');
+    debug('next()');
     this.state = 'initial';
     this.remaining = this.settings.cycleTime;
     this.postStatus();
@@ -235,9 +238,7 @@ class Timer {
       // this.state = 'initial';
       // this.remaining = this.settings.cycleTime;
 
-      console.debug(
-        `Cycle reset - Cycle: '${this.cycle}' Break: '${this.break}'.`
-      );
+      debug(`Cycle reset - Cycle: '${this.cycle}' Break: '${this.break}'.`);
     } else if (type === 'all') {
       this.targetCycles = [];
       this.targetBreaks = [];
@@ -249,9 +250,7 @@ class Timer {
       // this.state = 'initial';
       // this.remaining = this.settings.cycleTime;
 
-      console.debug(
-        `Timer reset - Cycle: '${this.cycle}' Break: '${this.break}'.`
-      );
+      debug(`Timer reset - Cycle: '${this.cycle}' Break: '${this.break}'.`);
     }
 
     this.state = 'initial';
@@ -329,11 +328,11 @@ class Timer {
       this.state !== 'paused' &&
       this.state !== 'initial'
     ) {
-      console.debug(`sync(): Met conditions for main IF statement`);
+      debug(`sync(): Met conditions for main IF statement`);
       const reference = Date.now();
 
       if (this.settings.autoStart) {
-        console.debug(`sync(): autoStart enabled`);
+        debug(`sync(): autoStart enabled`);
         // Index counters
         let cyclesCompleted = 0;
         let breaksCompleted = 0;
@@ -356,7 +355,7 @@ class Timer {
           target += 1;
         }
 
-        console.debug(
+        debug(
           `sync():\ncyclesCompleted: '${cyclesCompleted}', breaksCompleted: '${breaksCompleted}'`
         );
 
@@ -367,7 +366,7 @@ class Timer {
           this.state = 'complete';
           this.cycle = this.settings.totalCycles;
           this.break = this.settings.totalBreaks;
-          console.debug(`sync(): adjusted timer, set to '${this.state}'`);
+          debug(`sync(): adjusted timer, set to '${this.state}'`);
         } else if (locator === 1) {
           clearTimeout(this.timeouts.break);
           // Adjust timer to: break
@@ -378,7 +377,7 @@ class Timer {
           this.timeouts.break = setTimeout(() => {
             this.endBreak();
           }, newTarget);
-          console.debug(
+          debug(
             `sync(): adjusted timer, break will end in '${
               newTarget / 60000
             }' minutes`
@@ -393,26 +392,26 @@ class Timer {
           this.timeouts.cycle = setTimeout(() => {
             this.endCycle();
           }, newTarget);
-          console.debug(
+          debug(
             `sync(): adjusted timer, cycle will end in '${
               newTarget / 60000
             }' minutes`
           );
         }
       } else {
-        console.debug(`sync(): autoStart disabled`);
+        debug(`sync(): autoStart disabled`);
         // Figure out if last cycle or last break has ended (normal)
         if (this.state === 'running') {
           clearTimeout(this.timeouts.cycle);
           const difference = this.targetCycles[this.cycle - 1] - reference;
           if (difference < 0) {
             this.endCycle();
-            console.debug(`sync(): adjusted timer; cycle ended`);
+            debug(`sync(): adjusted timer; cycle ended`);
           } else {
             this.timeouts.cycle = setTimeout(() => {
               this.endCycle();
             }, difference);
-            console.debug(
+            debug(
               `sync(): adjusted timer; cycle will end in ${
                 difference / 60000
               } minutes`
@@ -423,12 +422,12 @@ class Timer {
           const difference = this.targetBreaks[this.break - 1] - reference;
           if (difference < 0) {
             this.endBreak();
-            console.debug(`sync(): adjusted timer; break ended`);
+            debug(`sync(): adjusted timer; break ended`);
           } else {
             this.timeouts.break = setTimeout(() => {
               this.endBreak();
             }, difference);
-            console.debug(
+            debug(
               `sync(): adjusted timer; break will end in ${
                 difference / 60000
               } minutes`
@@ -446,7 +445,7 @@ class Timer {
         this.input('preload');
       }
     } else {
-      console.debug(
+      debug(
         `sync(): Conditions not met; state is '${this.state}'; array length could also be 0`
       );
     }
@@ -492,12 +491,12 @@ class Timer {
       message: message,
     });
 
-    console.debug(`Notification sent.`);
+    debug(`Notification sent.`);
 
     if (this.notification.sound) {
       this.notification.audio.play();
 
-      console.debug(`Audio played.`);
+      debug(`Audio played.`);
     }
   }
 
@@ -518,7 +517,7 @@ class Timer {
         i++;
       }
 
-      console.debug(`Cleared all notifications.`);
+      debug(`Cleared all notifications.`);
     } else {
       // Clear notifications for the current cycle and current break only
       id = `${this.comms.cycleNotification}-${this.cycle}`;
@@ -526,7 +525,7 @@ class Timer {
       id = `${this.comms.breakNotification}-${this.break}`;
       chrome.notifications.clear(id);
 
-      console.debug(
+      debug(
         `Cleared notification for cycle '${this.cycle}', break '${this.break}'.`
       );
     }
@@ -545,15 +544,15 @@ class Timer {
     const difference = testTime - targetTime;
 
     if (Math.abs(difference) > 1000) {
-      console.debug(`Expected time: '${testTime}'.`);
-      console.debug(`Target time: '${targetTime}'.`);
-      console.debug(
+      debug(`Expected time: '${testTime}'.`);
+      debug(`Target time: '${targetTime}'.`);
+      debug(
         `Potential issue with target time, difference is: '${difference}' ms.`
       );
     } else {
-      console.debug(`Expected time: '${testTime}'.`);
-      console.debug(`Target time: '${targetTime}'.`);
-      console.debug(`Target did great, difference is: '${difference}' ms.`);
+      debug(`Expected time: '${testTime}'.`);
+      debug(`Target time: '${targetTime}'.`);
+      debug(`Target did great, difference is: '${difference}' ms.`);
     }
   }
 }
