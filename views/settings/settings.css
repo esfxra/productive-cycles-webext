@@ -1,6 +1,6 @@
 /* Settings View */
 .settings-view {
-  --margin-elements: 18px;
+  --margin-elements: 16px;
 
   width: 225px;
   font-size: 12px;
@@ -77,6 +77,9 @@ span {
 .option {
   display: grid;
   grid-template-columns: 1fr 0.35fr;
+}
+
+.option-margin {
   margin-bottom: var(--margin-elements);
 }
 
@@ -90,6 +93,7 @@ span {
   background-size: contain;
 }
 
-#status {
-  float: right;
+.status {
+  display: inline-block;
+  padding-left: 2px;
 }

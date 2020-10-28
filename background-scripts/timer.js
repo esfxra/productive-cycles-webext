@@ -32,12 +32,18 @@ class Timer {
       cycleDevOffset: 0,
       breakDevOffset: 0,
     };
+
+    this.notification = {
+      sound: true,
+      audio: null,
+    };
   }
 
   init() {
     chrome.storage.local.get(
-      ['minutes', 'totalCycles', 'break', 'autoStart'],
+      ['minutes', 'totalCycles', 'break', 'autoStart', 'notificationSound'],
       (storage) => {
+        // Timer settings
         if (storage.minutes !== undefined) {
           this.settings.cycleTime =
             storage.minutes * 60000 - this.settings.cycleDevOffset;
@@ -54,15 +60,25 @@ class Timer {
           this.settings.autoStart = storage.autoStart;
         }
 
+        // Notification settings
+        if (storage.notificationSound !== undefined) {
+          this.notification.sound = storage.notificationSound;
+        }
+
         // Initial value for remaining
         this.remaining = this.settings.cycleTime;
+
+        // Register sound
+        this.notification.audio = new Audio('../audio/metal-mallet.mp3');
 
         console.debug(
           `Init`,
           `\n\ntimer: ${this.settings.cycleTime}`,
           `\nbreak: ${this.settings.breakTime}`,
           `\ntotal cycles: ${this.settings.totalCycles}`,
-          `\nauto-start: ${this.settings.autoStart}`
+          `\nauto-start: ${this.settings.autoStart}`,
+          `\n----------------------`,
+          `\nnotification sound: ${this.notification.sound}`
         );
       }
     );
@@ -443,7 +459,9 @@ class Timer {
     switch (type) {
       case 'cycle-complete':
         id = `${this.comms.cycleNotification}-${this.cycle}`;
-        title = chrome.i18n.getMessage('cycleCompleteTitle');
+        title = `${chrome.i18n.getMessage('cycleCompleteTitle_Fragment_1')} ${
+          this.cycle
+        } ${chrome.i18n.getMessage('cycleCompleteTitle_Fragment_2')}`;
         message = chrome.i18n.getMessage('cycleCompleteMessage');
         message += ` ${this.settings.breakTime / 60000}`;
         break;
@@ -474,6 +492,12 @@ class Timer {
     });
 
     console.debug(`Notification sent.`);
+
+    if (this.notification.sound) {
+      this.notification.audio.play();
+
+      console.debug(`Audio played.`);
+    }
   }
 
   // Clear all notifications or just a pair of cycle-break notification

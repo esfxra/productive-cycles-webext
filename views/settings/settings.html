@@ -35,26 +35,53 @@
         ></div>
       </div>
 
+      <div class="section-container section-margin">
+        <h1>notifications</h1>
+        <!-- <div class="option option-margin">
+          <label for="notification-cycle">cycle complete</label>
+          <label class="container">
+            <input type="checkbox" id="notification-cycle" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="option option-margin">
+          <label for="notification-break">break complete</label>
+          <label class="container">
+            <input type="checkbox" id="notification-break" />
+            <span class="checkmark"></span>
+          </label>
+        </div> -->
+        <div class="option option-margin">
+          <label for="notification-sounds">notification ping</label>
+          <label class="container">
+            <input type="checkbox" id="notification-sound" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <button id="save-notification">save</button>
+        <div id="status-notification" class="status"></div>
+      </div>
+
       <div class="section-container">
         <h1>timer options</h1>
         <!-- <span class="note-span">note:</span><p class="note-p"> changes below will reset the timer</p> -->
 
-        <div class="option">
+        <div class="option option-margin">
           <label for="minutes">timer minutes</label>
           <input type="number" id="minutes" name="minutes" min="1" max="60" />
         </div>
 
-        <div class="option">
+        <div class="option option-margin">
           <label for="break">break minutes</label>
           <input type="number" id="break" name="break" min="1" max="20" />
         </div>
 
-        <div class="option">
+        <div class="option option-margin">
           <label for="cycles">total cycles</label>
           <input type="number" id="cycles" name="cycles" min="1" max="8" />
         </div>
 
-        <div class="option">
+        <div class="option option-margin">
           <label for="auto-start">cycle auto-start</label>
           <label class="container">
             <input type="checkbox" id="auto-start" />
@@ -62,8 +89,8 @@
           </label>
         </div>
 
-        <button id="save">save</button>
-        <div id="status"></div>
+        <button id="save-timer">save</button>
+        <div id="status-timer" class="status"></div>
       </div>
     </div>
     <script src="./settings.js"></script>

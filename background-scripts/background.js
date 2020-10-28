@@ -126,6 +126,10 @@ function newSettings(changes, namespace) {
         cycles.settings.autoStart = storageChange.newValue;
         settingsChanged = true;
         break;
+      // Different behavior for notification settings - Timer is not reset
+      case 'notificationSound':
+        cycles.notification.sound = storageChange.newValue;
+        break;
     }
   }
   if (settingsChanged) {

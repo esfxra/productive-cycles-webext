@@ -80,8 +80,11 @@
     "message": "upcoming features"
   },
 
-  "cycleCompleteTitle": {
-    "message": "cycle completed"
+  "cycleCompleteTitle_Fragment_1": {
+    "message": "cycle"
+  },
+  "cycleCompleteTitle_Fragment_2": {
+    "message": "completed"
   },
   "cycleCompleteMessage": {
     "message": "great job! everyone, take"

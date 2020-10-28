@@ -10,11 +10,18 @@ back.addEventListener('click', () => {
   window.location.href = '../timer/timer.html';
 });
 
-// Register listeners for 'save' button
-const saveButton = document.querySelector('#save');
+// Register listeners for 'save' button in Notification Options
+const saveNotificationButton = document.querySelector('#save-notification');
 
-saveButton.addEventListener('click', () => {
-  saveOptions();
+saveNotificationButton.addEventListener('click', () => {
+  saveNotificationOptions();
+});
+
+// Register listeners for 'save' button in Timer Options
+const saveTimerButton = document.querySelector('#save-timer');
+
+saveTimerButton.addEventListener('click', () => {
+  saveTimerOptions();
 });
 
 // Register the UI has been loaded and let the background script know
@@ -93,7 +100,29 @@ window.addEventListener('DOMContentLoaded', (event) => {
   });
 });
 
-function saveOptions() {
+// Notification Options
+function saveNotificationOptions() {
+  // const notificationCycle = document.querySelector('#notification-cycle');
+  // const notificationBreak = document.querySelector('#notification-break');
+  const notificationSound = document.querySelector('#notification-sound');
+  chrome.storage.local.set(
+    {
+      notificationSound: notificationSound.checked,
+    },
+    function () {
+      // Update status to let user know options were saved.
+      const status = document.querySelector('#status-notification');
+      const emoji = notificationSound.checked ? '🔉' : '🔇';
+      status.textContent = `${chrome.i18n.getMessage('statusSaved')} ${emoji}`;
+      setTimeout(function () {
+        status.textContent = '';
+      }, 5000);
+    }
+  );
+}
+
+// Timer Options
+function saveTimerOptions() {
   const time = parseInt(document.querySelector('#minutes').value);
   const breakTime = parseInt(document.querySelector('#break').value);
   const cycleNumber = parseInt(document.querySelector('#cycles').value);
@@ -107,8 +136,8 @@ function saveOptions() {
     },
     function () {
       // Update status to let user know options were saved.
-      const status = document.querySelector('#status');
-      status.textContent = `${chrome.i18n.getMessage('statusSaved')} 🎉`;
+      const status = document.querySelector('#status-timer');
+      status.textContent = `${chrome.i18n.getMessage('statusSaved')} 🕗`;
       setTimeout(function () {
         status.textContent = '';
       }, 5000);
@@ -119,12 +148,24 @@ function saveOptions() {
 function restoreOptions() {
   chrome.storage.local.get(
     {
+      // notificationCycle: true,
+      // notificationBreak: true,
+      notificationSound: true,
       minutes: 25,
       break: 5,
       totalCycles: 4,
       autoStart: true,
     },
     function (items) {
+      // Notification settings
+      // document.querySelector('#notification-cycle').checked =
+      //   items.notificationCycle;
+      // document.querySelector('#notification-break').checked =
+      //   items.notificationBreak;
+      document.querySelector('#notification-sound').checked =
+        items.notificationSound;
+
+      // Timer settings
       document.querySelector('#minutes').value = items.minutes;
       document.querySelector('#break').value = items.break;
       document.querySelector('#cycles').value = items.totalCycles;
