@@ -1,18 +1,22 @@
+'use strict';
+
 let lightTheme = false;
 let darkTheme = false;
 
-// Handle user clicks
-// Register listeners for 'back' button
-const back = document.querySelector('#back');
+// Register listeners for user input, and load theme
+window.addEventListener('DOMContentLoaded', () => {
+  // Register listeners for 'back' button
+  const back = document.querySelector('#back');
+  back.addEventListener('click', () => {
+    // Navigate to timer view
+    window.location.href = '../timer/timer.html';
+  });
 
-back.addEventListener('click', () => {
-  // Navigate to timer view
-  window.location.href = '../timer/timer.html';
+  // Theme operations
+  loadTheme();
 });
 
-// Register the UI has been loaded and let the background script know
-window.addEventListener('DOMContentLoaded', (event) => {
-  // Theme operations
+function loadTheme() {
   // Check what is the theme saved in storage
   let stylesheet = document.querySelector('#theme');
 
@@ -33,4 +37,4 @@ window.addEventListener('DOMContentLoaded', (event) => {
       }
     }
   });
-});
+}
