@@ -88,7 +88,7 @@ class Timer {
   }
 
   updatePort(port, portOpen) {
-    console.log(`portOpen: ${portOpen}`);
+    debug(`portOpen: ${portOpen}`);
     this.comms.port = port;
     this.comms.portOpen = portOpen;
   }
