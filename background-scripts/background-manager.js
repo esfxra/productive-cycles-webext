@@ -84,7 +84,7 @@ function disconnect() {
 
 function handleMessage(message) {
   console.log(message);
-  console.debug(`update set to ${update}`);
+  // console.debug(`'update' is ${update}`);
   if (message.command === 'preload' && update === true) {
     update = false;
     let message = cycles.status();

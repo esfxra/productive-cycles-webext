@@ -17,7 +17,7 @@ class Timer {
     };
 
     this.comms = {
-      port: 0,
+      port: null,
       portOpen: false,
       cycleNotification: 'cycle-complete-notification',
       breakNotification: 'break-complete-notification',
@@ -85,6 +85,7 @@ class Timer {
   }
 
   updatePort(port, portOpen) {
+    console.log(`portOpen: ${portOpen}`);
     this.comms.port = port;
     this.comms.portOpen = portOpen;
   }

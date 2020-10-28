@@ -1,7 +1,7 @@
 'use strict';
 
 // popup.js globals
-let port = chrome.runtime.connect({ name: 'port-from-popup' });
+let port = null;
 let previousState = null;
 let stateChanged = false;
 let lightTheme = false;
@@ -9,36 +9,18 @@ let darkTheme = false;
 
 // Register the UI has been loaded and let the background script know
 window.addEventListener('DOMContentLoaded', (event) => {
+  // Port operations
+  port = chrome.runtime.connect({ name: 'port-from-popup' });
+  port.onMessage.addListener(handleMessage);
+  // Ask for Timer settings with 'preload' command
   port.postMessage({ command: 'preload' });
-
   // Theme operations
-  // Check what is the theme saved in storage
-  let stylesheet = document.querySelector('#theme');
-
-  chrome.storage.local.get({ theme: 'light' }, function (items) {
-    if (items.theme === 'light') {
-      lightTheme = true;
-      darkTheme = false;
-
-      if (!stylesheet.href.includes('timer-light')) {
-        stylesheet.href = 'light.css';
-      }
-    } else {
-      darkTheme = true;
-      lightTheme = false;
-
-      if (!stylesheet.href.includes('timer-dark')) {
-        stylesheet.href = 'dark.css';
-      }
-    }
-  });
+  loadTheme();
 });
 
 // Make UI changes based on Timer details messaged by the background script
-port.onMessage.addListener((message) => {
-  // A myriad of actions ... including:
-  // Start interval at received time
-  // Make UI updates per the status
+
+function handleMessage(message) {
   console.log(message);
 
   // Show update if extension was recently updated
@@ -183,7 +165,30 @@ port.onMessage.addListener((message) => {
     }
     // document.querySelector(".cycles").innerHTML = html;
   }
-});
+}
+
+function loadTheme() {
+  // Check what is the theme saved in storage
+  let stylesheet = document.querySelector('#theme');
+
+  chrome.storage.local.get({ theme: 'light' }, function (items) {
+    if (items.theme === 'light') {
+      lightTheme = true;
+      darkTheme = false;
+
+      if (!stylesheet.href.includes('timer-light')) {
+        stylesheet.href = 'light.css';
+      }
+    } else {
+      darkTheme = true;
+      lightTheme = false;
+
+      if (!stylesheet.href.includes('timer-dark')) {
+        stylesheet.href = 'dark.css';
+      }
+    }
+  });
+}
 
 function hideElement(element) {
   console.debug('Hiding element');
@@ -206,6 +211,8 @@ function showElement(element) {
 const settings = document.querySelector('#options');
 
 settings.addEventListener('click', () => {
+  // Disconnect port
+  port.disconnect();
   // Navigate to Settings
   window.location.href = '../settings/settings.html';
 });
