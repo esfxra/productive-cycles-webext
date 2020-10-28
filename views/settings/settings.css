@@ -1,0 +1,99 @@
+/* Settings View */
+.settings-view {
+  --margin-elements: 16px;
+
+  width: 225px;
+  font-size: 12px;
+}
+
+.settings-view h1 {
+  font-size: 14px;
+  margin: 0;
+  margin-bottom: calc(var(--margin-elements) - 5px);
+  font-weight: bold;
+}
+
+.theme-option {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+button {
+  width: max-content;
+  height: fit-content;
+  display: inline-block;
+  font-family: inherit;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 0;
+  /* color: white;
+    background-color: black; */
+  padding: 2.5px 8px;
+  vertical-align: middle;
+}
+
+button span {
+  vertical-align: middle;
+}
+
+label {
+  padding: 4px 0;
+}
+
+input[type='number'] {
+  font-family: robotoMono;
+  width: 75%;
+  padding: 4px;
+  border: 0;
+  border-radius: 3px;
+  box-shadow: 1px 1px 1px #00000030;
+  /* border-bottom: 1px solid rgb(209, 209, 209);
+    background-color: #f2f2f2; */
+}
+
+p {
+  color: gray;
+  margin: 0;
+  margin-bottom: var(--margin-elements);
+}
+
+/* .note-p {
+  margin-top: 5px;
+  margin-bottom: 5px;
+} */
+
+span {
+  font-weight: bold;
+  color: gray;
+}
+
+/* .note-span {
+    display: inline-block;
+  } */
+
+.option {
+  display: grid;
+  grid-template-columns: 1fr 0.35fr;
+}
+
+.option-margin {
+  margin-bottom: var(--margin-elements);
+}
+
+#back {
+  width: 13px;
+  height: 13px;
+  float: right;
+  cursor: pointer;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.status {
+  display: inline-block;
+  padding-left: 2px;
+}

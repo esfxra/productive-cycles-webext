@@ -1,0 +1,50 @@
+body {
+  background-color: #202124;
+}
+
+.section-container {
+  background-color: #282828;
+}
+
+#time {
+  color: #f5f5f5;
+}
+
+.complete-text {
+  color: #f5f5f5;
+}
+
+.break {
+  color: #595959;
+}
+
+#break-text {
+  color: #595959;
+}
+
+#start {
+  background-color: #595959;
+}
+
+#pause,
+#reset-cycle,
+#reset-all {
+  background-color: #444444;
+}
+
+#skip {
+  color: #f5f5f5;
+  border-bottom: 1px dashed #f5f5f5;
+}
+
+.dot {
+  background-color: #595959;
+}
+
+.complete {
+  background-color: #f5f5f5;
+}
+
+.running {
+  background-color: #f5f5f5;
+}

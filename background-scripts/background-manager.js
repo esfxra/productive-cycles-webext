@@ -6,6 +6,15 @@ const defaultBreak = 5;
 const defaultCycles = 4;
 const defaultAutoStart = true;
 
+// Dev mode and debug messages
+// This is also run in background-timer
+const devMode = false;
+function debug(message) {
+  if (devMode) {
+    console.debug(message);
+  }
+}
+
 const cycles = new Timer(
   defaultTime,
   defaultBreak,
@@ -38,7 +47,7 @@ chrome.runtime.onConnect.addListener(connect);
 
 // Listen for the system changing states, and update time
 chrome.idle.onStateChanged.addListener((state) => {
-  console.debug(`System is '${state}'`);
+  debug(`System is '${state}'`);
   cycles.sync();
 });
 
@@ -62,7 +71,7 @@ function install(details) {
   } else if (details.reason === 'update') {
     // Future release: Open new tab with changes for this version
     update = true;
-    console.debug(`update set to ${update}`);
+    debug(`update set to ${update}`);
     cycles.clearNotifications(true);
   }
 }
@@ -83,12 +92,12 @@ function disconnect() {
 }
 
 function handleMessage(message) {
-  console.debug(`update set to ${update}`);
+  debug(message);
   if (message.command === 'preload' && update === true) {
     update = false;
     let message = cycles.status();
     message.update = true;
-    console.debug(message);
+    debug(message);
     port.postMessage(message);
   } else {
     cycles.input(message.command);
@@ -100,7 +109,7 @@ function newSettings(changes, namespace) {
   let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
-    console.debug(
+    debug(
       `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
     );
 
@@ -124,6 +133,10 @@ function newSettings(changes, namespace) {
       case 'autoStart':
         cycles.settings.autoStart = storageChange.newValue;
         settingsChanged = true;
+        break;
+      // Different behavior for notification settings - Timer is not reset
+      case 'notificationSound':
+        cycles.notification.sound = storageChange.newValue;
         break;
     }
   }
