@@ -23,10 +23,6 @@
   animation: runningCycle 4s infinite;
 }
 
-.hidden {
-  display: none;
-}
-
 .control {
   width: 100%;
   /* border-bottom: 2px dotted gray; */

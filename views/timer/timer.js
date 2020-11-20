@@ -22,7 +22,10 @@ window.addEventListener('DOMContentLoaded', () => {
   // Ask for Timer settings with 'preload' command
   port.postMessage({ command: 'preload' });
 
-  // Register listeners for user input
+  // Register listeners for menu
+  registerMenu();
+
+  // Register listeners for timer control
   registerButtons();
 
   // Internationalize
@@ -198,15 +201,6 @@ function handleMessage(message) {
 }
 
 function registerButtons() {
-  // Register listeners for 'settings' button
-  const settings = document.querySelector('#options');
-  settings.addEventListener('click', () => {
-    // Disconnect port
-    port.disconnect();
-    // Navigate to Settings
-    window.location.href = '../settings/settings.html';
-  });
-
   // Register listeners for all buttons
   const startButton = document.querySelector('#start');
   startButton.addEventListener('click', () => {

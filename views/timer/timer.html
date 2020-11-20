@@ -3,7 +3,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../common.css" />
+    <link rel="stylesheet" href="../common-styles.css" />
     <link rel="stylesheet" href="timer.css" />
     <link id="theme" rel="stylesheet" type="text/css" href="light.css" />
   </head>
@@ -11,13 +11,20 @@
   <body>
     <div class="timer-view">
       <nav class="nav">
-        <div id="options">
+        <div id="menu">
           <img
-            id="options-image"
-            alt="options icon"
-            title="options"
-            src="../../icons/nav-options.png"
+            id="menu-image"
+            alt="menu icon"
+            title="menu"
+            src="../../icons/nav-menu.svg"
           />
+          <div id="navigation" class="nav-list hidden">
+            <ul>
+              <li id="nav-timer">timer</li>
+              <li id="nav-settings">settings</li>
+              <li id="nav-stats">stats</li>
+            </ul>
+          </div>
         </div>
       </nav>
       <div class="section-container">
@@ -63,5 +70,6 @@
       </div>
     </div>
     <script src="./timer.js"></script>
+    <script src="../common-navigation.js"></script>
   </body>
 </html>

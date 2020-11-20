@@ -3,14 +3,10 @@
 let lightTheme = false;
 let darkTheme = false;
 
-// Register listeners for user input, and load theme
+// Register menu and load theme
 window.addEventListener('DOMContentLoaded', () => {
-  // Register listeners for 'back' button
-  const back = document.querySelector('#back');
-  back.addEventListener('click', () => {
-    // Navigate to timer view
-    window.location.href = '../timer/timer.html';
-  });
+  // Register listeners for menu
+  registerMenu();
 
   // Theme operations
   loadTheme();
