@@ -1,0 +1,24 @@
+body {
+  background-color: #eeeeee;
+}
+
+.section-container {
+  background-color: #ffffff;
+}
+
+#time {
+  color: #666666;
+}
+
+.nav-list ul {
+  color: #ffffff;
+  background-color: #b3b3b3;
+}
+
+.nav-list ul li:hover {
+  background-color: #666666;
+}
+
+.menu-icon-dot {
+  background-color: #666666;
+}

@@ -1,14 +1,4 @@
-body {
-  background-color: #eeeeee;
-}
-
-.section-container {
-  background-color: #ffffff;
-}
-
-#time {
-  color: #666666;
-}
+@import '../common-light.css';
 
 .complete-text {
   color: #666666;

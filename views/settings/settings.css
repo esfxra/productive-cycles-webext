@@ -1,3 +1,5 @@
+@import '../common-styles.css';
+
 /* Settings View */
 .settings-view {
   --margin-elements: 16px;
@@ -21,7 +23,7 @@
   cursor: pointer;
 }
 
-button {
+.settings-view button {
   width: max-content;
   height: fit-content;
   display: inline-block;
@@ -35,44 +37,31 @@ button {
   vertical-align: middle;
 }
 
-button span {
+.settings-view button span {
   vertical-align: middle;
 }
 
-label {
+.settings-view label {
   padding: 4px 0;
 }
 
-input[type='number'] {
+.settings-view input[type='number'] {
   font-family: robotoMono;
   width: 75%;
   padding: 4px;
   border: 0;
   border-radius: 3px;
   box-shadow: 1px 1px 1px #00000030;
-  /* border-bottom: 1px solid rgb(209, 209, 209);
-    background-color: #f2f2f2; */
 }
 
-p {
-  color: gray;
+.settings-view p {
   margin: 0;
   margin-bottom: var(--margin-elements);
 }
 
-/* .note-p {
-  margin-top: 5px;
-  margin-bottom: 5px;
-} */
-
-span {
+.settings-view span {
   font-weight: bold;
-  color: gray;
 }
-
-/* .note-span {
-    display: inline-block;
-  } */
 
 .option {
   display: grid;

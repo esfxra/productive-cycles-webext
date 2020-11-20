@@ -72,7 +72,7 @@ function navigate(e) {
 
 function registerMenu() {
   // Register listeners for 'menu' button
-  const menu = document.querySelector('#menu-image');
+  const menu = document.querySelector('#menu-icon');
   menu.addEventListener('click', () => {
     if (nav) {
       nav = false;

@@ -1,10 +1,4 @@
-body {
-  background-color: #202124;
-}
-
-.section-container {
-  background-color: #282828;
-}
+@import '../common-dark.css';
 
 #time {
   color: #f5f5f5;
