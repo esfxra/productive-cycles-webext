@@ -8,7 +8,7 @@ const defaultAutoStart = true;
 
 // Dev mode and debug messages
 // This is also run in background-timer
-const devMode = true;
+const devMode = false;
 function debug(message) {
   if (devMode) {
     console.debug(message);

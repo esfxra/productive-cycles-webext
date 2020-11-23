@@ -43,7 +43,7 @@ class Timer {
   }
 
   init() {
-    initTrackerStorage();
+    // initTrackerStorage();
 
     chrome.storage.local.get(
       ['minutes', 'break', 'totalCycles', 'autoStart', 'notificationSound'],
@@ -167,13 +167,13 @@ class Timer {
   endCycle() {
     this.compareTargets();
     if (this.cycle < this.settings.totalCycles) {
-      countCompletedCycle(this.settings.cycleTime);
+      // countCompletedCycle(this.settings.cycleTime);
 
       this.notify('cycle-complete');
       this.cycle += 1;
       this.startBreak();
     } else {
-      countCompletedTimer(this.settings.cycleTime);
+      // countCompletedTimer(this.settings.cycleTime);
 
       this.state = 'complete';
       this.postStatus();
@@ -194,7 +194,7 @@ class Timer {
   }
 
   endBreak() {
-    countCompletedBreak(this.settings.breakTime);
+    // countCompletedBreak(this.settings.breakTime);
 
     this.compareTargets();
     this.break += 1;
