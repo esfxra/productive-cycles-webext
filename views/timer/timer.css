@@ -1,10 +1,10 @@
 @import '../common-styles.css';
 
 /* Timer */
-.section-container {
+/* .section-container {
   padding-top: 25px;
   padding-bottom: 25px;
-}
+} */
 
 .timer-view {
   --margin-elements: 25px;

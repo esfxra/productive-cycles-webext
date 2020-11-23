@@ -62,12 +62,12 @@ body {
 #menu {
   margin-right: 2px;
   float: right;
-  cursor: pointer;
 }
 
 #menu-icon {
   padding: 0 8px;
   min-height: 19px;
+  cursor: pointer;
 }
 
 .menu-icon-dot {
@@ -76,6 +76,10 @@ body {
   border-radius: 50%;
   margin-bottom: 2px;
   display: block;
+}
+
+#navigation {
+  cursor: pointer;
 }
 
 #back {

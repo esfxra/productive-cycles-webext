@@ -1,7 +1,8 @@
 let nav = false;
 let current;
 
-const views = ['.timer-view', '.settings-view', '.stats-view'];
+// const views = ['.timer-view', '.settings-view', '.stats-view'];
+const views = ['.timer-view', '.settings-view'];
 
 current = determineView(views);
 console.log(current);
@@ -39,8 +40,10 @@ function navigate(e) {
   const options = document.querySelector('#nav-settings');
   options.removeEventListener('click', navigate);
 
-  const stats = document.querySelector('#nav-stats');
-  stats.removeEventListener('click', navigate);
+  // const stats = document.querySelector('#nav-stats');
+  // stats.removeEventListener('click', navigate);
+
+  document.removeEventListener('click', handleOutsideClickWhileOpen);
 
   // Hide the menu
   nav = false;
@@ -70,25 +73,41 @@ function navigate(e) {
   }
 }
 
+function handleOutsideClickWhileOpen(e) {
+  if (e.target.closest('#menu')) {
+    return;
+  } else {
+    document.removeEventListener('click', handleOutsideClickWhileOpen);
+
+    nav = false;
+    hideElement('#navigation');
+  }
+}
+
 function registerMenu() {
   // Register listeners for 'menu' button
   const menu = document.querySelector('#menu-icon');
   menu.addEventListener('click', () => {
     if (nav) {
+      document.removeEventListener('click', handleOutsideClickWhileOpen);
+
       nav = false;
       hideElement('#navigation');
     } else {
       nav = true;
       showElement('#navigation');
 
-      // Register listeners for menu options
+      // Register listeners for menu
       const timer = document.querySelector('#nav-timer');
-      const options = document.querySelector('#nav-settings');
-      const stats = document.querySelector('#nav-stats');
+      const settings = document.querySelector('#nav-settings');
+      // const stats = document.querySelector('#nav-stats');
 
       timer.addEventListener('click', navigate);
-      options.addEventListener('click', navigate);
-      stats.addEventListener('click', navigate);
+      settings.addEventListener('click', navigate);
+      // stats.addEventListener('click', navigate);
+
+      // Register listener for clicks outside the menu box
+      document.addEventListener('click', handleOutsideClickWhileOpen);
     }
   });
 }
