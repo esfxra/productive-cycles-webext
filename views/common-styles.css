@@ -21,22 +21,61 @@ body {
   margin: 0;
 }
 
+.hidden {
+  display: none;
+}
+
 /* Nav */
 .nav {
   width: 100%;
-  height: 17px;
+  min-height: 19px;
   margin-bottom: 11px;
 }
 
-#options {
-  margin-right: 3px;
+.nav-list {
+  position: relative;
+}
+
+.nav-list ul {
+  margin-top: 2px;
+  margin-left: 0;
+  margin-right: -1px;
+  margin-bottom: 0;
+  padding: 0;
+  z-index: 200;
+  right: 0;
+  border-radius: 5px;
+  font-size: 12px;
+  box-shadow: 1px 1px 1px #00000060;
+  position: absolute;
+  list-style: none;
+}
+
+.nav-list ul li {
+  padding: 5px 10px;
+}
+
+.nav-list ul li:hover {
+  border-radius: 5px;
+}
+
+#menu {
+  margin-right: 2px;
   float: right;
   cursor: pointer;
 }
 
-#options-image {
-  width: 17px;
-  height: 17px;
+#menu-icon {
+  padding: 0 8px;
+  min-height: 19px;
+}
+
+.menu-icon-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  margin-bottom: 2px;
+  display: block;
 }
 
 #back {

@@ -1,4 +1,11 @@
+@import '../common-styles.css';
+
 /* Timer */
+.section-container {
+  padding-top: 25px;
+  padding-bottom: 25px;
+}
+
 .timer-view {
   --margin-elements: 25px;
 
@@ -21,10 +28,6 @@
 
 .break {
   animation: runningCycle 4s infinite;
-}
-
-.hidden {
-  display: none;
 }
 
 .control {

@@ -1,14 +1,4 @@
-body {
-  background-color: #eeeeee;
-}
-
-.section-container {
-  background-color: white;
-}
-
-h1 {
-  color: #666666;
-}
+@import '../common-light.css';
 
 .updates-view p {
   color: #666666;

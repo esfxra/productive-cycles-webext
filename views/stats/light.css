@@ -1,0 +1,10 @@
+@import '../common-light.css';
+
+.stat {
+  color: #666666;
+}
+
+.stat-container {
+  background-color: #f5f5f5;
+  box-shadow: 1px 1px 2px #00000040;
+}

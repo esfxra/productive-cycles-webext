@@ -3,7 +3,6 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <link rel="stylesheet" href="../common.css" />
     <link rel="stylesheet" href="settings.css" />
     <link id="theme" rel="stylesheet" type="text/css" href="light.css" />
   </head>
@@ -11,13 +10,19 @@
   <body>
     <div class="settings-view">
       <nav class="nav">
-        <div id="back">
-          <img
-            id="back-image"
-            alt="back icon"
-            title="options"
-            src="../../icons/nav-back.png"
-          />
+        <div id="menu">
+          <div id="menu-icon">
+            <div class="menu-icon-dot"></div>
+            <div class="menu-icon-dot"></div>
+            <div class="menu-icon-dot"></div>
+          </div>
+          <div id="navigation" class="nav-list hidden">
+            <ul>
+              <li id="nav-timer">timer</li>
+              <li id="nav-settings">settings</li>
+              <li id="nav-stats">stats</li>
+            </ul>
+          </div>
         </div>
       </nav>
 
@@ -94,5 +99,6 @@
       </div>
     </div>
     <script src="./settings.js"></script>
+    <script src="../common-navigation.js"></script>
   </body>
 </html>

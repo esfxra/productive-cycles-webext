@@ -8,12 +8,8 @@ window.addEventListener('DOMContentLoaded', () => {
   // Restore current settings
   restoreOptions();
 
-  // Register listeners for 'back' button
-  const back = document.querySelector('#back');
-  back.addEventListener('click', () => {
-    // Navigate to timer view
-    window.location.href = '../timer/timer.html';
-  });
+  // Register listeners for menu
+  registerMenu();
 
   // Register listeners for 'save-notification' button
   const saveNotificationButton = document.querySelector('#save-notification');

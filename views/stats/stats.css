@@ -1,0 +1,32 @@
+@import '../common-styles.css';
+
+.stats-view {
+  --margin-elements: 16px;
+
+  width: 175px;
+  font-size: 12px;
+}
+
+.stats-view h1 {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.stat {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 1fr 0.35fr;
+  margin: var(--margin-elements) 0;
+}
+
+.stat-title {
+  display: inline-block;
+}
+
+.stat-container {
+  display: inline-block;
+  text-align: center;
+  width: 50px;
+  border-radius: 3px;
+  padding: 10px 5px;
+}
