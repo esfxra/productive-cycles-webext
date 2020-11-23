@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="stats.css" />
+    <link id="theme" rel="stylesheet" type="text/css" href="light.css" />
+  </head>
+
+  <body>
+    <div class="stats-view">
+      <nav class="nav">
+        <div id="menu">
+          <div id="menu-icon">
+            <div class="menu-icon-dot"></div>
+            <div class="menu-icon-dot"></div>
+            <div class="menu-icon-dot"></div>
+          </div>
+          <div id="navigation" class="nav-list hidden">
+            <ul>
+              <li id="nav-timer">timer</li>
+              <li id="nav-settings">settings</li>
+              <li id="nav-stats">stats</li>
+            </ul>
+          </div>
+        </div>
+      </nav>
+
+      <div class="section-container section-margin">
+        <h1>completed</h1>
+        <!-- <p>
+            <span class="version-text">welcome to version </span
+            ><span class="version-number">0.2</span>
+          </p> -->
+        <div class="stat">
+          <span class="stat-title">cycles</span>
+          <div class="stat-container">
+            <span id="stats-cycle-count" class="stat-value"></span>
+          </div>
+        </div>
+
+        <!-- <div class="stat">
+          <span class="stat-title">breaks</span>
+          <div class="stat-container">
+            <span id="stats-break-count" class="stat-value"></span>
+          </div>
+        </div> -->
+
+        <div class="stat">
+          <span class="stat-title">timers</span>
+          <div class="stat-container">
+            <span id="stats-timer-count" class="stat-value"></span>
+          </div>
+        </div>
+      </div>
+      <div class="section-container">
+        <h1>total time</h1>
+
+        <div class="stat">
+          <span class="stat-title">hours</span>
+          <div class="stat-container">
+            <span id="stats-time-total-hours" class="stat-value"></span>
+          </div>
+        </div>
+
+        <div class="stat">
+          <span class="stat-title">minutes</span>
+          <div class="stat-container">
+            <span id="stats-time-total-minutes" class="stat-value"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="./stats.js"></script>
+    <script src="../common-navigation.js"></script>
+  </body>
+</html>

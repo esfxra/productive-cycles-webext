@@ -32,8 +32,8 @@ class Timer {
       totalCycles: cycles,
       totalBreaks: cycles - 1,
       autoStart: auto,
-      cycleDevOffset: 0,
-      breakDevOffset: 0,
+      cycleDevOffset: 50000,
+      breakDevOffset: 50000,
     };
 
     this.notification = {
@@ -43,8 +43,10 @@ class Timer {
   }
 
   init() {
+    initTrackerStorage();
+
     chrome.storage.local.get(
-      ['minutes', 'totalCycles', 'break', 'autoStart', 'notificationSound'],
+      ['minutes', 'break', 'totalCycles', 'autoStart', 'notificationSound'],
       (storage) => {
         // Timer settings
         if (storage.minutes !== undefined) {
@@ -165,10 +167,14 @@ class Timer {
   endCycle() {
     this.compareTargets();
     if (this.cycle < this.settings.totalCycles) {
+      countCompletedCycle(this.settings.cycleTime);
+
       this.notify('cycle-complete');
       this.cycle += 1;
       this.startBreak();
     } else {
+      countCompletedTimer(this.settings.cycleTime);
+
       this.state = 'complete';
       this.postStatus();
       this.notify('timer-complete');
@@ -188,6 +194,8 @@ class Timer {
   }
 
   endBreak() {
+    countCompletedBreak(this.settings.breakTime);
+
     this.compareTargets();
     this.break += 1;
     this.next();
@@ -533,26 +541,28 @@ class Timer {
 
   // Debug purposes: Compare target times
   compareTargets() {
-    let targetTime = null;
-    if (this.state === 'running') {
-      targetTime = this.targetCycles[this.cycle - 1];
-    } else if (this.state === 'break') {
-      targetTime = this.targetBreaks[this.break - 1];
-    }
+    if (devMode) {
+      let targetTime = null;
+      if (this.state === 'running') {
+        targetTime = this.targetCycles[this.cycle - 1];
+      } else if (this.state === 'break') {
+        targetTime = this.targetBreaks[this.break - 1];
+      }
 
-    const testTime = new Date(Date.now());
-    const difference = testTime - targetTime;
+      const testTime = new Date(Date.now());
+      const difference = testTime - targetTime;
 
-    if (Math.abs(difference) > 1000) {
-      debug(`Expected time: '${testTime}'.`);
-      debug(`Target time: '${targetTime}'.`);
-      debug(
-        `Potential issue with target time, difference is: '${difference}' ms.`
-      );
-    } else {
-      debug(`Expected time: '${testTime}'.`);
-      debug(`Target time: '${targetTime}'.`);
-      debug(`Target did great, difference is: '${difference}' ms.`);
+      if (Math.abs(difference) > 1000) {
+        debug(`Expected time: '${testTime}'.`);
+        debug(`Target time: '${targetTime}'.`);
+        debug(
+          `Potential issue with target time, difference is: '${difference}' ms.`
+        );
+      } else {
+        debug(`Expected time: '${testTime}'.`);
+        debug(`Target time: '${targetTime}'.`);
+        debug(`Target did great, difference is: '${difference}' ms.`);
+      }
     }
   }
 }
