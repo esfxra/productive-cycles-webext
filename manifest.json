@@ -3,7 +3,7 @@
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "homepage_url": "http://diegoserrano.me/productive-cycles",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "default_locale": "en",
 
   "icons": {

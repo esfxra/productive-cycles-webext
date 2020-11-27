@@ -32,8 +32,8 @@ class Timer {
       totalCycles: cycles,
       totalBreaks: cycles - 1,
       autoStart: auto,
-      cycleDevOffset: 50000,
-      breakDevOffset: 50000,
+      cycleDevOffset: 0,
+      breakDevOffset: 0,
     };
 
     this.notification = {

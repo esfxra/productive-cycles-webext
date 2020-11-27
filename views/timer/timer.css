@@ -42,20 +42,22 @@
 }
 
 .control-button {
-  border-radius: 4px;
   cursor: pointer;
-  box-shadow: 1px 1px 1px #00000075;
+  border-radius: 4px;
+  /* box-shadow: 1px 1px 1px #00000075; */
 }
 
 .control-button img {
-  width: 15px;
-  height: 15px;
-  padding: 5px;
+  width: 17px;
+  height: 17px;
+  padding: 4px;
   vertical-align: middle;
 }
 
 #reset-all img {
-  transform: scaleX(-1);
+  width: 18px;
+  height: 18px;
+  padding: 3.5px;
 }
 
 #skip {
@@ -92,7 +94,7 @@
   display: inline-block;
   /* grid related: */
   justify-self: center;
-  box-shadow: 1px 1px 1px #000000;
+  /* box-shadow: 1px 1px 1px #000000; */
 }
 
 .pending {
