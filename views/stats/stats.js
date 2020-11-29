@@ -5,8 +5,9 @@ let darkTheme = false;
 
 // Restore options, register listeners for user input, and load theme
 window.addEventListener('DOMContentLoaded', () => {
-  // Restore current settings
-  loadStats();
+  // Load stats
+  loadStatsMap();
+  loadStatsSummary();
 
   // Register listeners for menu
   registerMenu();
@@ -15,23 +16,30 @@ window.addEventListener('DOMContentLoaded', () => {
   loadTheme();
 });
 
-function loadStats() {
+function loadStatsMap() {
+  chrome.storage.local.get(['statsMap'], (storage) => {
+    console.log(storage.statsMap);
+  });
+}
+
+function loadStatsSummary() {
   const cycleCount = document.querySelector('#stats-cycle-count');
-  // const breakCount = document.querySelector('#stats-break-count');
   const fullTimerCount = document.querySelector('#stats-timer-count');
 
   const timeTotalHours = document.querySelector('#stats-time-total-hours');
-  const timeTotalMinutes = document.querySelector('#stats-time-total-minutes');
+  // const timeTotalMinutes = document.querySelector('#stats-time-total-minutes');
 
-  chrome.storage.local.get(['stats'], (storage) => {
-    cycleCount.textContent = storage.stats.cycleCount;
-    // breakCount.textContent = storage.stats.breakCount;
-    fullTimerCount.textContent = storage.stats.timerCount;
-
-    timeTotalHours.textContent = (storage.stats.timeTotal / 60000 / 60).toFixed(
-      2
-    );
-    timeTotalMinutes.textContent = (storage.stats.timeTotal / 60000).toFixed(2);
+  chrome.storage.local.get(['statsSummary'], (storage) => {
+    cycleCount.textContent = storage.statsSummary.cycleCount;
+    fullTimerCount.textContent = storage.statsSummary.timerCount;
+    timeTotalHours.textContent = (
+      storage.statsSummary.timeTotal /
+      60000 /
+      60
+    ).toFixed(2);
+    // timeTotalMinutes.textContent = (
+    //   storage.statsSummary.timeTotal / 60000
+    // ).toFixed(2);
   });
 }
 

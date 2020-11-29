@@ -14,9 +14,13 @@
 
 .stat {
   display: grid;
+  grid-template-columns: 65% 30%;
+  gap: 5%;
   align-items: center;
-  grid-template-columns: 1fr 0.35fr;
-  margin: var(--margin-elements) 0;
+}
+
+.stat-margin {
+  margin-bottom: var(--margin-elements);
 }
 
 .stat-title {
@@ -26,7 +30,6 @@
 .stat-container {
   display: inline-block;
   text-align: center;
-  width: 50px;
-  border-radius: 3px;
-  padding: 10px 5px;
+  border-radius: 4px;
+  padding: 5px;
 }

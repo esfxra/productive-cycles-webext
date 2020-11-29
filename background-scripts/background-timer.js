@@ -32,8 +32,8 @@ class Timer {
       totalCycles: cycles,
       totalBreaks: cycles - 1,
       autoStart: auto,
-      cycleDevOffset: 0,
-      breakDevOffset: 0,
+      cycleDevOffset: 50000,
+      breakDevOffset: 50000,
     };
 
     this.notification = {
@@ -43,7 +43,7 @@ class Timer {
   }
 
   init() {
-    // initTrackerStorage();
+    initTrackerStorage();
 
     chrome.storage.local.get(
       ['minutes', 'break', 'totalCycles', 'autoStart', 'notificationSound'],
@@ -167,13 +167,13 @@ class Timer {
   endCycle() {
     this.compareTargets();
     if (this.cycle < this.settings.totalCycles) {
-      // countCompletedCycle(this.settings.cycleTime);
+      countCompletedCycle(this.settings.cycleTime, false);
 
       this.notify('cycle-complete');
       this.cycle += 1;
       this.startBreak();
     } else {
-      // countCompletedTimer(this.settings.cycleTime);
+      countCompletedCycle(this.settings.cycleTime, true);
 
       this.state = 'complete';
       this.postStatus();
@@ -194,8 +194,6 @@ class Timer {
   }
 
   endBreak() {
-    // countCompletedBreak(this.settings.breakTime);
-
     this.compareTargets();
     this.break += 1;
     this.next();
@@ -494,7 +492,7 @@ class Timer {
 
     chrome.notifications.create(id, {
       type: 'basic',
-      iconUrl: chrome.runtime.getURL('icons/icon-512.png'),
+      iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
       title: title,
       message: message,
     });

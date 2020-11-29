@@ -1,8 +1,7 @@
 let nav = false;
 let current;
 
-// const views = ['.timer-view', '.settings-view', '.stats-view'];
-const views = ['.timer-view', '.settings-view'];
+const views = ['.timer-view', '.settings-view', '.stats-view'];
 
 current = determineView(views);
 console.log(current);
@@ -40,8 +39,8 @@ function navigate(e) {
   const options = document.querySelector('#nav-settings');
   options.removeEventListener('click', navigate);
 
-  // const stats = document.querySelector('#nav-stats');
-  // stats.removeEventListener('click', navigate);
+  const stats = document.querySelector('#nav-stats');
+  stats.removeEventListener('click', navigate);
 
   document.removeEventListener('click', handleOutsideClickWhileOpen);
 
@@ -100,11 +99,11 @@ function registerMenu() {
       // Register listeners for menu
       const timer = document.querySelector('#nav-timer');
       const settings = document.querySelector('#nav-settings');
-      // const stats = document.querySelector('#nav-stats');
+      const stats = document.querySelector('#nav-stats');
 
       timer.addEventListener('click', navigate);
       settings.addEventListener('click', navigate);
-      // stats.addEventListener('click', navigate);
+      stats.addEventListener('click', navigate);
 
       // Register listener for clicks outside the menu box
       document.addEventListener('click', handleOutsideClickWhileOpen);
