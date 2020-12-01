@@ -1,59 +1,67 @@
-'use strict';
+// 'use strict';
 
-let lightTheme = false;
-let darkTheme = false;
+// let lightTheme = false;
+// let darkTheme = false;
 
-// Restore options, register listeners for user input, and load theme
-window.addEventListener('DOMContentLoaded', () => {
-  // Restore current settings
-  loadStats();
+// // Restore options, register listeners for user input, and load theme
+// window.addEventListener('DOMContentLoaded', () => {
+//   // Load stats
+//   loadRecentProgress();
 
-  // Register listeners for menu
-  registerMenu();
+//   // Register listeners for menu
+//   registerMenu();
 
-  // Theme operations
-  loadTheme();
-});
+//   // Theme operations
+//   loadTheme();
+// });
 
-function loadStats() {
-  const cycleCount = document.querySelector('#stats-cycle-count');
-  // const breakCount = document.querySelector('#stats-break-count');
-  const fullTimerCount = document.querySelector('#stats-timer-count');
+// function loadRecentProgress() {
+//   chrome.storage.local.get(['recentProgress'], (storage) => {
+//     // console.log(storage.recentProgress);
 
-  const timeTotalHours = document.querySelector('#stats-time-total-hours');
-  const timeTotalMinutes = document.querySelector('#stats-time-total-minutes');
+//     const latest_idx = storage.recentProgress.length - 1;
 
-  chrome.storage.local.get(['stats'], (storage) => {
-    cycleCount.textContent = storage.stats.cycleCount;
-    // breakCount.textContent = storage.stats.breakCount;
-    fullTimerCount.textContent = storage.stats.timerCount;
+//     // const today = formatDate(new Date());
+//     const latest = storage.recentProgress[latest_idx];
 
-    timeTotalHours.textContent = (storage.stats.timeTotal / 60000 / 60).toFixed(
-      2
-    );
-    timeTotalMinutes.textContent = (storage.stats.timeTotal / 60000).toFixed(2);
-  });
-}
+//     console.log(latest);
 
-function loadTheme() {
-  // Check what is the theme saved in storage
-  let stylesheet = document.querySelector('#theme');
+//     // Find last week range
+//     // let thisWeek = [];
 
-  chrome.storage.local.get({ theme: 'light' }, function (items) {
-    if (items.theme === 'light') {
-      lightTheme = true;
-      darkTheme = false;
+//     // Find last month range
+//     // let thisMonth = [];
 
-      if (!stylesheet.href.includes('timer-light')) {
-        stylesheet.href = 'light.css';
-      }
-    } else {
-      darkTheme = true;
-      lightTheme = false;
+//     // Find last year range
+//     // let thisYear = [];
 
-      if (!stylesheet.href.includes('timer-dark')) {
-        stylesheet.href = 'dark.css';
-      }
-    }
-  });
-}
+//     // Calculate weekly count
+
+//     // Calculate monthly count
+
+//     // Calculate yearly count
+//   });
+// }
+
+// function loadTheme() {
+//   // Check what is the theme saved in storage
+//   let stylesheet = document.querySelector('#theme');
+
+//   chrome.storage.local.get({ theme: 'light' }, function (items) {
+//     if (items.theme === 'light') {
+//       lightTheme = true;
+//       darkTheme = false;
+
+//       if (!stylesheet.href.includes('timer-light')) {
+//         stylesheet.href = 'light.css';
+//       }
+//     } else {
+//       darkTheme = true;
+//       lightTheme = false;
+
+//       if (!stylesheet.href.includes('timer-dark')) {
+//         stylesheet.href = 'dark.css';
+//       }
+//     }
+//   });
+// }

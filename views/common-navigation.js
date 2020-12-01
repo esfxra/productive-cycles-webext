@@ -5,7 +5,7 @@ let current;
 const views = ['.timer-view', '.settings-view'];
 
 current = determineView(views);
-console.log(current);
+// console.log(current);
 
 function hideElement(element) {
   const elt = document.querySelector(element);
@@ -90,22 +90,18 @@ function registerMenu() {
   menu.addEventListener('click', () => {
     if (nav) {
       document.removeEventListener('click', handleOutsideClickWhileOpen);
-
       nav = false;
       hideElement('#navigation');
     } else {
       nav = true;
       showElement('#navigation');
-
       // Register listeners for menu
       const timer = document.querySelector('#nav-timer');
       const settings = document.querySelector('#nav-settings');
       // const stats = document.querySelector('#nav-stats');
-
       timer.addEventListener('click', navigate);
       settings.addEventListener('click', navigate);
       // stats.addEventListener('click', navigate);
-
       // Register listener for clicks outside the menu box
       document.addEventListener('click', handleOutsideClickWhileOpen);
     }

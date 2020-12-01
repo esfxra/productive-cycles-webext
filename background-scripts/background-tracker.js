@@ -1,63 +1,55 @@
-function initTrackerStorage() {
-  chrome.storage.local.get(['stats'], (storage) => {
-    if (storage.stats === undefined) {
-      const stats = {
-        cycleCount: 0,
-        breakCount: 0,
-        timerCount: 0,
-        timeTotal: 0,
-      };
+// function initTrackerStorage() {
+//   chrome.storage.local.get(['recentProgress'], (storage) => {
+//     if (storage.recentProgress === undefined) {
+//       let recentProgress = [];
 
-      chrome.storage.local.set({ stats });
-    }
-  });
-}
+//       const today = formatDate(new Date());
 
-function countCompletedCycle(cycleTime) {
-  chrome.storage.local.get(['stats'], (storage) => {
-    const cycleCount = storage.stats.cycleCount + 1;
-    const timeTotal = storage.stats.timeTotal + cycleTime;
+//       recentProgress.push({
+//         date: today,
+//         cycles: 0,
+//       });
 
-    const stats = {
-      cycleCount: cycleCount,
-      breakCount: storage.stats.breakCount,
-      timerCount: storage.stats.timerCount,
-      timeTotal: timeTotal,
-    };
+//       chrome.storage.local.set({ recentProgress });
+//     }
+//   });
+// }
 
-    chrome.storage.local.set({ stats });
-  });
-}
+// function countCompletedCycle() {
+//   chrome.storage.local.get(['recentProgress'], (storage) => {
+//     // Stats map
+//     let recentProgress = [...storage.recentProgress];
 
-function countCompletedBreak(breakTime) {
-  chrome.storage.local.get(['stats'], (storage) => {
-    const breakCount = storage.stats.breakCount + 1;
-    const timeTotal = storage.stats.timeTotal + breakTime;
+//     // Retrieve last item
+//     const last_idx = recentProgress.length - 1;
+//     console.log(`Last index: ${last_idx}`);
+//     const latest = recentProgress[last_idx];
+//     console.log(`Latest date: ${latest.date}`);
+//     const today = formatDate(new Date());
 
-    const stats = {
-      cycleCount: storage.stats.cycleCount,
-      breakCount: breakCount,
-      timerCount: storage.stats.timerCount,
-      timeTotal: timeTotal,
-    };
+//     // Compare dates
+//     if (sameDay(today, latest.date)) {
+//       recentProgress[last_idx] = {
+//         date: latest.date,
+//         cycles: latest.cycles + 1,
+//       };
+//     } else {
+//       recentProgress.push({
+//         date: today,
+//         cycles: 1,
+//       });
+//     }
 
-    chrome.storage.local.set({ stats });
-  });
-}
+//     chrome.storage.local.set({ recentProgress });
+//   });
+// }
 
-function countCompletedTimer(cycleTime) {
-  chrome.storage.local.get(['stats'], (storage) => {
-    const cycleCount = storage.stats.cycleCount + 1;
-    const timerCount = storage.stats.timerCount + 1;
-    const timeTotal = storage.stats.timeTotal + cycleTime;
+// // Utility Functions
+// function formatDate(date) {
+//   return `${date.getMonth() + 1}-${date.getDate()}-${date.getFullYear()}`;
+// }
 
-    const stats = {
-      cycleCount: cycleCount,
-      breakCount: storage.stats.breakCount,
-      timerCount: timerCount,
-      timeTotal: timeTotal,
-    };
-
-    chrome.storage.local.set({ stats });
-  });
-}
+// function sameDay(date1, date2) {
+//   console.log(`same day: ${date1 === date2}`);
+//   return date1 === date2;
+// }
