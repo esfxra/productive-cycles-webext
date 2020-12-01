@@ -32,8 +32,8 @@ class Timer {
       totalCycles: cycles,
       totalBreaks: cycles - 1,
       autoStart: auto,
-      cycleDevOffset: 50000,
-      breakDevOffset: 50000,
+      cycleDevOffset: 0,
+      breakDevOffset: 0,
     };
 
     this.notification = {
@@ -167,13 +167,13 @@ class Timer {
   endCycle() {
     this.compareTargets();
     if (this.cycle < this.settings.totalCycles) {
-      countCompletedCycle(this.settings.cycleTime, false);
+      // countCompletedCycle();
 
       this.notify('cycle-complete');
       this.cycle += 1;
       this.startBreak();
     } else {
-      countCompletedCycle(this.settings.cycleTime, true);
+      // countCompletedCycle();
 
       this.state = 'complete';
       this.postStatus();
