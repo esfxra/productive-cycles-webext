@@ -2,6 +2,10 @@ body {
   background-color: #eeeeee;
 }
 
+h1 {
+  color: #212121;
+}
+
 .section-container {
   background-color: #ffffff;
 }
