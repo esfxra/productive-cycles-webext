@@ -1,0 +1,10 @@
+@import '../common-light.css';
+
+.quick-stat {
+  color: #666666;
+}
+
+.new-timer-button {
+  color: #f5f5f5;
+  background-color: #666666;
+}
