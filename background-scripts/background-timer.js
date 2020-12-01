@@ -43,7 +43,7 @@ class Timer {
   }
 
   init() {
-    initTrackerStorage();
+    // initTrackerStorage();
 
     chrome.storage.local.get(
       ['minutes', 'break', 'totalCycles', 'autoStart', 'notificationSound'],
