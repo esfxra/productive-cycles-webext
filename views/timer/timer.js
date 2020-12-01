@@ -1,10 +1,11 @@
 'use strict';
 
+import { registerNavigation } from '../common-navigation.js';
+import { hideElement, showElement, loadTheme } from '../common-utils.js';
+
 let port = null;
 let previousState = null;
 let stateChanged = false;
-let lightTheme = false;
-let darkTheme = false;
 
 // Dev mode and debug messages
 const devMode = false;
@@ -23,7 +24,9 @@ window.addEventListener('DOMContentLoaded', () => {
   port.postMessage({ command: 'preload' });
 
   // Register listeners for menu
-  registerMenu();
+  // const navigation = new Navigation('timer', port);
+  // navigation.init();
+  registerNavigation('timer', port);
 
   // Register listeners for timer control
   registerButtons();
@@ -34,22 +37,6 @@ window.addEventListener('DOMContentLoaded', () => {
   // Theme operations
   loadTheme();
 });
-
-function hideElement(element) {
-  debug('Hiding element');
-  const elt = document.querySelector(element);
-  if (!elt.classList.contains('hidden')) {
-    elt.classList.add('hidden');
-  }
-}
-
-function showElement(element) {
-  debug('Showing element');
-  const elt = document.querySelector(element);
-  if (elt.classList.contains('hidden')) {
-    elt.classList.remove('hidden');
-  }
-}
 
 // Make UI changes based on Timer details messaged by the background script
 function handleMessage(message) {
@@ -115,13 +102,14 @@ function handleMessage(message) {
         showElement('#start');
         break;
       case 'complete':
+        window.location.href = '../complete/complete.html';
         // Adjust "time"
-        document.querySelector('#time').textContent = 'complete';
-        document.querySelector('#time').classList.add('complete-text');
-        document.querySelector('.control').style.justifyContent =
-          'space-around';
-        hideElement('#pause');
-        hideElement('#start');
+        // document.querySelector('#time').textContent = 'complete';
+        // document.querySelector('#time').classList.add('complete-text');
+        // document.querySelector('.control').style.justifyContent =
+        //   'space-around';
+        // hideElement('#pause');
+        // hideElement('#start');
         break;
       case 'break':
         elt = document.querySelector('.time-container');
@@ -268,27 +256,4 @@ function internationalize() {
   // Set 'skip break' text
   const skipButton = document.querySelector('#skip');
   skipButton.textContent = chrome.i18n.getMessage('skipBreak');
-}
-
-function loadTheme() {
-  // Check what is the theme saved in storage
-  let stylesheet = document.querySelector('#theme');
-
-  chrome.storage.local.get({ theme: 'light' }, function (items) {
-    if (items.theme === 'light') {
-      lightTheme = true;
-      darkTheme = false;
-
-      if (!stylesheet.href.includes('timer-light')) {
-        stylesheet.href = 'light.css';
-      }
-    } else {
-      darkTheme = true;
-      lightTheme = false;
-
-      if (!stylesheet.href.includes('timer-dark')) {
-        stylesheet.href = 'dark.css';
-      }
-    }
-  });
 }

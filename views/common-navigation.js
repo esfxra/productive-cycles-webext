@@ -1,109 +1,125 @@
-let nav = false;
-let current;
+import { hideElement, showElement } from './common-utils.js';
 
-// const views = ['.timer-view', '.settings-view', '.stats-view'];
-const views = ['.timer-view', '.settings-view'];
+/*
+|--------------------------------------------------------------------------
+| Navigation-related Functions
+|--------------------------------------------------------------------------
+|
+| Module that enables navigation within the extension's views
+|
+*/
+let currentView = '';
+let communicationsPort;
+let open = false;
 
-current = determineView(views);
-// console.log(current);
+const views = ['timer', 'settings'];
 
-function hideElement(element) {
-  const elt = document.querySelector(element);
-  if (!elt.classList.contains('hidden')) {
-    elt.classList.add('hidden');
-  }
-}
+const registerNavigation = (current, port) => {
+  currentView = current;
+  communicationsPort = port;
 
-function showElement(element) {
-  const elt = document.querySelector(element);
-  if (elt.classList.contains('hidden')) {
-    elt.classList.remove('hidden');
-  }
-}
+  // Build and append navigation
+  buildMenuList(views);
 
-function determineView(views) {
-  let result = views.filter((view) => document.querySelector(view))[0];
-  if (result) {
-    result = result.replace('.', '');
-    result = result.replace('-view', '');
-  }
-  return result;
-}
+  // Register menu icon listener
+  const menu = document.querySelector('#menu-icon');
+  menu.addEventListener('click', () => {
+    if (open) {
+      closeMenu();
+    } else {
+      openMenu();
+    }
+  });
+};
 
-function navigate(e) {
-  const destination = e.target.id;
+const buildMenuList = (views) => {
+  // Append navigation list
+  const navMenuList = document.createElement('ul');
+  navMenuList.id = 'navigation-ul';
 
-  // Remove existing listeners
-  const timer = document.querySelector('#nav-timer');
-  timer.removeEventListener('click', navigate);
+  views.forEach((view) => {
+    let node = document.createElement('li');
+    node.id = `nav-${view}`;
+    node.textContent = view;
+    navMenuList.appendChild(node);
+  });
 
-  const options = document.querySelector('#nav-settings');
-  options.removeEventListener('click', navigate);
+  const nav = document.querySelector('#navigation');
+  nav.appendChild(navMenuList);
+};
 
-  // const stats = document.querySelector('#nav-stats');
-  // stats.removeEventListener('click', navigate);
+const navigate = (e) => {
+  // Close menu and make necessary listener removals
+  closeMenu();
 
-  document.removeEventListener('click', handleOutsideClickWhileOpen);
-
-  // Hide the menu
-  nav = false;
-  hideElement('#navigation');
-
-  // Change view based on user input
-  switch (destination) {
+  // Load new view resource
+  switch (e.target.id) {
     case 'nav-timer':
-      if (current !== 'timer') {
+      if (currentView !== 'timer') {
         window.location.href = '../timer/timer.html';
       }
       break;
     case 'nav-settings':
-      if (current === 'timer' && port) port.disconnect();
+      if (currentView === 'timer' && communicationsPort) {
+        communicationsPort.disconnect();
+      }
 
-      if (current !== 'settings') {
+      if (currentView !== 'settings') {
         window.location.href = '../settings/settings.html';
       }
       break;
     case 'nav-stats':
-      if (current === 'timer' && port) port.disconnect();
+      if (currentView === 'timer' && communicationsPort) {
+        communicationsPort.disconnect();
+      }
 
-      if (current !== 'stats') {
+      if (currentView !== 'stats') {
         window.location.href = '../stats/stats.html';
       }
       break;
   }
-}
+};
 
-function handleOutsideClickWhileOpen(e) {
+const handleOutsideClick = (e) => {
   if (e.target.closest('#menu')) {
     return;
   } else {
-    document.removeEventListener('click', handleOutsideClickWhileOpen);
-
-    nav = false;
-    hideElement('#navigation');
+    closeMenu();
   }
-}
+};
 
-function registerMenu() {
-  // Register listeners for 'menu' button
-  const menu = document.querySelector('#menu-icon');
-  menu.addEventListener('click', () => {
-    if (nav) {
-      document.removeEventListener('click', handleOutsideClickWhileOpen);
-      nav = false;
-      hideElement('#navigation');
-    } else {
-      nav = true;
-      showElement('#navigation');
-      // Register listeners for menu
-      const timer = document.querySelector('#nav-timer');
-      const settings = document.querySelector('#nav-settings');
-      // const stats = document.querySelector('#nav-stats');
-      timer.addEventListener('click', navigate);
-      settings.addEventListener('click', navigate);
-      // stats.addEventListener('click', navigate);
-      // Register listener for clicks outside the menu box
-      document.addEventListener('click', handleOutsideClickWhileOpen);
-    }
+const openMenu = () => {
+  open = true;
+  registerMenuListeners();
+  showElement('#navigation');
+};
+
+const closeMenu = () => {
+  open = false;
+  removeMenuListeners();
+  hideElement('#navigation');
+};
+
+const registerMenuListeners = () => {
+  // Add listener for clicks outside the menu container
+  document.addEventListener('click', handleOutsideClick);
+
+  // Add necessary listeners to navigation items
+  const navigation = document.querySelector('#navigation-ul');
+  navigation.childNodes.forEach((node) => {
+    node.addEventListener('click', navigate);
   });
-}
+};
+
+const removeMenuListeners = () => {
+  // Remove listener for clicks outside the menu container
+  document.removeEventListener('click', handleOutsideClick);
+
+  // Remove existing listeners
+  const navigation = document.querySelector('#navigation-ul');
+  navigation.childNodes.forEach((node) => {
+    node.removeEventListener('click', navigate);
+  });
+};
+
+export { registerNavigation };

@@ -1,7 +1,7 @@
 'use strict';
 
-let lightTheme = false;
-let darkTheme = false;
+import { registerNavigation } from '../common-navigation.js';
+import { loadTheme } from '../common-utils.js';
 
 // Restore options, register listeners for user input, and load theme
 window.addEventListener('DOMContentLoaded', () => {
@@ -9,7 +9,7 @@ window.addEventListener('DOMContentLoaded', () => {
   restoreOptions();
 
   // Register listeners for menu
-  registerMenu();
+  registerNavigation('settings');
 
   // Register listeners for 'save-notification' button
   const saveNotificationButton = document.querySelector('#save-notification');
@@ -20,7 +20,8 @@ window.addEventListener('DOMContentLoaded', () => {
   saveTimerButton.addEventListener('click', saveTimerOptions);
 
   // Theme operations
-  loadThemeAndRegisterToggles();
+  loadTheme();
+  registerThemeToggles();
 });
 
 // Notification Options
@@ -90,54 +91,25 @@ function restoreOptions() {
 }
 
 // Load theme and register theme toggles (toggles only in settings page)
-function loadThemeAndRegisterToggles() {
-  // Check what is the theme saved in storage
+function registerThemeToggles() {
   let stylesheet = document.querySelector('#theme');
-
-  chrome.storage.local.get({ theme: 'light' }, function (items) {
-    if (items.theme === 'light') {
-      lightTheme = true;
-      darkTheme = false;
-
-      if (!stylesheet.href.includes('timer-light')) {
-        stylesheet.href = 'light.css';
-      }
-    } else {
-      darkTheme = true;
-      lightTheme = false;
-
-      if (!stylesheet.href.includes('timer-dark')) {
-        stylesheet.href = 'dark.css';
-      }
-    }
-  });
 
   // Theme toggle (light / dark)
   const light = document.querySelector('.option-light');
   const dark = document.querySelector('.option-dark');
   light.addEventListener('click', () => {
-    if (!stylesheet.href.includes('timer-light')) {
+    if (!stylesheet.href.includes('light')) {
       stylesheet.href = 'light.css';
-    }
 
-    // Check if it this is the theme saved
-    if (!lightTheme) {
-      darkTheme = false;
-      lightTheme = true;
       chrome.storage.local.set({
         theme: 'light',
       });
     }
   });
   dark.addEventListener('click', () => {
-    if (!stylesheet.href.includes('timer-dark')) {
+    if (!stylesheet.href.includes('dark')) {
       stylesheet.href = 'dark.css';
-    }
 
-    // Check if it this is the theme saved
-    if (!darkTheme) {
-      darkTheme = true;
-      lightTheme = false;
       chrome.storage.local.set({
         theme: 'dark',
       });
