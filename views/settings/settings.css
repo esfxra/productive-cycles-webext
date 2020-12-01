@@ -2,18 +2,19 @@
 
 /* Settings View */
 .settings-view {
-  --margin-elements: 16px;
+  --margin-elements: 15px;
 
-  width: 225px;
-  font-size: 12px;
+  /* width: 225px; */
+  font-size: 13px;
 }
 
 .theme-option {
   display: inline-block;
+  cursor: pointer;
   width: 15px;
   height: 15px;
   border-radius: 50%;
-  cursor: pointer;
+  margin-right: 5px;
 }
 
 .option-light {
@@ -27,35 +28,36 @@
 }
 
 .settings-view button {
-  width: max-content;
-  height: fit-content;
   display: inline-block;
-  font-family: inherit;
-  vertical-align: middle;
   cursor: pointer;
+  font-family: inherit;
+
+  /* margin-top: calc(var(--margin-elements) - 5px); */
+
   border-radius: 5px;
   border: 0;
-  padding-top: 1px;
-  padding-bottom: 3px;
-  padding-left: 8px;
-  padding-right: 8px;
+  padding: 3px 8px;
   font-size: 12px;
+}
+
+.status {
+  display: inline-block;
+  text-transform: lowercase;
+
+  font-size: 12px;
+  padding-left: 2px;
 }
 
 .settings-view button span {
   vertical-align: middle;
 }
 
-.settings-view label {
-  padding: 4px 0;
-}
-
 .settings-view input[type='number'] {
-  font-family: robotoMono;
-  width: 75%;
-  padding: 4px;
+  font-size: 13px;
+  font-family: 'Open Sans', sans-serif;
+  padding: 5px;
   border: 0;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 
 .settings-view p {
@@ -69,26 +71,13 @@
 
 .option {
   display: grid;
-  grid-template-columns: 1fr 0.35fr;
+  align-items: center;
+  grid-template-columns: 110px 45px;
+  column-gap: 30px;
 }
 
 .option-margin {
   margin-bottom: var(--margin-elements);
-}
-
-#back {
-  width: 13px;
-  height: 13px;
-  float: right;
-  cursor: pointer;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: contain;
-}
-
-.status {
-  display: inline-block;
-  padding-left: 2px;
 }
 
 /* Checkmark */
@@ -96,11 +85,8 @@
 .container {
   display: block;
   position: relative;
-  margin-top: 5px;
-  /* padding-left: 35px;
-      margin-bottom: 12px; */
+  padding: 0;
   cursor: pointer;
-  /* font-size: 22px; */
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
@@ -109,6 +95,7 @@
 
 /* Hide the browser's default checkbox */
 .container input {
+  display: block;
   position: absolute;
   opacity: 0;
   cursor: pointer;
@@ -118,9 +105,11 @@
 
 /* Create a custom checkbox */
 .checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: relative;
+  /* vertical-align: middle; */
+  /* top: 0; */
+  /* left: 0; */
+  display: block;
   height: 13px;
   width: 13px;
   border-radius: 3px;
@@ -147,7 +136,7 @@
 /* Style the checkmark/indicator */
 .container .checkmark:after {
   left: 3px;
-  top: 1px;
+  top: 0px;
   width: 3px;
   height: 7px;
   border-radius: 1px;

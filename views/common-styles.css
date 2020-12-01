@@ -1,18 +1,23 @@
 @font-face {
-  font-family: robotoMono;
-  src: url(../../fonts/RobotoMono-Regular.ttf);
+  font-family: 'Open Sans';
+  src: url(../../fonts/OpenSans-Regular.ttf);
 }
 
 @font-face {
-  font-family: robotoMono;
-  src: url(../../fonts/RobotoMono-Bold.ttf);
-  font-weight: bold;
+  font-family: 'Open Sans';
+  src: url(../../fonts/OpenSans-SemiBold.ttf);
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url(../../fonts/RobotoMono-Regular.ttf);
 }
 
 body,
 html {
   min-width: fit-content;
-  font-family: robotoMono, monospace;
+  font-family: 'Open Sans', sans-serif;
   overflow: hidden;
 }
 
@@ -25,6 +30,7 @@ body {
 
 h1 {
   font-size: 14px;
+  font-weight: 600;
   margin-top: 0;
   margin-bottom: calc(var(--margin-elements) - 5px);
 }
@@ -48,6 +54,7 @@ h1 {
 .nav-list ul {
   position: absolute;
   list-style: none;
+  text-transform: capitalize;
   margin-top: 2px;
   margin-left: 0;
   margin-right: -1px;
