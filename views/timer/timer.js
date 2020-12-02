@@ -102,14 +102,22 @@ function handleMessage(message) {
         showElement('#start');
         break;
       case 'complete':
-        window.location.href = '../complete/complete.html';
-        // Adjust "time"
-        // document.querySelector('#time').textContent = 'complete';
-        // document.querySelector('#time').classList.add('complete-text');
-        // document.querySelector('.control').style.justifyContent =
-        //   'space-around';
-        // hideElement('#pause');
-        // hideElement('#start');
+        hideElement('.time-container');
+        hideElement('.control');
+        showElement('.timer-complete-message');
+        showElement('.timer-complete-button');
+
+        // Register listener for new timer button
+        const newTimerButton = document.querySelector('.timer-complete-button');
+        newTimerButton.addEventListener('click', () => {
+          port.postMessage({ command: 'reset-all' });
+
+          hideElement('.timer-complete-message');
+          hideElement('.timer-complete-button');
+          showElement('.time-container');
+          showElement('.control');
+        });
+
         break;
       case 'break':
         elt = document.querySelector('.time-container');

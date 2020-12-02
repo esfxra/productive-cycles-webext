@@ -1,15 +1,10 @@
 @import '../common-styles.css';
 
-/* Timer */
-/* .section-container {
-  padding-top: 25px;
-  padding-bottom: 25px;
-} */
-
 .timer-view {
   --margin-elements: 25px;
+  --margin-elements-shorter: 18px;
 
-  min-width: 142px;
+  width: 142px;
 }
 
 .time-container {
@@ -23,21 +18,16 @@
   font-size: 23px;
 }
 
-.complete-text {
-  font-size: 20px !important;
-}
-
 .break {
   animation: runningCycle 4s infinite;
 }
 
 .control {
-  width: 100%;
-  /* border-bottom: 2px dotted gray; */
   display: flex;
   flex-direction: row;
   justify-content: space-between;
   position: relative;
+  width: 100%;
   top: -2px;
   margin-bottom: calc(var(--margin-elements) + 2px);
 }
@@ -116,4 +106,18 @@
   100% {
     opacity: 1;
   }
+}
+
+.timer-complete-message {
+  margin-bottom: var(--margin-elements-shorter);
+  font-size: 16px;
+}
+
+.timer-complete-button {
+  cursor: pointer;
+  text-align: center;
+  margin-top: calc(var(--margin-elements-shorter) + 2px);
+  padding: 5px;
+  border-radius: 5px;
+  font-size: 12px;
 }

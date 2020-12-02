@@ -38,3 +38,12 @@
 .running {
   background-color: #666666;
 }
+
+.timer-complete-message {
+  color: #666666;
+}
+
+.timer-complete-button {
+  background-color: #666666;
+  color: #f5f5f5;
+}
