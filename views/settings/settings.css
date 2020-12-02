@@ -29,8 +29,8 @@
 .option {
   display: grid;
   align-items: center;
-  grid-template-columns: 110px 35px;
-  column-gap: 10px;
+  grid-template-columns: 110px 40px;
+  column-gap: 15px;
 }
 
 .option-margin {
@@ -42,7 +42,7 @@ input[type='number'] {
   box-shadow: none;
   font-family: 'Open Sans', sans-serif;
   font-size: 13px;
-  padding: 2px;
+  padding: 3px;
 
   border-radius: 4px;
   border-width: 1px;

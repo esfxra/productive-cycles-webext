@@ -18,10 +18,7 @@ input[type='number'] {
   color: #f5f5f5;
   /* border: 1px solid #282828; */
   /* border-bottom: 1px solid #f5f5f5; */
-  border-top-color: #282828;
-  border-right-color: #282828;
-  border-left-color: #282828;
-  border-bottom-color: #f5f5f5;
+  border-color: #282828;
   background-color: #808080;
 }
 
