@@ -45,14 +45,13 @@
 .control-button {
   cursor: pointer;
   border-radius: 4px;
-  /* box-shadow: 1px 1px 1px #00000075; */
 }
 
 .control-button img {
+  display: block;
   width: 17px;
   height: 17px;
   padding: 4px;
-  vertical-align: middle;
 }
 
 #reset-all img {
