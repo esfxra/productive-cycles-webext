@@ -19,8 +19,12 @@
   color: #666666;
 }
 
-.settings-view input[type='number'] {
+input[type='number'] {
   color: #666666;
+  border-top-color: #ffffff;
+  border-right-color: #ffffff;
+  border-left-color: #ffffff;
+  border-bottom-color: #d4d4d4;
   background-color: #f2f2f2;
 }
 

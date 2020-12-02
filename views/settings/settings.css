@@ -4,80 +4,79 @@
 .settings-view {
   --margin-elements: 15px;
 
-  /* width: 225px; */
   font-size: 13px;
 }
 
 .theme-option {
   display: inline-block;
   cursor: pointer;
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
   border-radius: 50%;
   margin-right: 5px;
 }
 
 .option-light {
-  border-width: 1px;
   border-style: solid;
+  border-width: 1px;
 }
 
 .option-dark {
-  border-width: 1px;
   border-style: solid;
-}
-
-.settings-view button {
-  display: inline-block;
-  cursor: pointer;
-  font-family: inherit;
-
-  /* margin-top: calc(var(--margin-elements) - 5px); */
-
-  border-radius: 5px;
-  border: 0;
-  padding: 3px 8px;
-  font-size: 12px;
-}
-
-.status {
-  display: inline-block;
-  text-transform: lowercase;
-
-  font-size: 12px;
-  padding-left: 2px;
-}
-
-.settings-view button span {
-  vertical-align: middle;
-}
-
-.settings-view input[type='number'] {
-  font-size: 13px;
-  font-family: 'Open Sans', sans-serif;
-  padding: 5px;
-  border: 0;
-  border-radius: 5px;
-}
-
-.settings-view p {
-  margin: 0;
-  margin-bottom: var(--margin-elements);
-}
-
-.settings-view span {
-  font-weight: bold;
+  border-width: 1px;
 }
 
 .option {
   display: grid;
   align-items: center;
-  grid-template-columns: 110px 45px;
-  column-gap: 30px;
+  grid-template-columns: 110px 35px;
+  column-gap: 10px;
 }
 
 .option-margin {
   margin-bottom: var(--margin-elements);
+}
+
+input[type='number'] {
+  text-align: center;
+  box-shadow: none;
+  font-family: 'Open Sans', sans-serif;
+  font-size: 13px;
+  padding: 2px;
+  /* border: 1px solid #ffffff;
+  border-bottom: 1px solid #d4d4d4; */
+
+  border-radius: 4px;
+  border-width: 1px;
+  border-style: solid;
+
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number'] {
+  -moz-appearance: textfield;
+}
+
+input[type='number']:focus {
+  outline: none;
+  border: 1px solid rgb(129, 65, 247);
+}
+
+.input-error-outline {
+  outline: none;
+  border: 1px solid red !important;
+}
+
+.input-error-outline:focus {
+  outline: none;
+  border: 1px solid red !important;
 }
 
 /* Checkmark */
@@ -85,20 +84,20 @@
 .container {
   display: block;
   position: relative;
-  padding: 0;
   cursor: pointer;
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
+  padding: 0;
 }
 
 /* Hide the browser's default checkbox */
 .container input {
   display: block;
   position: absolute;
-  opacity: 0;
   cursor: pointer;
+  opacity: 0;
   height: 0;
   width: 0;
 }
@@ -106,15 +105,13 @@
 /* Create a custom checkbox */
 .checkmark {
   position: relative;
-  /* vertical-align: middle; */
-  /* top: 0; */
-  /* left: 0; */
   display: block;
-  height: 13px;
-  width: 13px;
+  border-style: solid;
   border-radius: 3px;
   border-width: 1px;
-  border-style: solid;
+  height: 13px;
+  width: 13px;
+  margin-left: 1px;
 }
 
 .container input:checked ~ .checkmark {

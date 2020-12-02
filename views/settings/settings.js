@@ -54,50 +54,47 @@ const registerSoundCheckmark = () => {
 const registerTimerOptions = () => {
   // Cycle minutes
   const cycleMinutes = document.querySelector('#cycle-minutes');
-  cycleMinutes.addEventListener('change', (e) => {
-    // Validation
-    const numberValue = validateNumberType(e.target.value);
-    const rangedValue = validateRangeAndCorrect(
-      cycleMinutes,
-      numberValue,
-      1,
-      59
-    );
+  cycleMinutes.addEventListener('input', (e) => {
+    const [valid, value] = validate(e.target.value, 1, 59);
 
-    // Save to storage
-    chrome.storage.local.set({ minutes: rangedValue });
+    if (!valid) {
+      cycleMinutes.classList.add('input-error-outline');
+      return;
+    } else {
+      cycleMinutes.classList.remove('input-error-outline');
+      chrome.storage.local.set({ minutes: value });
+      return;
+    }
   });
 
   // Break minutes
   const breakMinutes = document.querySelector('#break-minutes');
-  breakMinutes.addEventListener('change', (e) => {
-    // Validation
-    const numberValue = validateNumberType(e.target.value);
-    const rangedValue = validateRangeAndCorrect(
-      breakMinutes,
-      numberValue,
-      1,
-      59
-    );
+  breakMinutes.addEventListener('input', (e) => {
+    const [valid, value] = validate(e.target.value, 1, 59);
 
-    // Save to storage
-    chrome.storage.local.set({ break: rangedValue });
+    if (!valid) {
+      breakMinutes.classList.add('input-error-outline');
+      return;
+    } else {
+      breakMinutes.classList.remove('input-error-outline');
+      chrome.storage.local.set({ break: value });
+      return;
+    }
   });
 
   // Total cycles
   const totalCycles = document.querySelector('#total-cycles');
-  totalCycles.addEventListener('change', (e) => {
-    // Validation
-    const numberValue = validateNumberType(e.target.value);
-    const rangedValue = validateRangeAndCorrect(
-      totalCycles,
-      numberValue,
-      1,
-      12
-    );
+  totalCycles.addEventListener('input', (e) => {
+    const [valid, value] = validate(e.target.value, 1, 12);
 
-    // Save to storage
-    chrome.storage.local.set({ totalCycles: rangedValue });
+    if (!valid) {
+      totalCycles.classList.add('input-error-outline');
+      return;
+    } else {
+      totalCycles.classList.remove('input-error-outline');
+      chrome.storage.local.set({ totalCycles: value });
+      return;
+    }
   });
 
   // Auto-start
@@ -134,23 +131,16 @@ const registerThemeToggles = () => {
   });
 };
 
-const validateNumberType = (value) => {
-  if (typeof value !== 'number') {
-    return parseInt(value);
+const validate = (value, min, max) => {
+  let parsed = typeof value === 'number' ? value : parseInt(value);
+
+  if (isNaN(parsed)) {
+    return [false, parsed];
+  }
+
+  if (parsed < min || parsed > max) {
+    return [false, parsed];
   } else {
-    return value;
+    return [true, parsed];
   }
-};
-
-const validateRangeAndCorrect = (inputNode, value, min, max) => {
-  let inRange = value;
-  if (value < min) {
-    inputNode.value = min;
-    inRange = min;
-  } else if (value > max) {
-    inputNode.value = max;
-    inRange = max;
-  }
-
-  return inRange;
 };
