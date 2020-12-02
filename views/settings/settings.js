@@ -20,75 +20,8 @@ window.addEventListener('DOMContentLoaded', () => {
   registerThemeToggles();
 });
 
-// Register an 'on change' event listener for sound checkmark, and save changes
-const registerSoundCheckmark = () => {
-  const soundCheckmark = document.querySelector('#notification-sound');
-  soundCheckmark.addEventListener('change', (e) => {
-    chrome.storage.local.set({ notificationSound: e.target.checked });
-  });
-};
-
-// Submit timer options to storage
-function saveTimerOptions() {
-  const time = parseInt(document.querySelector('#minutes').value);
-  const breakTime = parseInt(document.querySelector('#break').value);
-  const cycleNumber = parseInt(document.querySelector('#cycles').value);
-  const autoStartBox = document.querySelector('#auto-start').checked;
-  chrome.storage.local.set(
-    {
-      minutes: time,
-      break: breakTime,
-      totalCycles: cycleNumber,
-      autoStart: autoStartBox,
-    },
-    function () {
-      // Update status to let user know options were saved.
-      const status = document.querySelector('#status-timer');
-      status.textContent = `${chrome.i18n.getMessage('statusSaved')} 🕗`;
-      setTimeout(function () {
-        status.textContent = '';
-      }, 5000);
-    }
-  );
-}
-
-const registerTimerOptions = () => {
-  // Cycle minutes
-  const cycleMinutes = document.querySelector('#cycle-minutes');
-  cycleMinutes.addEventListener('change', (e) => {
-    // Add validation step: check number, and only in range from 1 to 60
-
-    // Save to storage
-    chrome.storage.local.set({ minutes: parseInt(e.target.value) });
-  });
-
-  // Break minutes
-  const breakMinutes = document.querySelector('#break-minutes');
-  breakMinutes.addEventListener('change', (e) => {
-    // Add validation step: check number, and only in range from 1 to 60
-
-    // Save to storage
-    chrome.storage.local.set({ break: parseInt(e.target.value) });
-  });
-
-  // Total cycles
-  const totalCycles = document.querySelector('#total-cycles');
-  totalCycles.addEventListener('change', (e) => {
-    // Add validation step: check number, and only in range from 1 to 10
-
-    // Save to storage
-    chrome.storage.local.set({ totalCycles: parseInt(e.target.value) });
-  });
-
-  // Auto-start
-  const autoStartCheckmark = document.querySelector('#auto-start');
-  autoStartCheckmark.addEventListener('change', (e) => {
-    chrome.storage.local.set({ autoStart: e.target.checked });
-  });
-};
-
 // Retrieve timer options from storage
-function restoreOptions() {
+const restoreOptions = () => {
   chrome.storage.local.get(
     {
       notificationSound: true,
@@ -108,10 +41,74 @@ function restoreOptions() {
       document.querySelector('#auto-start').checked = storage.autoStart;
     }
   );
-}
+};
+
+// Register an 'on change' event listener for sound checkmark, and save changes
+const registerSoundCheckmark = () => {
+  const soundCheckmark = document.querySelector('#notification-sound');
+  soundCheckmark.addEventListener('change', (e) => {
+    chrome.storage.local.set({ notificationSound: e.target.checked });
+  });
+};
+
+const registerTimerOptions = () => {
+  // Cycle minutes
+  const cycleMinutes = document.querySelector('#cycle-minutes');
+  cycleMinutes.addEventListener('change', (e) => {
+    // Validation
+    const numberValue = validateNumberType(e.target.value);
+    const rangedValue = validateRangeAndCorrect(
+      cycleMinutes,
+      numberValue,
+      1,
+      59
+    );
+
+    // Save to storage
+    chrome.storage.local.set({ minutes: rangedValue });
+  });
+
+  // Break minutes
+  const breakMinutes = document.querySelector('#break-minutes');
+  breakMinutes.addEventListener('change', (e) => {
+    // Validation
+    const numberValue = validateNumberType(e.target.value);
+    const rangedValue = validateRangeAndCorrect(
+      breakMinutes,
+      numberValue,
+      1,
+      59
+    );
+
+    // Save to storage
+    chrome.storage.local.set({ break: rangedValue });
+  });
+
+  // Total cycles
+  const totalCycles = document.querySelector('#total-cycles');
+  totalCycles.addEventListener('change', (e) => {
+    // Validation
+    const numberValue = validateNumberType(e.target.value);
+    const rangedValue = validateRangeAndCorrect(
+      totalCycles,
+      numberValue,
+      1,
+      12
+    );
+
+    // Save to storage
+    chrome.storage.local.set({ totalCycles: rangedValue });
+  });
+
+  // Auto-start
+  const autoStartCheckmark = document.querySelector('#auto-start');
+  autoStartCheckmark.addEventListener('change', (e) => {
+    chrome.storage.local.set({ autoStart: e.target.checked });
+  });
+};
 
 // Load theme and register theme toggles (toggles only in settings page)
-function registerThemeToggles() {
+const registerThemeToggles = () => {
   let stylesheet = document.querySelector('#theme');
 
   // Theme toggle (light / dark)
@@ -135,4 +132,25 @@ function registerThemeToggles() {
       });
     }
   });
-}
+};
+
+const validateNumberType = (value) => {
+  if (typeof value !== 'number') {
+    return parseInt(value);
+  } else {
+    return value;
+  }
+};
+
+const validateRangeAndCorrect = (inputNode, value, min, max) => {
+  let inRange = value;
+  if (value < min) {
+    inputNode.value = min;
+    inRange = min;
+  } else if (value > max) {
+    inputNode.value = max;
+    inRange = max;
+  }
+
+  return inRange;
+};
