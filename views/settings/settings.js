@@ -11,37 +11,22 @@ window.addEventListener('DOMContentLoaded', () => {
   // Register listeners for menu
   registerNavigation('settings');
 
-  // Register listeners for 'save-notification' button
-  const saveNotificationButton = document.querySelector('#save-notification');
-  saveNotificationButton.addEventListener('click', saveNotificationOptions);
+  registerSoundCheckmark();
 
-  // Register listeners for 'save-timer' button
-  const saveTimerButton = document.querySelector('#save-timer');
-  saveTimerButton.addEventListener('click', saveTimerOptions);
+  registerTimerOptions();
 
   // Theme operations
   loadTheme();
   registerThemeToggles();
 });
 
-// Notification Options
-function saveNotificationOptions() {
-  const notificationSound = document.querySelector('#notification-sound');
-  chrome.storage.local.set(
-    {
-      notificationSound: notificationSound.checked,
-    },
-    function () {
-      // Update status to let user know options were saved.
-      const status = document.querySelector('#status-notification');
-      const emoji = notificationSound.checked ? '🔉' : '🔇';
-      status.textContent = `${chrome.i18n.getMessage('statusSaved')} ${emoji}`;
-      setTimeout(function () {
-        status.textContent = '';
-      }, 5000);
-    }
-  );
-}
+// Register an 'on change' event listener for sound checkmark, and save changes
+const registerSoundCheckmark = () => {
+  const soundCheckmark = document.querySelector('#notification-sound');
+  soundCheckmark.addEventListener('change', (e) => {
+    chrome.storage.local.set({ notificationSound: e.target.checked });
+  });
+};
 
 // Submit timer options to storage
 function saveTimerOptions() {
@@ -67,6 +52,41 @@ function saveTimerOptions() {
   );
 }
 
+const registerTimerOptions = () => {
+  // Cycle minutes
+  const cycleMinutes = document.querySelector('#cycle-minutes');
+  cycleMinutes.addEventListener('change', (e) => {
+    // Add validation step: check number, and only in range from 1 to 60
+
+    // Save to storage
+    chrome.storage.local.set({ minutes: parseInt(e.target.value) });
+  });
+
+  // Break minutes
+  const breakMinutes = document.querySelector('#break-minutes');
+  breakMinutes.addEventListener('change', (e) => {
+    // Add validation step: check number, and only in range from 1 to 60
+
+    // Save to storage
+    chrome.storage.local.set({ break: parseInt(e.target.value) });
+  });
+
+  // Total cycles
+  const totalCycles = document.querySelector('#total-cycles');
+  totalCycles.addEventListener('change', (e) => {
+    // Add validation step: check number, and only in range from 1 to 10
+
+    // Save to storage
+    chrome.storage.local.set({ totalCycles: parseInt(e.target.value) });
+  });
+
+  // Auto-start
+  const autoStartCheckmark = document.querySelector('#auto-start');
+  autoStartCheckmark.addEventListener('change', (e) => {
+    chrome.storage.local.set({ autoStart: e.target.checked });
+  });
+};
+
 // Retrieve timer options from storage
 function restoreOptions() {
   chrome.storage.local.get(
@@ -77,15 +97,15 @@ function restoreOptions() {
       totalCycles: 4,
       autoStart: true,
     },
-    function (items) {
+    (storage) => {
       document.querySelector('#notification-sound').checked =
-        items.notificationSound;
+        storage.notificationSound;
 
       // Timer settings
-      document.querySelector('#minutes').value = items.minutes;
-      document.querySelector('#break').value = items.break;
-      document.querySelector('#cycles').value = items.totalCycles;
-      document.querySelector('#auto-start').checked = items.autoStart;
+      document.querySelector('#cycle-minutes').value = storage.minutes;
+      document.querySelector('#break-minutes').value = storage.break;
+      document.querySelector('#total-cycles').value = storage.totalCycles;
+      document.querySelector('#auto-start').checked = storage.autoStart;
     }
   );
 }
