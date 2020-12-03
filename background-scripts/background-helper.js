@@ -10,7 +10,7 @@
 
 class NotificationInterface {
   constructor() {
-    this.idTemplate = 'notification-for-period-';
+    this.idTemplate = 'notification-for-period';
     this.soundAudio = new Audio('../audio/metal-mallet.mp3');
 
     this.soundEnabled = false;
@@ -22,12 +22,63 @@ class NotificationInterface {
     // Add listener for changes to notification settings
   }
 
-  notify(status) {
-    const notification = this.build(status);
+  notify(status, settings) {
+    const notification = this.build(status, settings);
     this.send(notification);
   }
 
-  send(id, title, message) {
+  build(status, settings) {
+    debug('Building notification');
+    debug('---------------');
+
+    debug(status);
+
+    const { period, state } = status;
+    const { breakTime, autoStart } = settings;
+
+    console.log(breakTime);
+    console.log(autoStart);
+
+    let id = `${this.idTemplate}-${period}`;
+    let title;
+    let message;
+
+    // Cycle complete
+    if (state === 'running') {
+      const cycle = Utilities.mapCycle(period);
+      const breakMinutes = Utilities.msToMin(breakTime);
+      title = `Cycle ${cycle} complete!`;
+      message = `Great job. Everyone, take ${breakMinutes}.`;
+    }
+
+    // Break complete
+    if (state === 'break') {
+      const _break = Utilities.mapBreak(period);
+      title = `Break ${_break} is over.`;
+
+      if (autoStart) message = `Time to grind! Starting next cycle.`;
+      else message = `Don't forget to start the next cycle.`;
+    }
+
+    // Timer complete
+    if (state === 'complete') {
+      title = `You did it! All cycles are complete.`;
+      message = `Take a long break 🧖`;
+    }
+
+    let notification = {
+      id: id,
+      title: title,
+      message: message,
+    };
+
+    console.log(notification);
+
+    return notification;
+  }
+
+  send(notification) {
+    const { id, title, message } = notification;
     debug(`Sending notification: ${title}`);
 
     // Post notification to web browser
@@ -45,65 +96,21 @@ class NotificationInterface {
         .then(() => console.log('Played sound'))
         .catch((e) => console.log(e));
     }
-
-    debug('---------------');
   }
 
-  build(status) {
-    debug('Building notification');
-    debug('---------------');
-
-    let id = this.idTemplate;
-    let title = `Timer finished ${status.state}`;
-    let message = 'Test notification';
-
-    // switch (type) {
-    //   case 'cycle-complete':
-    //     id = `${this.comms.cycleNotification}-${this.cycle}`;
-    //     title = `${chrome.i18n.getMessage('cycleCompleteTitle_Fragment_1')} ${
-    //       this.cycle
-    //     } ${chrome.i18n.getMessage('cycleCompleteTitle_Fragment_2')}`;
-    //     message = chrome.i18n.getMessage('cycleCompleteMessage');
-    //     message += ` ${this.settings.breakTime / 60000}`;
-    //     break;
-    //   case 'timer-complete':
-    //     id = `${this.comms.cycleNotification}-${this.cycle}`;
-    //     title = chrome.i18n.getMessage('timerCompleteTitle');
-    //     message = chrome.i18n.getMessage('timerCompleteMessage');
-    //     break;
-    //   case 'autostart':
-    //     id = `${this.comms.breakNotification}-${this.break - 1}`;
-    //     title = chrome.i18n.getMessage('autoStartTitle');
-    //     title += ` ${this.cycle}`;
-    //     message = chrome.i18n.getMessage('autoStartMessage');
-    //     break;
-    //   case 'break-complete':
-    //     id = `${this.comms.breakNotification}-${this.break - 1}`;
-    //     title = chrome.i18n.getMessage('breakCompleteTitle');
-    //     title += ` ${this.cycle}`;
-    //     message = chrome.i18n.getMessage('breakCompleteMessage');
-    //     break;
-    // }
+  clear(period) {
+    debug(`Clearing notification for period: ${period}`);
+    const clearID = `${this.idTemplate}-${period}`;
+    chrome.notifications.clear(clearID);
   }
 
-  clear(id) {
-    chrome.notifications.clear(id);
-  }
-
-  clearAll() {
-    // let i = 1;
-    // while (i <= this.settings.totalCycles) {
-    //   id = `${this.comms.cycleNotification}-${i}`;
-    //   chrome.notifications.clear(id);
-    //   i++;
-    // }
-    // i = 1;
-    // while (i <= this.settings.totalBreaks) {
-    //   id = `${this.comms.breakNotification}-${i}`;
-    //   chrome.notifications.clear(id);
-    //   i++;
-    // }
-    // debug(`Cleared all notifications.`);
+  clearAll(periods) {
+    debug('Clearing all notifications');
+    let i = 0;
+    while (i < periods) {
+      this.clear(i);
+      i++;
+    }
   }
 }
 

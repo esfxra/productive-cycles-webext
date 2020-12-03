@@ -33,7 +33,7 @@ chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.idle.onStateChanged.addListener((state) => {
   debug(`System is '${state}'`);
-  // timer.sync();
+  timer.sync();
 });
 chrome.storage.onChanged.addListener(handleStorageChange);
 
@@ -62,6 +62,7 @@ function runUpdate() {
   debug('Update');
   debug('---------------');
   // Upgrade storage
+  // Storage.upgrade()
   // Set update flag to true
   update = true;
 }
@@ -161,9 +162,9 @@ function handleStorageChange(changes, namespace) {
   }
   if (settingsChanged) {
     // Clear all intervals and Timeouts
-    clearTimeout(timer.timeouts.cycle);
-    clearTimeout(timer.timeouts.break);
-    clearTimeout(timer.timeouts.count);
+    // clearTimeout(timer.timeouts.cycle);
+    // clearTimeout(timer.timeouts.break);
+    // clearTimeout(timer.timeouts.count);
 
     // Clear all notifications
     timer.clearNotifications(true);

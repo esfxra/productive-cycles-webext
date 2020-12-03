@@ -6,7 +6,7 @@
 const Notifications = new NotificationInterface();
 
 class Timer {
-  constructor(cycleTime, breakTime, cycles, auto) {
+  constructor(cycleMinutes, breakMinutes, totalCycles, autoStart) {
     this.time = 0;
     this.state = 'initial';
     this.period = 0;
@@ -19,31 +19,33 @@ class Timer {
       portOpen: false,
     };
 
+    this.dev = {
+      cycleOffset: 50000,
+      breakOffset: 50000,
+    };
+
     this.settings = {
-      cycleTime: cycleTime * 60000,
-      breakTime: breakTime * 60000,
-      totalCycles: cycles,
-      totalBreaks: cycles - 1,
-      autoStart: auto,
-      cycleDevOffset: 0,
-      breakDevOffset: 0,
+      cycleTime: cycleMinutes * 60000 - this.dev.cycleOffset,
+      breakTime: breakMinutes * 60000 - this.dev.breakOffset,
+      totalCycles: totalCycles,
+      totalBreaks: totalCycles - 1,
+      autoStart: autoStart,
     };
   }
 
   init() {
-    // initTrackerStorage();
-
+    // Check stored settings and reconfigure the timer
     chrome.storage.local.get(
       ['minutes', 'break', 'totalCycles', 'autoStart'],
       (storage) => {
         // Timer settings
         if (storage.minutes !== undefined) {
           this.settings.cycleTime =
-            storage.minutes * 60000 - this.settings.cycleDevOffset;
+            storage.minutes * 60000 - this.dev.cycleOffset;
         }
         if (storage.break !== undefined) {
           this.settings.breakTime =
-            storage.break * 60000 - this.settings.breakDevOffset;
+            storage.break * 60000 - this.dev.breakOffset;
         }
         if (storage.totalCycles !== undefined) {
           this.settings.totalCycles = storage.totalCycles;
@@ -53,16 +55,14 @@ class Timer {
           this.settings.autoStart = storage.autoStart;
         }
 
-        // Initial value for remaining
+        // Initial time value
         this.time = this.settings.cycleTime;
 
-        debug(
-          `Init`,
-          `\n\ntimer: ${this.settings.cycleTime}`,
-          `\nbreak: ${this.settings.breakTime}`,
-          `\ntotal cycles: ${this.settings.totalCycles}`,
-          `\nauto-start: ${this.settings.autoStart}`
-        );
+        debug('Timer Initialized');
+        debug(`Cycle time: ${this.settings.cycleTime}`);
+        debug(`Break time: ${this.settings.breakTime}`);
+        debug(`Total cycles: ${this.settings.totalCycles}`);
+        debug(`Auto-start: ${this.settings.autoStart}`);
       }
     );
   }
@@ -110,9 +110,6 @@ class Timer {
     const periods = this.settings.totalCycles + this.settings.totalBreaks;
     let newTimeline = [...this.timeline];
 
-    debug('Before timeline operations:');
-    debug(newTimeline);
-
     for (let i = this.period; i < periods; i += 1) {
       if (i === this.period) {
         newTimeline[i] = Date.now() + this.time;
@@ -123,16 +120,11 @@ class Timer {
       }
     }
 
-    debug('After timeline operations:');
-    debug(newTimeline);
-
-    debug('---------------');
     this.timeline = [...newTimeline];
   }
 
   runSubtractor() {
-    debug('Run subtractor');
-    debug('---------------');
+    // debug(`Running subtractor: ${this.time}`);
 
     if (this.state === 'running' || this.state === 'break') {
       this.time -= 1000;
@@ -150,13 +142,15 @@ class Timer {
   }
 
   stopSubtractor() {
-    debug('Stop subtractor');
-    debug('---------------');
-
     clearTimeout(this.subtractor);
   }
 
   next() {
+    const periods = this.settings.totalCycles + this.settings.totalBreaks;
+    debug(
+      `Next - State: ${this.state}, Period: ${this.period}, Periods: ${periods}`
+    );
+
     // Timer is on 'break'
     if (this.state === 'break') {
       this.endBreak();
@@ -165,14 +159,11 @@ class Timer {
 
     // Timer is 'running'
     if (this.state === 'running') {
-      const periods = this.settings.totalCycles + this.settings.totalBreaks;
-
-      if (this.period < periods) {
-        this.endCycle();
-        return;
-      }
-      if (this.period === periods) {
+      if (this.period === periods - 1) {
         this.endTimer();
+        return;
+      } else if (this.period < periods - 1) {
+        this.endCycle();
         return;
       }
     }
@@ -180,7 +171,6 @@ class Timer {
 
   startCycle() {
     debug('Start Cycle');
-    debug('---------------');
 
     this.state = 'running';
     this.buildTimeline();
@@ -189,9 +179,9 @@ class Timer {
 
   endCycle() {
     debug('End Cycle');
-    debug('---------------');
+
     // Diagnostics.compareTargets();
-    Notifications.notify(this.status());
+    Notifications.notify(this.status(), this.settings);
     this.period += 1;
     this.time = this.settings.breakTime;
     this.startBreak();
@@ -199,16 +189,15 @@ class Timer {
 
   endTimer() {
     debug('End Timer');
-    debug('---------------');
+
     // Diagnostics.compareTargets();
     this.state = 'complete';
     this.postStatus();
-    Notifications.notify(this.status());
+    Notifications.notify(this.status(), this.settings);
   }
 
   startBreak() {
     debug('Start Break');
-    debug('---------------');
 
     this.state = 'break';
     this.buildTimeline();
@@ -216,8 +205,9 @@ class Timer {
   }
 
   endBreak() {
+    debug('End Break');
     // Diagnostics.compareTargets();
-    Notifications.notify(this.status());
+    Notifications.notify(this.status(), this.settings);
     this.period += 1;
     this.time = this.settings.cycleTime;
 
@@ -245,23 +235,22 @@ class Timer {
 
   resetCycle() {
     debug('Reset Cycle');
-    debug('---------------');
 
     this.stopSubtractor();
 
     if (this.state === 'initial' && this.period > 0) {
-      this.period -= 1;
+      this.period -= 2;
+      Notifications.clear(this.period + 1);
       Notifications.clear(this.period);
     }
 
     this.state = 'initial';
     this.time = this.settings.cycleTime;
-    his.postStatus();
+    this.postStatus();
   }
 
   resetAll() {
     debug('Reset All');
-    debug('---------------');
 
     this.stopSubtractor();
 
@@ -271,150 +260,84 @@ class Timer {
     this.state = 'initial';
 
     this.postStatus();
-    Notifications.clearAll();
+    Notifications.clearAll(
+      this.settings.totalCycles + this.settings.totalBreaks
+    );
   }
 
   status() {
     return {
       time: Utilities.parseMs(this.time),
-      totalCycles: this.settings.totalCycles,
-      cycle: Utilities.mapCycle(this.period),
       state: this.state,
+      cycle: Utilities.mapCycle(this.period),
+      period: this.period,
+      totalCycles: this.settings.totalCycles,
     };
   }
 
   postStatus() {
     if (this.comms.portOpen) {
+      console.log(this.status());
       this.comms.port.postMessage(this.status());
     }
   }
 
-  // sync() {
-  //   if (
-  //     this.targetCycles.length >= 1 &&
-  //     this.state !== 'paused' &&
-  //     this.state !== 'initial'
-  //   ) {
-  //     debug(`sync(): Met conditions for main IF statement`);
-  //     const reference = Date.now();
+  sync() {
+    debug('Sync');
 
-  //     if (this.settings.autoStart) {
-  //       debug(`sync(): autoStart enabled`);
-  //       // Index counters
-  //       let cyclesCompleted = 0;
-  //       let breaksCompleted = 0;
+    if (!(this.state === 'running' || this.state === 'break')) {
+      debug(`Timer is ${this.state}. No corrections made.`);
+      return;
+    }
 
-  //       // Count the number of cycles completed comparing target to current time
-  //       let target = 0;
-  //       while (target < this.settings.totalCycles) {
-  //         if (reference > this.targetCycles[target]) {
-  //           cyclesCompleted += 1;
-  //         }
-  //         target += 1;
-  //       }
+    if (this.settings.autoStart) {
+      // Stop the subtractor
+      this.stopSubtractor();
 
-  //       // Count the number of breaks completed comparing target to current time
-  //       target = 0;
-  //       while (target < this.settings.totalBreaks) {
-  //         if (reference > this.targetBreaks[target]) {
-  //           breaksCompleted += 1;
-  //         }
-  //         target += 1;
-  //       }
+      // Get reference
+      const reference = Date.now();
+      const periods = this.settings.totalCycles + this.settings.totalBreaks;
 
-  //       debug(
-  //         `sync():\ncyclesCompleted: '${cyclesCompleted}', breaksCompleted: '${breaksCompleted}'`
-  //       );
+      // Determine the correct period
+      let correctedPeriod = this.period;
+      for (let i = this.period; i < periods; i += 1) {
+        const target = this.timeline[i];
+        if (reference > target) {
+          correctedPeriod = i + 1;
+        } else {
+          break;
+        }
+      }
 
-  //       const locator = cyclesCompleted - breaksCompleted;
+      // Handle 'complete' case
+      if (correctedPeriod === periods) {
+        this.state = 'complete';
+        this.period = correctedPeriod;
+        this.time = 0;
+        this.postStatus();
+        return;
+      }
 
-  //       if (cyclesCompleted >= this.settings.totalCycles) {
-  //         // Adjust timer to: all cycles completed
-  //         this.state = 'complete';
-  //         this.cycle = this.settings.totalCycles;
-  //         this.break = this.settings.totalBreaks;
-  //         debug(`sync(): adjusted timer, set to '${this.state}'`);
-  //       } else if (locator === 1) {
-  //         clearTimeout(this.timeouts.break);
-  //         // Adjust timer to: break
-  //         this.state = 'break';
-  //         this.cycle = cyclesCompleted + 1;
-  //         this.break = breaksCompleted + 1;
-  //         const newTarget = this.targetBreaks[breaksCompleted] - reference;
-  //         this.timeouts.break = setTimeout(() => {
-  //           this.endBreak();
-  //         }, newTarget);
-  //         debug(
-  //           `sync(): adjusted timer, break will end in '${
-  //             newTarget / 60000
-  //           }' minutes`
-  //         );
-  //       } else if (locator === 0) {
-  //         clearTimeout(this.timeouts.cycle);
-  //         // Adjust timer to: running
-  //         this.state = 'running';
-  //         this.cycle = cyclesCompleted + 1;
-  //         this.break = breaksCompleted + 1;
-  //         const newTarget = this.targetCycles[cyclesCompleted] - reference;
-  //         this.timeouts.cycle = setTimeout(() => {
-  //           this.endCycle();
-  //         }, newTarget);
-  //         debug(
-  //           `sync(): adjusted timer, cycle will end in '${
-  //             newTarget / 60000
-  //           }' minutes`
-  //         );
-  //       }
-  //     } else {
-  //       debug(`sync(): autoStart disabled`);
-  //       // Figure out if last cycle or last break has ended (normal)
-  //       if (this.state === 'running') {
-  //         clearTimeout(this.timeouts.cycle);
-  //         const difference = this.targetCycles[this.cycle - 1] - reference;
-  //         if (difference < 0) {
-  //           this.endCycle();
-  //           debug(`sync(): adjusted timer; cycle ended`);
-  //         } else {
-  //           this.timeouts.cycle = setTimeout(() => {
-  //             this.endCycle();
-  //           }, difference);
-  //           debug(
-  //             `sync(): adjusted timer; cycle will end in ${
-  //               difference / 60000
-  //             } minutes`
-  //           );
-  //         }
-  //       } else if (this.state === 'break') {
-  //         clearTimeout(this.timeouts.break);
-  //         const difference = this.targetBreaks[this.break - 1] - reference;
-  //         if (difference < 0) {
-  //           this.endBreak();
-  //           debug(`sync(): adjusted timer; break ended`);
-  //         } else {
-  //           this.timeouts.break = setTimeout(() => {
-  //             this.endBreak();
-  //           }, difference);
-  //           debug(
-  //             `sync(): adjusted timer; break will end in ${
-  //               difference / 60000
-  //             } minutes`
-  //           );
-  //         }
-  //       }
-
-  //       // // Fixes a bug where the displayed value would change from 'complete' to '00:00'
-  //       // if (this.state !== 'complete') {
-  //       //   this.postStatus();
-  //       // }
-  //     }
-  //     // Reset UI countdown
-  //     if (this.comms.portOpen) {
-  //       this.input('preload');
-  //     }
-  //   } else {
-  //     debug(
-  //       `sync(): Conditions not met; state is '${this.state}'; array length could also be 0`
-  //     );
-  //   }
-  // }
+      // Handle other cases
+      let correctedState = correctedPeriod % 2 === 0 ? 'running' : 'break';
+      // Determine the correct time
+      let correctedTime = this.timeline[correctedPeriod] - reference;
+      // Set the timer to the corrected values
+      this.state = correctedState;
+      this.period = correctedPeriod;
+      this.time = correctedTime;
+      this.postStatus();
+      // this.buildTimeline();
+      this.runSubtractor();
+      return;
+    } else {
+      const correctedTime = this.timeline[this.period] - Date.now();
+      if (correctedTime < 0) {
+        this.stopSubtractor();
+        this.next();
+      } else {
+        this.time = correctedTime;
+      }
+    }
+  }
 }
