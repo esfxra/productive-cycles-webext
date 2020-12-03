@@ -3,6 +3,8 @@
 // Dev mode and debug messages
 // Debug function is defined in background-manager.js
 
+const Notifications = new NotificationInterface();
+
 class Timer {
   constructor(cycleTime, breakTime, cycles, auto) {
     this.time = 0;
@@ -32,7 +34,7 @@ class Timer {
     // initTrackerStorage();
 
     chrome.storage.local.get(
-      ['minutes', 'break', 'totalCycles', 'autoStart', 'notificationSound'],
+      ['minutes', 'break', 'totalCycles', 'autoStart'],
       (storage) => {
         // Timer settings
         if (storage.minutes !== undefined) {
@@ -52,7 +54,7 @@ class Timer {
         }
 
         // Initial value for remaining
-        this.remaining = this.settings.cycleTime;
+        this.time = this.settings.cycleTime;
 
         debug(
           `Init`,
@@ -89,15 +91,16 @@ class Timer {
         this.resetAll();
         break;
       case 'preload':
-        if (this.state === 'running') {
-          // this.remaining = this.targetCycles[this.cycle - 1] - Date.now();
-          // this.countdown();
-        } else if (this.state === 'break') {
-          // this.remaining = this.targetBreaks[this.break - 1] - Date.now();
-          // this.countdown();
-        } else {
-          this.postStatus();
-        }
+        this.postStatus();
+        // if (this.state === 'running') {
+        //   // this.remaining = this.targetCycles[this.cycle - 1] - Date.now();
+        //   // this.countdown();
+        // } else if (this.state === 'break') {
+        //   // this.remaining = this.targetBreaks[this.break - 1] - Date.now();
+        //   // this.countdown();
+        // } else {
+        //   this.postStatus();
+        // }
         break;
     }
   }
@@ -188,7 +191,7 @@ class Timer {
     debug('End Cycle');
     debug('---------------');
     // Diagnostics.compareTargets();
-    // Notifications.sendNotification('cycle-complete');
+    Notifications.notify(this.status());
     this.period += 1;
     this.time = this.settings.breakTime;
     this.startBreak();
@@ -200,7 +203,7 @@ class Timer {
     // Diagnostics.compareTargets();
     this.state = 'complete';
     this.postStatus();
-    // Notifications.sendNotification('timer-complete');
+    Notifications.notify(this.status());
   }
 
   startBreak() {
@@ -214,7 +217,7 @@ class Timer {
 
   endBreak() {
     // Diagnostics.compareTargets();
-    // Notifications.sendNotification('break-complete');
+    Notifications.notify(this.status());
     this.period += 1;
     this.time = this.settings.cycleTime;
 
@@ -241,103 +244,41 @@ class Timer {
   }
 
   resetCycle() {
+    debug('Reset Cycle');
+    debug('---------------');
+
     this.stopSubtractor();
 
-    // if (this.state === 'initial' && this.cycle > 1) {
-    //   this.cycle -= 1;
-    //   this.break -= 1;
-    // } else if (this.state === 'complete') {
-    //   this.cycle = this.settings.totalCycles;
-    //   this.break = this.cycle;
-    // }
+    if (this.state === 'initial' && this.period > 0) {
+      this.period -= 1;
+      Notifications.clear(this.period);
+    }
 
-    // this.clearNotifications(false);
-
-    // // this.state = 'initial';
-    // // this.remaining = this.settings.cycleTime;
-
-    // debug(`Cycle reset - Cycle: '${this.cycle}' Break: '${this.break}'.`);
-
-    // this.state = 'initial';
-    // this.remaining = this.settings.cycleTime;
-
-    // this.postStatus();
+    this.state = 'initial';
+    this.time = this.settings.cycleTime;
+    his.postStatus();
   }
 
   resetAll() {
+    debug('Reset All');
+    debug('---------------');
+
     this.stopSubtractor();
 
-    // this.targetCycles = [];
-    // this.targetBreaks = [];
-    // this.cycle = 1;
-    // this.break = 1;
+    this.timeline = [];
+    this.period = 0;
+    this.time = this.settings.cycleTime;
+    this.state = 'initial';
 
-    // this.clearNotifications(true);
-
-    // // this.state = 'initial';
-    // // this.remaining = this.settings.cycleTime;
-
-    // debug(`Timer reset - Cycle: '${this.cycle}' Break: '${this.break}'.`);
-
-    // this.state = 'initial';
-    // this.remaining = this.settings.cycleTime;
-
-    // this.postStatus();
-  }
-
-  // countdown() {
-  //   clearTimeout(this.timeouts.count);
-  //   if (this.comms.portOpen) {
-  //     if (this.state === 'running' || this.state === 'break') {
-  //       this.remaining -= 1000;
-  //       this.postStatus();
-
-  //       if (!(this.remaining < 1000)) {
-  //         this.timeouts.count = setTimeout(() => {
-  //           this.countdown();
-  //         }, 1000);
-  //       }
-  //     }
-  //   }
-  // }
-
-  milliseconds(milliseconds) {
-    // Use a time library for better ms-to-minutes-seconds in the future
-    let min = Math.floor((milliseconds % (1000 * 60 * 60)) / (1000 * 60));
-    let sec = Math.floor((milliseconds % (1000 * 60)) / 1000);
-
-    // Temporary fix for -1 at the end of timer
-    if (min < 1) {
-      min = 0;
-    }
-    if (sec < 1) {
-      sec = 0;
-    }
-
-    let minStr = '';
-    let secStr = '';
-
-    // Format processed time; add missing 0s
-    if (Math.floor(Math.log10(min)) < 1) {
-      minStr = '0' + min;
-    } else {
-      minStr = min;
-    }
-
-    if (Math.floor(Math.log10(sec)) < 1) {
-      secStr = '0' + sec;
-    } else {
-      secStr = sec;
-    }
-
-    return minStr + ':' + secStr;
+    this.postStatus();
+    Notifications.clearAll();
   }
 
   status() {
     return {
-      time: this.milliseconds(this.remaining),
+      time: Utilities.parseMs(this.time),
       totalCycles: this.settings.totalCycles,
-      cycle: 1,
+      cycle: Utilities.mapCycle(this.period),
       state: this.state,
     };
   }
