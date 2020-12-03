@@ -14,6 +14,7 @@
 } */
 
 .updates-view ul {
-  padding-left: 10px;
-  list-style-position: inside;
+  list-style-position: outside;
+  padding-left: 24px;
+  margin-bottom: 0;
 }
