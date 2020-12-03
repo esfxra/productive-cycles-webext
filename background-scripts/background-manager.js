@@ -33,7 +33,7 @@ chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.idle.onStateChanged.addListener((state) => {
   debug(`System is '${state}'`);
-  timer.sync();
+  // timer.sync();
 });
 chrome.storage.onChanged.addListener(handleStorageChange);
 
@@ -42,36 +42,36 @@ chrome.storage.onChanged.addListener(handleStorageChange);
 | Install & Update operations
 |--------------------------------------------------------------------------
 */
-const handleOnInstalled = (details) => {
+function handleOnInstalled(details) {
   if (details.reason === 'install') {
-    install();
+    runInstall();
   } else if (details.reason === 'update') {
-    update();
+    runUpdate();
   }
-};
+}
 
-const install = () => {
+function runInstall() {
   debug('Install');
   debug('---------------');
   // Initialize storage
   // Set update flag to true
   update = true;
-};
+}
 
-const update = () => {
+function runUpdate() {
   debug('Update');
   debug('---------------');
   // Upgrade storage
   // Set update flag to true
   update = true;
-};
+}
 
 /*
 |--------------------------------------------------------------------------
 | Port communications
 |--------------------------------------------------------------------------
 */
-const handleOnConnect = (portFromPopUp) => {
+function handleOnConnect(portFromPopUp) {
   debug('Port connected');
   debug('---------------');
   port = portFromPopUp;
@@ -81,16 +81,16 @@ const handleOnConnect = (portFromPopUp) => {
   popUpOpen = true;
 
   timer.updatePort(port, popUpOpen);
-};
+}
 
-const handleOnDisconnect = () => {
+function handleOnDisconnect() {
   debug('Port disconnected');
   debug('---------------');
   popUpOpen = false;
   timer.updatePort(port, popUpOpen);
-};
+}
 
-const handleMessage = (message) => {
+function handleMessage(message) {
   debug(`Message received: ${message.command}`);
   debug('---------------');
   if (message.command === 'preload' && update === true) {
@@ -117,14 +117,14 @@ const handleMessage = (message) => {
     */
     timer.input(message.command);
   }
-};
+}
 
 /*
 |--------------------------------------------------------------------------
 | Storage changes
 |--------------------------------------------------------------------------
 */
-const handleStorageChange = (changes, namespace) => {
+function handleStorageChange(changes, namespace) {
   let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
@@ -171,15 +171,15 @@ const handleStorageChange = (changes, namespace) => {
     // Set runtime properties to defaults
     timer.reset('all');
   }
-};
+}
 
 /*
 |--------------------------------------------------------------------------
 | Additional utilities
 |--------------------------------------------------------------------------
 */
-const debug = (message) => {
+function debug(message) {
   if (devMode) {
     console.debug(message);
   }
-};
+}

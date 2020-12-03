@@ -22,7 +22,8 @@
   "background": {
     "scripts": [
       "background-scripts/background-timer.js",
-      "background-scripts/background-manager.js"
+      "background-scripts/background-manager.js",
+      "background-scripts/background-helper.js"
     ]
   },
 
