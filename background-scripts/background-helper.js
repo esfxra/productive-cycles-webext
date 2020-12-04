@@ -233,26 +233,46 @@ class Utilities {
 |--------------------------------------------------------------------------
 */
 class Diagnostics {
-  static compareTargets(status, timeline) {} // Debug purposes: Compare target times
-  // if (devMode) {
-  //   let targetTime = null;
-  //   if (this.state === 'running') {
-  //     targetTime = this.targetCycles[this.cycle - 1];
-  //   } else if (this.state === 'break') {
-  //     targetTime = this.targetBreaks[this.break - 1];
-  //   }
-  //   const testTime = new Date(Date.now());
-  //   const difference = testTime - targetTime;
-  //   if (Math.abs(difference) > 1000) {
-  //     debug(`Expected time: '${testTime}'.`);
-  //     debug(`Target time: '${targetTime}'.`);
-  //     debug(
-  //       `Potential issue with target time, difference is: '${difference}' ms.`
-  //     );
-  //   } else {
-  //     debug(`Expected time: '${testTime}'.`);
-  //     debug(`Target time: '${targetTime}'.`);
-  //     debug(`Target did great, difference is: '${difference}' ms.`);
-  //   }
-  // }
+  static compareTargets(period, timeline) {
+    if (devMode) {
+      debug('Diagnostics - compareTargets');
+      let targetTime = timeline[period];
+
+      const testTime = new Date();
+      const difference = testTime - targetTime;
+
+      if (Math.abs(difference) > 1000) {
+        debug(`Expected time: '${testTime}'.`);
+        debug(`Target time: '${targetTime}'.`);
+        debug(
+          `Potential issue with target time, difference is: '${difference}' ms.`
+        );
+      } else {
+        debug(`Expected time: '${testTime}'.`);
+        debug(`Target time: '${targetTime}'.`);
+        debug(`Target did great, difference is: '${difference}' ms.`);
+      }
+    }
+  }
+
+  static checkRange(period, timeline) {
+    debug('Diagnostics - checkRange');
+
+    let lowerBound = 0;
+    if (timeline[period - 1]) lowerBound = timeline[period - 1];
+
+    let upperBound = 0;
+    if (timeline[period]) upperBound = timeline[period];
+
+    const testTime = new Date();
+
+    if (testTime > lowerBound && testTime < upperBound) {
+      debug('Test time is within range. Cool beans.');
+    } else {
+      debug('The timer could be out of sync.');
+    }
+
+    debug(`Duration from Upper Bound: ${upperBound - testTime}`);
+    debug(`Duration from Lower Bound: ${testTime - lowerBound}`);
+  }
 }

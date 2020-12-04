@@ -6,7 +6,9 @@
 const Notifications = new NotificationInterface();
 
 class Timer {
-  constructor(cycleMinutes, breakMinutes, totalCycles, autoStart) {
+  constructor(defaultValue) {
+    const { cycleMinutes, breakMinutes, totalCycles, autoStart } = defaultValue;
+
     this.time = 0;
     this.state = 'initial';
     this.period = 0;
@@ -20,8 +22,8 @@ class Timer {
     };
 
     this.dev = {
-      cycleOffset: 50000,
-      breakOffset: 50000,
+      cycleOffset: 0,
+      breakOffset: 0,
     };
 
     this.settings = {
@@ -180,7 +182,8 @@ class Timer {
   endCycle() {
     debug('End Cycle');
 
-    // Diagnostics.compareTargets();
+    Diagnostics.compareTargets(this.period, this.timeline);
+
     Notifications.notify(this.status(), this.settings);
     this.period += 1;
     this.time = this.settings.breakTime;
@@ -190,7 +193,8 @@ class Timer {
   endTimer() {
     debug('End Timer');
 
-    // Diagnostics.compareTargets();
+    Diagnostics.compareTargets(this.period, this.timeline);
+
     this.state = 'complete';
     this.postStatus();
     Notifications.notify(this.status(), this.settings);
@@ -206,7 +210,9 @@ class Timer {
 
   endBreak() {
     debug('End Break');
-    // Diagnostics.compareTargets();
+
+    Diagnostics.compareTargets(this.period, this.timeline);
+
     Notifications.notify(this.status(), this.settings);
     this.period += 1;
     this.time = this.settings.cycleTime;
@@ -311,12 +317,16 @@ class Timer {
 
       // Handle 'complete' case
       if (correctedPeriod === periods) {
+        Diagnostics.checkRange(correctedPeriod, this.timeline);
+
         this.state = 'complete';
         this.period = correctedPeriod;
         this.time = 0;
         this.postStatus();
         return;
       }
+
+      Diagnostics.checkRange(correctedPeriod, this.timeline);
 
       // Handle other cases
       let correctedState = correctedPeriod % 2 === 0 ? 'running' : 'break';

@@ -15,7 +15,7 @@ let popUpOpen = false;
 let uiInterval = 0;
 let update = false;
 
-const timer = new Timer({ ...defaultValues });
+const timer = new Timer(defaultValues);
 timer.init();
 
 /*
@@ -137,12 +137,12 @@ function handleStorageChange(changes, namespace) {
     switch (key) {
       case 'minutes':
         timer.settings.cycleTime =
-          storageChange.newValue * 60000 - timer.settings.cycleDevOffset;
+          storageChange.newValue * 60000 - timer.dev.cycleOffset;
         settingsChanged = true;
         break;
       case 'break':
         timer.settings.breakTime =
-          storageChange.newValue * 60000 - timer.settings.breakDevOffset;
+          storageChange.newValue * 60000 - timer.dev.breakOffset;
         settingsChanged = true;
         break;
       case 'totalCycles':
@@ -156,21 +156,17 @@ function handleStorageChange(changes, namespace) {
         break;
       // Different behavior for notification settings - Timer is not reset
       case 'notificationSound':
-        timer.notification.sound = storageChange.newValue;
+        Notifications.soundEnabled = storageChange.newValue;
         break;
     }
   }
   if (settingsChanged) {
-    // Clear all intervals and Timeouts
-    // clearTimeout(timer.timeouts.cycle);
-    // clearTimeout(timer.timeouts.break);
-    // clearTimeout(timer.timeouts.count);
-
-    // Clear all notifications
-    timer.clearNotifications(true);
+    // Clear the subtractor
+    timer.stopSubtractor();
 
     // Set runtime properties to defaults
-    timer.reset('all');
+    // The resetAll() function will clear notifications too
+    timer.resetAll();
   }
 }
 
