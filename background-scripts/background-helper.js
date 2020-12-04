@@ -4,22 +4,22 @@
 |--------------------------------------------------------------------------
 */
 
-// IMPORTANT: The notifications API will receive the period that just ended -always-
-// And send a notification based on that
-// Also: The notifications API should support sending reminder in case of idle time
+// Future implementation: The notifications API should support sending reminder in case of idle time
 
 class NotificationInterface {
   constructor() {
     this.idTemplate = 'notification-for-period';
-    this.soundAudio = new Audio('../audio/metal-mallet.mp3');
 
-    this.soundEnabled = false;
-    chrome.storage.local.get(
-      ['notificationSound'],
-      (storage) => (this.soundEnabled = storage.notificationSound)
-    );
+    this.soundAudio = new Audio();
+    this.soundAudio.src = '../audio/metal-mallet.mp3';
 
-    // Add listener for changes to notification settings
+    this.soundEnabled = true;
+
+    chrome.storage.local.get(['notificationSound'], (storage) => {
+      if (storage.soundEnabled !== undefined) {
+        this.soundEnabled = storage.notificationSound;
+      }
+    });
   }
 
   notify(status, settings) {
@@ -81,6 +81,18 @@ class NotificationInterface {
     const { id, title, message } = notification;
     debug(`Sending notification: ${title}`);
 
+    // Play sound
+    // Play before notifications.create to prevent interference
+    if (this.soundEnabled) {
+      this.soundAudio
+        .play()
+        .then(() => {
+          // this.soundAudio.load();
+          debug('Played sound.');
+        })
+        .catch((e) => debug(e));
+    }
+
     // Post notification to web browser
     chrome.notifications.create(id, {
       type: 'basic',
@@ -88,14 +100,6 @@ class NotificationInterface {
       title: title,
       message: message,
     });
-
-    // Play sound
-    if (this.soundEnabled) {
-      this.soundAudio
-        .play()
-        .then(() => console.log('Played sound'))
-        .catch((e) => console.log(e));
-    }
   }
 
   clear(period) {
