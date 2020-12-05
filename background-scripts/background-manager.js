@@ -35,7 +35,7 @@ chrome.idle.onStateChanged.addListener((state) => {
   debug(`System is '${state}'`);
   timer.sync();
 });
-chrome.storage.onChanged.addListener(handleStorageChange);
+chrome.storage.onChanged.addListener(Storage.handleChanges);
 
 /*
 |--------------------------------------------------------------------------
@@ -73,7 +73,7 @@ function runUpdate() {
 |--------------------------------------------------------------------------
 */
 function handleOnConnect(portFromPopUp) {
-  debug('Port connected');
+  debug('On Connect - Port connected');
   debug('---------------');
   port = portFromPopUp;
   port.onDisconnect.addListener(handleOnDisconnect);
@@ -85,21 +85,21 @@ function handleOnConnect(portFromPopUp) {
 }
 
 function handleOnDisconnect() {
-  debug('Port disconnected');
+  debug('On Disconnect - Port disconnected');
   debug('---------------');
   popUpOpen = false;
   timer.updatePort(port, popUpOpen);
 }
 
 function handleMessage(message) {
-  debug(`Message received: ${message.command}`);
+  debug(`Handle Message - Message received: ${message.command}`);
   debug('---------------');
   if (message.command === 'preload' && update === true) {
     // Disable flag until next update
     update = false;
 
     // Communicate with PopUp to open update view
-    let message = timer.status();
+    let message = timer.formatState();
     message.update = true;
     port.postMessage(message);
   } else {
@@ -108,75 +108,33 @@ function handleMessage(message) {
     | Forward all other commands to timer
     |--------------------------------------------------------------------------
     |
-    | - 'preload'
     | - 'start'
     | - 'pause'
     | - 'reset-cycle'
     | - 'reset-all'
     | - 'skip'
+    | - 'preload'
     |
     */
-    timer.input(message.command);
-  }
-}
-
-/*
-|--------------------------------------------------------------------------
-| Storage changes
-|--------------------------------------------------------------------------
-*/
-function handleStorageChange(changes, namespace) {
-  let settingsChanged = false;
-  for (let key in changes) {
-    let storageChange = changes[key];
-    debug(
-      `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
-    );
-
-    // Update Settings
-    switch (key) {
-      case 'minutes':
-        timer.settings.cycleTime =
-          storageChange.newValue * 60000 - timer.dev.cycleOffset;
-        settingsChanged = true;
+    switch (message.command) {
+      case 'start':
+        timer.startCycle();
         break;
-      case 'break':
-        timer.settings.breakTime =
-          storageChange.newValue * 60000 - timer.dev.breakOffset;
-        settingsChanged = true;
+      case 'pause':
+        timer.pauseCycle();
         break;
-      case 'totalCycles':
-        timer.settings.totalCycles = storageChange.newValue;
-        timer.settings.totalBreaks = storageChange.newValue - 1;
-        settingsChanged = true;
+      case 'skip':
+        timer.skipBreak();
         break;
-      case 'autoStart':
-        timer.settings.autoStart = storageChange.newValue;
-        settingsChanged = true;
+      case 'reset-cycle':
+        timer.resetCycle();
         break;
-      // Different behavior for notification settings - Timer is not reset
-      case 'notificationSound':
-        Notifications.soundEnabled = storageChange.newValue;
+      case 'reset-all':
+        timer.resetAll();
+        break;
+      case 'preload':
+        timer.postState();
         break;
     }
-  }
-  if (settingsChanged) {
-    // Clear the subtractor
-    timer.stopSubtractor();
-
-    // Set runtime properties to defaults
-    // The resetAll() function will clear notifications too
-    timer.resetAll();
-  }
-}
-
-/*
-|--------------------------------------------------------------------------
-| Additional utilities
-|--------------------------------------------------------------------------
-*/
-function debug(message) {
-  if (devMode) {
-    console.debug(message);
   }
 }

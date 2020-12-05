@@ -6,12 +6,19 @@
 const Notifications = new NotificationInterface();
 
 class Timer {
-  constructor(defaultValue) {
-    const { cycleMinutes, breakMinutes, totalCycles, autoStart } = defaultValue;
+  constructor(defaultValues) {
+    const {
+      cycleMinutes,
+      breakMinutes,
+      totalCycles,
+      autoStart,
+    } = defaultValues;
 
-    this.time = 0;
-    this.state = 'initial';
-    this.period = 0;
+    this.state = {
+      period: 0,
+      time: 0,
+      status: 'initial',
+    };
 
     this.timeline = [];
     this.subtractor = 0;
@@ -32,6 +39,37 @@ class Timer {
       totalCycles: totalCycles,
       totalBreaks: totalCycles - 1,
       autoStart: autoStart,
+    };
+  }
+
+  getSettings() {
+    return {
+      cycleTime: this.settings.cycleTime,
+      breakTime: this.settings.breakTime,
+      totalPeriods: this.settings.totalCycles + this.settings.totalBreaks,
+      autoStart: this.settings.autoStart,
+    };
+  }
+
+  getState() {
+    return {
+      period: this.state.period,
+      time: this.state.time,
+      status: this.state.status,
+    };
+  }
+
+  setState(newState) {
+    this.state = { ...this.state, ...newState };
+  }
+
+  formatState() {
+    return {
+      time: Utilities.parseMs(this.state.time),
+      state: this.state.status,
+      cycle: Utilities.mapCycle(this.state.period),
+      period: this.state.period,
+      totalCycles: this.settings.totalCycles,
     };
   }
 
@@ -58,13 +96,13 @@ class Timer {
         }
 
         // Initial time value
-        this.time = this.settings.cycleTime;
+        this.state.time = this.settings.cycleTime;
 
-        debug('Timer Initialized');
-        debug(`Cycle time: ${this.settings.cycleTime}`);
-        debug(`Break time: ${this.settings.breakTime}`);
-        debug(`Total cycles: ${this.settings.totalCycles}`);
-        debug(`Auto-start: ${this.settings.autoStart}`);
+        debug('Init - Timer Initialized');
+        debug(`Init - Cycle time: ${this.settings.cycleTime}`);
+        debug(`Init - Break time: ${this.settings.breakTime}`);
+        debug(`Init - Total cycles: ${this.settings.totalCycles}`);
+        debug(`Init - Auto-start: ${this.settings.autoStart}`);
       }
     );
   }
@@ -75,50 +113,28 @@ class Timer {
     this.comms.portOpen = portOpen;
   }
 
-  input(command) {
-    switch (command) {
-      case 'start':
-        this.startCycle();
-        break;
-      case 'pause':
-        this.pauseCycle();
-        break;
-      case 'skip':
-        this.skipBreak();
-        break;
-      case 'reset-cycle':
-        this.resetCycle();
-        break;
-      case 'reset-all':
-        this.resetAll();
-        break;
-      case 'preload':
-        this.postStatus();
-        // if (this.state === 'running') {
-        //   // this.remaining = this.targetCycles[this.cycle - 1] - Date.now();
-        //   // this.countdown();
-        // } else if (this.state === 'break') {
-        //   // this.remaining = this.targetBreaks[this.break - 1] - Date.now();
-        //   // this.countdown();
-        // } else {
-        //   this.postStatus();
-        // }
-        break;
-    }
-  }
-
   buildTimeline() {
-    debug('Build timeline');
-    const periods = this.settings.totalCycles + this.settings.totalBreaks;
+    const { period, time, status } = this.getState();
+    const { cycleTime, breakTime, totalPeriods } = this.getSettings();
+
+    // Note that checking if autoStart is enabled / disabled could be important in the future
+    if (status !== 'initial' && status !== 'paused') {
+      debug('Timeline - Skipping build');
+      return;
+    }
+
+    debug('Timeline - Building timeline');
     let newTimeline = [...this.timeline];
 
-    for (let i = this.period; i < periods; i += 1) {
-      if (i === this.period) {
-        newTimeline[i] = Date.now() + this.time;
+    const reference = Date.now();
+
+    for (let i = period; i < totalPeriods; i += 1) {
+      if (i === period) {
+        newTimeline[i] = reference + time;
       } else if (i % 2 === 0) {
-        newTimeline[i] = newTimeline[i - 1] + this.settings.cycleTime;
+        newTimeline[i] = newTimeline[i - 1] + cycleTime;
       } else if (i % 2 !== 0) {
-        newTimeline[i] = newTimeline[i - 1] + this.settings.breakTime;
+        newTimeline[i] = newTimeline[i - 1] + breakTime;
       }
     }
 
@@ -126,45 +142,49 @@ class Timer {
   }
 
   runSubtractor() {
-    // debug(`Running subtractor: ${this.time}`);
+    let { time } = this.getState();
+    const newTime = time - 1000;
+    this.setState({ time: newTime });
 
-    if (this.state === 'running' || this.state === 'break') {
-      this.time -= 1000;
-      this.postStatus();
+    this.postState();
 
-      if (this.time < 1000) {
+    this.subtractor = setInterval(() => {
+      let { time } = this.getState();
+      const newTime = time - 1000;
+      this.setState({ time: newTime });
+
+      if (newTime < 0) {
         this.stopSubtractor();
         this.next();
+        return;
       } else {
-        this.subtractor = setTimeout(() => {
-          this.runSubtractor();
-        }, 1000);
+        this.postState();
       }
-    }
+    }, 1000);
   }
 
   stopSubtractor() {
-    clearTimeout(this.subtractor);
+    clearInterval(this.subtractor);
   }
 
   next() {
-    const periods = this.settings.totalCycles + this.settings.totalBreaks;
-    debug(
-      `Next - State: ${this.state}, Period: ${this.period}, Periods: ${periods}`
-    );
+    const { period, status } = this.getState();
+    const { totalPeriods } = this.getSettings();
+
+    debug('Next');
 
     // Timer is on 'break'
-    if (this.state === 'break') {
+    if (status === 'break') {
       this.endBreak();
       return;
     }
 
     // Timer is 'running'
-    if (this.state === 'running') {
-      if (this.period === periods - 1) {
+    if (status === 'running') {
+      if (period === totalPeriods - 1) {
         this.endTimer();
         return;
-      } else if (this.period < periods - 1) {
+      } else if (period < totalPeriods - 1) {
         this.endCycle();
         return;
       }
@@ -174,139 +194,151 @@ class Timer {
   startCycle() {
     debug('Start Cycle');
 
-    this.state = 'running';
     this.buildTimeline();
+
+    this.setState({ status: 'running' });
+
     this.runSubtractor();
   }
 
   endCycle() {
+    const { period } = this.getState();
+    const { breakTime } = this.getSettings();
+
     debug('End Cycle');
 
-    Diagnostics.compareTargets(this.period, this.timeline);
+    Diagnostics.compareTargets(period, this.timeline);
 
-    Notifications.notify(this.status(), this.settings);
-    this.period += 1;
-    this.time = this.settings.breakTime;
+    Notifications.notify(this.getState(), this.getSettings());
+
+    this.setState({ period: period + 1, time: breakTime });
+
     this.startBreak();
   }
 
   endTimer() {
+    const { period } = this.getState();
+
     debug('End Timer');
 
-    Diagnostics.compareTargets(this.period, this.timeline);
+    Diagnostics.compareTargets(period, this.timeline);
 
-    this.state = 'complete';
-    this.postStatus();
-    Notifications.notify(this.status(), this.settings);
+    this.setState({ status: 'complete' });
+
+    this.postState();
+
+    Notifications.notify(this.getState(), this.getSettings());
   }
 
   startBreak() {
     debug('Start Break');
 
-    this.state = 'break';
-    this.buildTimeline();
+    this.setState({ status: 'break' });
+
     this.runSubtractor();
   }
 
   endBreak() {
+    const { period } = this.getState();
+    const { cycleTime, autoStart } = this.getSettings();
     debug('End Break');
 
-    Diagnostics.compareTargets(this.period, this.timeline);
+    Diagnostics.compareTargets(period, this.timeline);
 
-    Notifications.notify(this.status(), this.settings);
-    this.period += 1;
-    this.time = this.settings.cycleTime;
+    Notifications.notify(this.getState(), this.getSettings());
 
-    if (this.settings.autoStart) {
-      this.startCycle();
-    } else {
-      this.state = 'initial';
-      this.postStatus();
-    }
+    this.setState({ period: period + 1, time: cycleTime });
+
+    setTimeout(() => {
+      if (autoStart) {
+        this.startCycle();
+      } else {
+        this.setState({ status: 'initial' });
+        this.postState();
+      }
+    }, 1000);
   }
 
   pauseCycle() {
+    this.stopSubtractor();
+
+    this.setState({ status: 'paused' });
+
     // Understand whether Timer View can be tweaked to fully depend on background messaging
     // If so ... this function should post the new 'paused' state
-
-    this.stopSubtractor();
-    this.state = 'paused';
-    // this.postStatus();
+    // this.postState();
   }
 
   skipBreak() {
     this.stopSubtractor();
+
     this.endBreak();
   }
 
   resetCycle() {
+    const { period, status } = this.getState();
+    const { cycleTime } = this.getSettings();
+
     debug('Reset Cycle');
 
     this.stopSubtractor();
 
-    if (this.state === 'initial' && this.period > 0) {
-      this.period -= 2;
-      Notifications.clear(this.period + 1);
-      Notifications.clear(this.period);
+    if (status === 'initial' && period > 0) {
+      this.setState({ period: period - 2 });
+
+      Notifications.clear(period + 1);
+      Notifications.clear(period);
     }
 
-    this.state = 'initial';
-    this.time = this.settings.cycleTime;
-    this.postStatus();
+    this.setState({ status: 'initial', time: cycleTime });
+
+    this.postState();
   }
 
   resetAll() {
+    const { cycleTime, totalPeriods } = this.getSettings();
+
     debug('Reset All');
 
     this.stopSubtractor();
 
     this.timeline = [];
-    this.period = 0;
-    this.time = this.settings.cycleTime;
-    this.state = 'initial';
 
-    this.postStatus();
-    Notifications.clearAll(
-      this.settings.totalCycles + this.settings.totalBreaks
-    );
+    this.setState({ period: 0, time: cycleTime, status: 'initial' });
+
+    this.postState();
+
+    Notifications.clearAll(totalPeriods);
   }
 
-  status() {
-    return {
-      time: Utilities.parseMs(this.time),
-      state: this.state,
-      cycle: Utilities.mapCycle(this.period),
-      period: this.period,
-      totalCycles: this.settings.totalCycles,
-    };
-  }
-
-  postStatus() {
+  postState() {
     if (this.comms.portOpen) {
-      console.log(this.status());
-      this.comms.port.postMessage(this.status());
+      this.comms.port.postMessage(this.formatState());
     }
   }
 
   sync() {
+    const { period, status } = this.getState();
+    const { totalPeriods, autoStart } = this.getSettings();
+
     debug('Sync');
 
-    if (!(this.state === 'running' || this.state === 'break')) {
-      debug(`Timer is ${this.state}. No corrections made.`);
+    if (!(status === 'running' || status === 'break')) {
+      debug(`Sync - Timer is ${status}. No corrections made.`);
       return;
     }
 
-    if (this.settings.autoStart) {
+    debug('Sync - Correcting timer');
+    if (autoStart) {
       // Stop the subtractor
       this.stopSubtractor();
 
       // Get reference
       const reference = Date.now();
-      const periods = this.settings.totalCycles + this.settings.totalBreaks;
 
       // Determine the correct period
-      let correctedPeriod = this.period;
-      for (let i = this.period; i < periods; i += 1) {
+      let correctedPeriod = period;
+      for (let i = period; i < totalPeriods; i += 1) {
         const target = this.timeline[i];
         if (reference > target) {
           correctedPeriod = i + 1;
@@ -319,34 +351,41 @@ class Timer {
       if (correctedPeriod === periods) {
         Diagnostics.checkRange(correctedPeriod, this.timeline);
 
-        this.state = 'complete';
-        this.period = correctedPeriod;
-        this.time = 0;
-        this.postStatus();
+        this.setState({
+          period: correctedPeriod,
+          time: 0,
+          status: 'complete',
+        });
+        this.postState();
         return;
       }
 
       Diagnostics.checkRange(correctedPeriod, this.timeline);
 
       // Handle other cases
-      let correctedState = correctedPeriod % 2 === 0 ? 'running' : 'break';
+      const correctedState = correctedPeriod % 2 === 0 ? 'running' : 'break';
       // Determine the correct time
-      let correctedTime = this.timeline[correctedPeriod] - reference;
+      const correctedTime = this.timeline[correctedPeriod] - reference;
+
       // Set the timer to the corrected values
-      this.state = correctedState;
-      this.period = correctedPeriod;
-      this.time = correctedTime;
-      this.postStatus();
-      // this.buildTimeline();
+      this.setState({
+        period: correctedPeriod,
+        time: correctedTime,
+        status: correctedState,
+      });
+
+      this.postState();
       this.runSubtractor();
       return;
     } else {
-      const correctedTime = this.timeline[this.period] - Date.now();
+      const correctedTime = this.timeline[period] - Date.now();
       if (correctedTime < 0) {
         this.stopSubtractor();
         this.next();
       } else {
-        this.time = correctedTime;
+        this.setState({
+          time: correctedTime,
+        });
       }
     }
   }

@@ -13,28 +13,23 @@ class NotificationInterface {
     this.soundAudio = new Audio();
     this.soundAudio.src = '../audio/metal-mallet.mp3';
 
-    this.soundEnabled = true;
-
     chrome.storage.local.get(['notificationSound'], (storage) => {
       if (storage.soundEnabled !== undefined) {
         this.soundEnabled = storage.notificationSound;
+      } else {
+        this.soundEnabled = true;
       }
     });
   }
 
-  notify(status, settings) {
-    const notification = this.build(status, settings);
+  notify(state, settings) {
+    const notification = this.build(state, settings);
     this.send(notification);
   }
 
-  build(status, settings) {
+  build({ period, status }, { breakTime, autoStart }) {
     debug('Building notification');
     debug('---------------');
-
-    debug(status);
-
-    const { period, state } = status;
-    const { breakTime, autoStart } = settings;
 
     console.log(breakTime);
     console.log(autoStart);
@@ -44,7 +39,7 @@ class NotificationInterface {
     let message;
 
     // Cycle complete
-    if (state === 'running') {
+    if (status === 'running') {
       const cycle = Utilities.mapCycle(period);
       const breakMinutes = Utilities.msToMin(breakTime);
       title = `Cycle ${cycle} complete!`;
@@ -52,7 +47,7 @@ class NotificationInterface {
     }
 
     // Break complete
-    if (state === 'break') {
+    if (status === 'break') {
       const _break = Utilities.mapBreak(period);
       title = `Break ${_break} is over.`;
 
@@ -61,7 +56,7 @@ class NotificationInterface {
     }
 
     // Timer complete
-    if (state === 'complete') {
+    if (status === 'complete') {
       title = `You did it! All cycles are complete.`;
       message = `Take a long break 🧖`;
     }
@@ -177,7 +172,52 @@ class Stats {
 | Storage - Collection of static methods that handle stored settings
 |--------------------------------------------------------------------------
 */
-class Storage {}
+class Storage {
+  static handleChanges(changes, namespace) {
+    let settingsChanged = false;
+    for (let key in changes) {
+      let storageChange = changes[key];
+      debug(
+        `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
+      );
+
+      // Update Settings
+      switch (key) {
+        case 'minutes':
+          timer.settings.cycleTime =
+            storageChange.newValue * 60000 - timer.dev.cycleOffset;
+          settingsChanged = true;
+          break;
+        case 'break':
+          timer.settings.breakTime =
+            storageChange.newValue * 60000 - timer.dev.breakOffset;
+          settingsChanged = true;
+          break;
+        case 'totalCycles':
+          timer.settings.totalCycles = storageChange.newValue;
+          timer.settings.totalBreaks = storageChange.newValue - 1;
+          settingsChanged = true;
+          break;
+        case 'autoStart':
+          timer.settings.autoStart = storageChange.newValue;
+          settingsChanged = true;
+          break;
+        // Different behavior for notification settings - Timer is not reset
+        case 'notificationSound':
+          Notifications.soundEnabled = storageChange.newValue;
+          break;
+      }
+    }
+    if (settingsChanged) {
+      // Clear the subtractor
+      timer.stopSubtractor();
+
+      // Set runtime properties to defaults
+      // The resetAll() function will clear notifications too
+      timer.resetAll();
+    }
+  }
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -238,23 +278,20 @@ class Utilities {
 */
 class Diagnostics {
   static compareTargets(period, timeline) {
+    // Need to upgrade to support calculating 'Skip break'
+
     if (devMode) {
       debug('Diagnostics - compareTargets');
+      debug(`Diagnostics - Running diagnostics on period: ${period}`);
       let targetTime = timeline[period];
+      const testTime = Date.now();
 
-      const testTime = new Date();
-      const difference = testTime - targetTime;
-
-      if (Math.abs(difference) > 1000) {
-        debug(`Expected time: '${testTime}'.`);
-        debug(`Target time: '${targetTime}'.`);
-        debug(
-          `Potential issue with target time, difference is: '${difference}' ms.`
-        );
+      if (testTime > targetTime) {
+        debug(`Diagnostics - Timer is delayed by ${testTime - targetTime} ms`);
+      } else if (testTime < targetTime) {
+        debug(`Diagnostics - Timer is ahead by ${targetTime - testTime} ms`);
       } else {
-        debug(`Expected time: '${testTime}'.`);
-        debug(`Target time: '${targetTime}'.`);
-        debug(`Target did great, difference is: '${difference}' ms.`);
+        debug('Diagnostics - Timer is right one time');
       }
     }
   }
@@ -268,15 +305,23 @@ class Diagnostics {
     let upperBound = 0;
     if (timeline[period]) upperBound = timeline[period];
 
-    const testTime = new Date();
+    const testTime = Date.now();
 
     if (testTime > lowerBound && testTime < upperBound) {
-      debug('Test time is within range. Cool beans.');
+      debug('Diagnostics - Test time is within range. Cool beans.');
     } else {
-      debug('The timer could be out of sync.');
+      debug('Diagnostics - The timer could be out of sync.');
     }
+  }
+}
 
-    debug(`Duration from Upper Bound: ${upperBound - testTime}`);
-    debug(`Duration from Lower Bound: ${testTime - lowerBound}`);
+/*
+|--------------------------------------------------------------------------
+| Logging
+|--------------------------------------------------------------------------
+*/
+function debug(message) {
+  if (devMode) {
+    console.debug(message);
   }
 }
