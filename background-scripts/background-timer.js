@@ -348,7 +348,7 @@ class Timer {
       }
 
       // Handle 'complete' case
-      if (correctedPeriod === periods) {
+      if (correctedPeriod === totalPeriods) {
         Diagnostics.checkRange(correctedPeriod, this.timeline);
 
         this.setState({
