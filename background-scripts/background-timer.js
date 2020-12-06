@@ -65,16 +65,6 @@ class Timer {
     this.state = { ...this.state, ...newState };
   }
 
-  formatState() {
-    return {
-      time: Utilities.parseMs(this.state.time),
-      state: this.state.status,
-      cycle: Utilities.mapCycle(this.state.period),
-      period: this.state.period,
-      totalCycles: this.settings.totalCycles,
-    };
-  }
-
   /*
   |--------------------------------------------------------------------------
   | Timer Init - Find settings in storage
@@ -413,6 +403,20 @@ class Timer {
         });
       }
     }
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Comms-related
+  |--------------------------------------------------------------------------
+  */
+  formatState() {
+    return {
+      period: this.state.period,
+      time: Utilities.parseMs(this.state.time),
+      status: this.state.status,
+      totalPeriods: this.settings.totalCycles + this.settings.totalBreaks,
+    };
   }
 
   updatePort(port, portOpen) {
