@@ -1,8 +1,5 @@
 'use strict';
 
-// Dev mode and debug messages
-// Debug function is defined in background-manager.js
-
 const Notifications = new NotificationInterface();
 
 class Timer {
@@ -42,6 +39,11 @@ class Timer {
     };
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | Getters, Setters
+  |--------------------------------------------------------------------------
+  */
   getSettings() {
     return {
       cycleTime: this.settings.cycleTime,
@@ -73,6 +75,11 @@ class Timer {
     };
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | Timer Init - Find settings in storage
+  |--------------------------------------------------------------------------
+  */
   init() {
     // Check stored settings and reconfigure the timer
     chrome.storage.local.get(
@@ -107,12 +114,11 @@ class Timer {
     );
   }
 
-  updatePort(port, portOpen) {
-    debug(`portOpen: ${portOpen}`);
-    this.comms.port = port;
-    this.comms.portOpen = portOpen;
-  }
-
+  /*
+  |--------------------------------------------------------------------------
+  | Timeline
+  |--------------------------------------------------------------------------
+  */
   buildTimeline() {
     const { period, time, status } = this.getState();
     const { cycleTime, breakTime, totalPeriods } = this.getSettings();
@@ -141,6 +147,11 @@ class Timer {
     this.timeline = [...newTimeline];
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | Subtractor functions
+  |--------------------------------------------------------------------------
+  */
   runSubtractor() {
     let { time } = this.getState();
     const newTime = time - 1000;
@@ -167,6 +178,11 @@ class Timer {
     clearInterval(this.subtractor);
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | Next
+  |--------------------------------------------------------------------------
+  */
   next() {
     const { period, status } = this.getState();
     const { totalPeriods } = this.getSettings();
@@ -191,6 +207,11 @@ class Timer {
     }
   }
 
+  /*
+  |--------------------------------------------------------------------------
+  | State flow: Cycle start & end, and Break start & end
+  |--------------------------------------------------------------------------
+  */
   startCycle() {
     debug('Start Cycle');
 
@@ -214,20 +235,6 @@ class Timer {
     this.setState({ period: period + 1, time: breakTime });
 
     this.startBreak();
-  }
-
-  endTimer() {
-    const { period } = this.getState();
-
-    debug('End Timer');
-
-    Diagnostics.compareTargets(period, this.timeline);
-
-    this.setState({ status: 'complete' });
-
-    this.postState();
-
-    Notifications.notify(this.getState(), this.getSettings());
   }
 
   startBreak() {
@@ -259,6 +266,25 @@ class Timer {
     }, 1000);
   }
 
+  endTimer() {
+    const { period } = this.getState();
+
+    debug('End Timer');
+
+    Diagnostics.compareTargets(period, this.timeline);
+
+    this.setState({ status: 'complete' });
+
+    this.postState();
+
+    Notifications.notify(this.getState(), this.getSettings());
+  }
+
+  /*
+  |--------------------------------------------------------------------------
+  | Timer control
+  |--------------------------------------------------------------------------
+  */
   pauseCycle() {
     this.stopSubtractor();
 
@@ -311,12 +337,11 @@ class Timer {
     Notifications.clearAll(totalPeriods);
   }
 
-  postState() {
-    if (this.comms.portOpen) {
-      this.comms.port.postMessage(this.formatState());
-    }
-  }
-
+  /*
+  |--------------------------------------------------------------------------
+  | Sync
+  |--------------------------------------------------------------------------
+  */
   sync() {
     const { period, status } = this.getState();
     const { totalPeriods, autoStart } = this.getSettings();
@@ -387,6 +412,18 @@ class Timer {
           time: correctedTime,
         });
       }
+    }
+  }
+
+  updatePort(port, portOpen) {
+    debug(`portOpen: ${portOpen}`);
+    this.comms.port = port;
+    this.comms.portOpen = portOpen;
+  }
+
+  postState() {
+    if (this.comms.portOpen) {
+      this.comms.port.postMessage(this.formatState());
     }
   }
 }
