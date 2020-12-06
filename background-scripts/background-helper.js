@@ -1,11 +1,11 @@
+'use strict';
+
 /*
 |--------------------------------------------------------------------------
 | Notifications Interface
 |--------------------------------------------------------------------------
 */
-
 // Future implementation: The notifications API should support sending reminder in case of idle time
-
 class NotificationInterface {
   constructor() {
     this.idTemplate = 'notification-for-period';
