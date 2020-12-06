@@ -153,12 +153,12 @@ class Timer {
       const newTime = time - 1000;
       this.setState({ time: newTime });
 
+      this.postState();
+
       if (newTime < 0) {
         this.stopSubtractor();
         this.next();
         return;
-      } else {
-        this.postState();
       }
     }, 1000);
   }
