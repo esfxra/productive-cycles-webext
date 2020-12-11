@@ -1,5 +1,8 @@
 'use strict';
 
+import { Storage, debug } from './background-helper.js';
+import { Timer } from './background-timer.js';
+
 // Defaults
 const defaultValues = {
   cycleMinutes: 25,
@@ -8,13 +11,11 @@ const defaultValues = {
   autoStart: true,
 };
 
-const devMode = true;
-
 let port = 0;
 let popUpOpen = false;
-let uiInterval = 0;
 let update = false;
 
+// Initialiaze timer
 const timer = new Timer(defaultValues);
 timer.init();
 

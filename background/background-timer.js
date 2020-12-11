@@ -1,5 +1,12 @@
 'use strict';
 
+import {
+  NotificationInterface,
+  Utilities,
+  Diagnostics,
+  debug,
+} from './background-helper.js';
+
 const Notifications = new NotificationInterface();
 
 class Timer {
@@ -442,3 +449,5 @@ class Timer {
     }
   }
 }
+
+export { Timer };

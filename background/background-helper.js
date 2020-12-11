@@ -278,20 +278,18 @@ class Utilities {
 */
 class Diagnostics {
   static compareTargets(period, timeline) {
-    if (devMode) {
-      debug('Diagnostics - compareTargets');
+    debug('Diagnostics - compareTargets');
 
-      debug(`Diagnostics - Running diagnostics on period: ${period}`);
-      let targetTime = timeline[period];
-      const testTime = Date.now();
+    debug(`Diagnostics - Running diagnostics on period: ${period}`);
+    let targetTime = timeline[period];
+    const testTime = Date.now();
 
-      if (testTime > targetTime) {
-        debug(`Diagnostics - Timer is delayed by ${testTime - targetTime} ms`);
-      } else if (testTime < targetTime) {
-        debug(`Diagnostics - Timer is ahead by ${targetTime - testTime} ms`);
-      } else {
-        debug('Diagnostics - Timer is right one time');
-      }
+    if (testTime > targetTime) {
+      debug(`Diagnostics - Timer is delayed by ${testTime - targetTime} ms`);
+    } else if (testTime < targetTime) {
+      debug(`Diagnostics - Timer is ahead by ${targetTime - testTime} ms`);
+    } else {
+      debug('Diagnostics - Timer is right one time');
     }
   }
 
@@ -320,7 +318,7 @@ class Diagnostics {
 |--------------------------------------------------------------------------
 */
 function debug(message) {
-  if (devMode) {
-    console.debug(message);
-  }
+  console.debug(message);
 }
+
+export { NotificationInterface, Storage, Utilities, Diagnostics, debug };
