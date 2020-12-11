@@ -58,7 +58,7 @@ class NotificationInterface {
     // Timer complete
     if (status === 'complete') {
       title = `You did it! All cycles are complete.`;
-      message = `Take a long break 🧖`;
+      message = `Take a long break 🧘`;
     }
 
     let notification = {
@@ -266,7 +266,10 @@ class Diagnostics {
 |--------------------------------------------------------------------------
 */
 function debug(message) {
-  console.debug(message);
+  let devMode = false;
+  if (devMode) {
+    console.debug(message);
+  }
 }
 
 export { NotificationInterface, Utilities, Diagnostics, debug };

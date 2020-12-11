@@ -12,7 +12,7 @@ let state = {
 };
 
 // Dev mode and debug messages
-const devMode = true;
+const devMode = false;
 function debug(message) {
   if (devMode) {
     console.debug(message);
