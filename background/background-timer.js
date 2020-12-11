@@ -1,6 +1,11 @@
 'use strict';
 
-const Notifications = new NotificationInterface();
+import {
+  NotificationInterface,
+  Utilities,
+  Diagnostics,
+  debug,
+} from './background-helper.js';
 
 class Timer {
   constructor(defaultValues) {
@@ -24,6 +29,10 @@ class Timer {
       port: null,
       portOpen: false,
     };
+
+    this.notifications = new NotificationInterface();
+    this.utilities = Utilities;
+    this.diagnostics = Diagnostics;
 
     this.dev = {
       cycleOffset: 0,
@@ -218,9 +227,9 @@ class Timer {
 
     debug('End Cycle');
 
-    Diagnostics.compareTargets(period, false, this.timeline);
+    this.diagnostics.compareTargets(period, this.timeline);
 
-    Notifications.notify(this.getState(), this.getSettings());
+    this.notifications.notify(this.getState(), this.getSettings());
 
     this.setState({ period: period + 1, time: breakTime });
 
@@ -241,8 +250,8 @@ class Timer {
     const { period } = this.getState();
     const { cycleTime, autoStart } = this.getSettings();
 
-    Diagnostics.compareTargets(period, this.timeline);
-    Notifications.notify(this.getState(), this.getSettings());
+    this.diagnostics.compareTargets(period, this.timeline);
+    this.notifications.notify(this.getState(), this.getSettings());
 
     this.setState({ period: period + 1, time: cycleTime });
 
@@ -259,13 +268,13 @@ class Timer {
 
     debug('End Timer');
 
-    Diagnostics.compareTargets(period, this.timeline);
+    this.diagnostics.compareTargets(period, this.timeline);
 
     this.setState({ status: 'complete' });
 
     this.postState();
 
-    Notifications.notify(this.getState(), this.getSettings());
+    this.notifications.notify(this.getState(), this.getSettings());
   }
 
   /*
@@ -313,8 +322,8 @@ class Timer {
     if (status === 'initial' && period > 0) {
       this.setState({ period: period - 2 });
 
-      Notifications.clear(period + 1);
-      Notifications.clear(period);
+      this.notifications.clear(period + 1);
+      this.notifications.clear(period);
     }
 
     this.setState({ status: 'initial', time: cycleTime });
@@ -335,7 +344,7 @@ class Timer {
 
     this.postState();
 
-    Notifications.clearAll(totalPeriods);
+    this.notifications.clearAll(totalPeriods);
   }
 
   /*
@@ -375,7 +384,7 @@ class Timer {
 
       // Handle 'complete' case
       if (correctedPeriod === totalPeriods) {
-        Diagnostics.checkRange(correctedPeriod, this.timeline);
+        this.diagnostics.checkRange(correctedPeriod, this.timeline);
 
         this.setState({
           period: correctedPeriod,
@@ -386,7 +395,7 @@ class Timer {
         return;
       }
 
-      Diagnostics.checkRange(correctedPeriod, this.timeline);
+      this.diagnostics.checkRange(correctedPeriod, this.timeline);
 
       // Handle other cases
       const correctedState = correctedPeriod % 2 === 0 ? 'running' : 'break';
@@ -424,7 +433,7 @@ class Timer {
   formatState() {
     return {
       period: this.state.period,
-      time: Utilities.parseMs(this.state.time),
+      time: this.utilities.parseMs(this.state.time),
       status: this.state.status,
       totalPeriods: this.settings.totalCycles + this.settings.totalBreaks,
     };
@@ -442,3 +451,5 @@ class Timer {
     }
   }
 }
+
+export { Timer };

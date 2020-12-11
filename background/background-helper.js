@@ -169,58 +169,6 @@ class Stats {
 
 /*
 |--------------------------------------------------------------------------
-| Storage - Collection of static methods that handle stored settings
-|--------------------------------------------------------------------------
-*/
-class Storage {
-  static handleChanges(changes, namespace) {
-    let settingsChanged = false;
-    for (let key in changes) {
-      let storageChange = changes[key];
-      debug(
-        `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
-      );
-
-      // Update Settings
-      switch (key) {
-        case 'minutes':
-          timer.settings.cycleTime =
-            storageChange.newValue * 60000 - timer.dev.cycleOffset;
-          settingsChanged = true;
-          break;
-        case 'break':
-          timer.settings.breakTime =
-            storageChange.newValue * 60000 - timer.dev.breakOffset;
-          settingsChanged = true;
-          break;
-        case 'totalCycles':
-          timer.settings.totalCycles = storageChange.newValue;
-          timer.settings.totalBreaks = storageChange.newValue - 1;
-          settingsChanged = true;
-          break;
-        case 'autoStart':
-          timer.settings.autoStart = storageChange.newValue;
-          settingsChanged = true;
-          break;
-        // Different behavior for notification settings - Timer is not reset
-        case 'notificationSound':
-          Notifications.soundEnabled = storageChange.newValue;
-          break;
-      }
-    }
-    if (settingsChanged) {
-      // Clear the subtractor
-      timer.stopSubtractor();
-
-      // Set runtime properties to defaults
-      // The resetAll() function will clear notifications too
-      timer.resetAll();
-    }
-  }
-}
-
-/*
-|--------------------------------------------------------------------------
 | Utilities - Collection of static methods that parse time and map periods
 |--------------------------------------------------------------------------
 */
@@ -278,20 +226,18 @@ class Utilities {
 */
 class Diagnostics {
   static compareTargets(period, timeline) {
-    if (devMode) {
-      debug('Diagnostics - compareTargets');
+    debug('Diagnostics - compareTargets');
 
-      debug(`Diagnostics - Running diagnostics on period: ${period}`);
-      let targetTime = timeline[period];
-      const testTime = Date.now();
+    debug(`Diagnostics - Running diagnostics on period: ${period}`);
+    let targetTime = timeline[period];
+    const testTime = Date.now();
 
-      if (testTime > targetTime) {
-        debug(`Diagnostics - Timer is delayed by ${testTime - targetTime} ms`);
-      } else if (testTime < targetTime) {
-        debug(`Diagnostics - Timer is ahead by ${targetTime - testTime} ms`);
-      } else {
-        debug('Diagnostics - Timer is right one time');
-      }
+    if (testTime > targetTime) {
+      debug(`Diagnostics - Timer is delayed by ${testTime - targetTime} ms`);
+    } else if (testTime < targetTime) {
+      debug(`Diagnostics - Timer is ahead by ${targetTime - testTime} ms`);
+    } else {
+      debug('Diagnostics - Timer is right on time');
     }
   }
 
@@ -320,7 +266,7 @@ class Diagnostics {
 |--------------------------------------------------------------------------
 */
 function debug(message) {
-  if (devMode) {
-    console.debug(message);
-  }
+  console.debug(message);
 }
+
+export { NotificationInterface, Utilities, Diagnostics, debug };
