@@ -1,6 +1,6 @@
 'use strict';
 
-import { Storage, debug } from './background-helper.js';
+import { debug } from './background-helper.js';
 import { Timer } from './background-timer.js';
 
 // Defaults
@@ -32,11 +32,11 @@ timer.init();
 */
 chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
+chrome.storage.onChanged.addListener(handleStorageChanges);
 chrome.idle.onStateChanged.addListener((state) => {
   debug(`System is '${state}'`);
   timer.sync();
 });
-chrome.storage.onChanged.addListener(Storage.handleChanges);
 
 /*
 |--------------------------------------------------------------------------
@@ -137,5 +137,50 @@ function handleMessage(message) {
         timer.postState();
         break;
     }
+  }
+}
+
+function handleStorageChanges(changes, namespace) {
+  let settingsChanged = false;
+  for (let key in changes) {
+    let storageChange = changes[key];
+    debug(
+      `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
+    );
+
+    // Update Settings
+    switch (key) {
+      case 'minutes':
+        timer.settings.cycleTime =
+          storageChange.newValue * 60000 - timer.dev.cycleOffset;
+        settingsChanged = true;
+        break;
+      case 'break':
+        timer.settings.breakTime =
+          storageChange.newValue * 60000 - timer.dev.breakOffset;
+        settingsChanged = true;
+        break;
+      case 'totalCycles':
+        timer.settings.totalCycles = storageChange.newValue;
+        timer.settings.totalBreaks = storageChange.newValue - 1;
+        settingsChanged = true;
+        break;
+      case 'autoStart':
+        timer.settings.autoStart = storageChange.newValue;
+        settingsChanged = true;
+        break;
+      // Different behavior for notification settings - Timer is not reset
+      case 'notificationSound':
+        timer.notifications.soundEnabled = storageChange.newValue;
+        break;
+    }
+  }
+  if (settingsChanged) {
+    // Clear the subtractor
+    timer.stopSubtractor();
+
+    // Set runtime properties to defaults
+    // The resetAll() function will clear notifications too
+    timer.resetAll();
   }
 }
