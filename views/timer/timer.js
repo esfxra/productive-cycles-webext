@@ -4,11 +4,15 @@ import { registerNavigation } from '../common-navigation.js';
 import { hideElement, showElement, loadTheme } from '../common-utils.js';
 
 let port = null;
-let previousState = null;
-let stateChanged = false;
+
+let state = {
+  status: null,
+  period: null,
+  changed: false,
+};
 
 // Dev mode and debug messages
-const devMode = false;
+const devMode = true;
 function debug(message) {
   if (devMode) {
     console.debug(message);
@@ -20,12 +24,11 @@ window.addEventListener('DOMContentLoaded', () => {
   // Port operations
   port = chrome.runtime.connect({ name: 'port-from-popup' });
   port.onMessage.addListener(handleMessage);
-  // Ask for Timer settings with 'preload' command
+
+  // Ask for timer settings with 'preload' command
   port.postMessage({ command: 'preload' });
 
   // Register listeners for menu
-  // const navigation = new Navigation('timer', port);
-  // navigation.init();
   registerNavigation('timer', port);
 
   // Register listeners for timer control
@@ -42,157 +45,30 @@ window.addEventListener('DOMContentLoaded', () => {
 function handleMessage(message) {
   debug(message);
 
-  // Show update if extension was recently updated
+  // Check whether the update view should be displayed
   if (message.update) {
     port.disconnect();
     window.location.href = '../updates/updates.html';
   }
 
-  // Determine whether the state has changed
-  if (previousState !== message.state) {
-    stateChanged = true;
-    previousState = message.state;
+  // Check if the state has changed
+  if (state.status !== message.status || state.period !== message.period) {
+    state.changed = true;
+    state.status = message.status;
+    state.period = message.period;
   } else {
-    stateChanged = false;
+    state.changed = false;
   }
 
   // Change the text in the #time element with the updated time coming from the background script
-  document.querySelector('#time').textContent = message.time;
+  updateTime(message.time);
 
-  // Change UI based on message.state
-  if (stateChanged) {
-    let elt = null;
-    switch (message.state) {
-      case 'initial':
-        elt = document.querySelector('.time-container');
-        if (elt.classList.contains('break')) {
-          elt.classList.remove('break');
-        }
-        // Adjust "time"
-        document.querySelector('#time').classList.remove('complete-text');
-        // Adjust .control spacing
-        document.querySelector('.control').style.justifyContent =
-          'space-between';
-        hideElement('#skip');
-        // hideElement("#break-text");
-        hideElement('#pause');
-        showElement('#start');
-        showElement('#reset-cycle');
-        showElement('#reset-all');
-        break;
-      case 'running':
-        // Adjust "time"
-        document.querySelector('#time').classList.remove('complete-text');
-        elt = document.querySelector('.time-container');
-        if (elt.classList.contains('break')) {
-          elt.classList.remove('break');
-        }
-        // Adjust .control spacing
-        document.querySelector('.control').style.justifyContent =
-          'space-between';
-        hideElement('#skip');
-        // hideElement("#break-text");
-        hideElement('#start');
-        showElement('#pause');
-        showElement('#reset-cycle');
-        showElement('#reset-all');
-        break;
-      case 'paused':
-        hideElement('#pause');
-        showElement('#start');
-        break;
-      case 'complete':
-        hideElement('.time-container');
-        hideElement('.control');
-        showElement('.timer-complete-message');
-        showElement('.timer-complete-button');
-
-        // Register listener for new timer button
-        const newTimerButton = document.querySelector('.timer-complete-button');
-        newTimerButton.addEventListener('click', () => {
-          port.postMessage({ command: 'reset-all' });
-
-          hideElement('.timer-complete-message');
-          hideElement('.timer-complete-button');
-          showElement('.time-container');
-          showElement('.control');
-        });
-
-        break;
-      case 'break':
-        elt = document.querySelector('.time-container');
-        if (!elt.classList.contains('break')) {
-          elt.classList.add('break');
-        }
-        document.querySelector('.control').style.justifyContent = 'center';
-        hideElement('#pause');
-        hideElement('#start');
-        hideElement('#reset-cycle');
-        hideElement('#reset-all');
-        // showElement("#break-text");
-        showElement('#skip');
-
-        break;
-    }
+  if (state.changed) {
+    // UI changes for control buttons and time styles - Based on status
+    adjustControlAndTime(state.status);
 
     // Tracker
-    // Compute the number of cycles to display, which one is running, and which are complete
-    debug('Rebuilding the tracker ...');
-    debug(`previousState: ${previousState}`);
-    const cyclesNode = document.querySelector('.cycles');
-
-    // Reset cyclesNode
-    let node = cyclesNode.lastElementChild;
-    while (node) {
-      cyclesNode.removeChild(node);
-      node = cyclesNode.lastElementChild;
-    }
-
-    // Adjust CSS for < 4 cycles
-    if (message.totalCycles < 4) {
-      cyclesNode.style.gridTemplateColumns =
-        'repeat(' + message.totalCycles + ', auto)';
-    } else {
-      cyclesNode.style.gridTemplateColumns = 'repeat(4, auto)';
-    }
-
-    if (message.totalCycles < 3) {
-      cyclesNode.style.justifyContent = 'space-evenly';
-    } else {
-      cyclesNode.style.justifyContent = 'space-between';
-    }
-
-    // Build cyclesNode
-    const cycleTitleString = chrome.i18n.getMessage('cycle');
-    let dotNode = null;
-    let i = 1;
-    while (i <= message.totalCycles) {
-      dotNode = document.createElement('span');
-      dotNode.id = 'cycle-' + i;
-      dotNode.setAttribute('title', `${cycleTitleString} ${i}`);
-      dotNode.classList.add('dot');
-      if (i === message.cycle) {
-        if (message.state === 'initial' || message.state === 'break') {
-          dotNode.classList.add('pending');
-          // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
-        } else if (message.state === 'running' || message.state === 'paused') {
-          dotNode.classList.add('running');
-          // html += '<span id="cycle-' + i + '" class="dot running"></span>';
-        } else if (message.state === 'complete') {
-          dotNode.classList.add('complete');
-        }
-      } else if (i < message.cycle) {
-        dotNode.classList.add('complete');
-        // html += '<span id="cycle-' + i + '" class="dot complete"></span>';
-      } else {
-        // This should affect all cycles that are past the current (i.e. i > message.cycle)
-        dotNode.classList.add('pending');
-        // html += '<span id="cycle-' + i + '" class="dot pending"></span>';
-      }
-      cyclesNode.appendChild(dotNode);
-      i++;
-    }
-    // document.querySelector(".cycles").innerHTML = html;
+    adjustCycleTracker(state.period, state.status, message.totalPeriods);
   }
 }
 
@@ -264,4 +140,178 @@ function internationalize() {
   // Set 'skip break' text
   const skipButton = document.querySelector('#skip');
   skipButton.textContent = chrome.i18n.getMessage('skipBreak');
+}
+
+function updateTime(newTime) {
+  const time = document.querySelector('#time');
+  time.textContent = newTime;
+}
+
+function adjustControlAndTime(status) {
+  switch (status) {
+    case 'initial': {
+      // Remove 'break' styles
+      const time = document.querySelector('.time-container');
+      if (time.classList.contains('break')) {
+        time.classList.remove('break');
+      }
+
+      // Adjust .control spacing to 'space-between'
+      const control = document.querySelector('.control');
+      control.style.justifyContent = 'space-between';
+
+      // Hide necessary elements
+      hideElement('#skip');
+      hideElement('#pause');
+
+      // Show necessary elements
+      showElement('#start');
+      showElement('#reset-cycle');
+      showElement('#reset-all');
+      return;
+    }
+
+    case 'running': {
+      // Remove 'break' styles
+      const time = document.querySelector('.time-container');
+      if (time.classList.contains('break')) {
+        time.classList.remove('break');
+      }
+
+      // Adjust .control spacing to 'space-between'
+      const control = document.querySelector('.control');
+      control.style.justifyContent = 'space-between';
+
+      // Hide necessary elements
+      hideElement('#skip');
+      hideElement('#start');
+
+      // Show necessary elements
+      showElement('#pause');
+      showElement('#reset-cycle');
+      showElement('#reset-all');
+      return;
+    }
+    case 'paused': {
+      // Hide necessary elements
+      hideElement('#pause');
+
+      // Show necessary elements
+      showElement('#start');
+      return;
+    }
+    case 'complete': {
+      // Hide necessary elements
+      hideElement('.time-container');
+      hideElement('.control');
+
+      // Show necessary elements
+      showElement('.timer-complete-message');
+      showElement('.timer-complete-button');
+
+      // Register listener for new timer button
+      const newTimer = document.querySelector('.timer-complete-button');
+      newTimer.addEventListener('click', () => {
+        port.postMessage({ command: 'reset-all' });
+
+        // Hide necessary elements
+        hideElement('.timer-complete-message');
+        hideElement('.timer-complete-button');
+
+        // Show necessary elements
+        showElement('.time-container');
+        showElement('.control');
+      });
+
+      return;
+    }
+    case 'break': {
+      // Add 'break' styles
+      const time = document.querySelector('.time-container');
+      if (!time.classList.contains('break')) {
+        time.classList.add('break');
+      }
+
+      // Adjust .control spacing to 'center'
+      const control = document.querySelector('.control');
+      control.style.justifyContent = 'center';
+
+      // Hide necessary elements
+      hideElement('#pause');
+      hideElement('#start');
+      hideElement('#reset-cycle');
+      hideElement('#reset-all');
+
+      // Show necessary elements
+      showElement('#skip');
+
+      return;
+    }
+  }
+}
+
+function adjustCycleTracker(period, status, totalPeriods) {
+  const totalCycles = Math.ceil(totalPeriods / 2);
+
+  debug('Rebuilding the tracker ...');
+  debug(`totalPeriods: ${totalPeriods}`);
+  debug(`totalCycles: ${totalCycles}`);
+
+  const cyclesNode = document.querySelector('.cycles');
+
+  // Reset cyclesNode
+  let node = cyclesNode.lastElementChild;
+  while (node) {
+    cyclesNode.removeChild(node);
+    node = cyclesNode.lastElementChild;
+  }
+
+  // Adjust CSS for < 4 cycles
+  if (totalCycles < 4) {
+    cyclesNode.style.gridTemplateColumns = 'repeat(' + totalCycles + ', auto)';
+  } else {
+    cyclesNode.style.gridTemplateColumns = 'repeat(4, auto)';
+  }
+
+  // Adjust CSS for < 3 cycles
+  if (totalCycles < 3) {
+    cyclesNode.style.justifyContent = 'space-evenly';
+  } else {
+    cyclesNode.style.justifyContent = 'space-between';
+  }
+
+  // Build cyclesNode
+  const cycleTitleString = chrome.i18n.getMessage('cycle');
+  let dotNode = null;
+  let i = 0;
+  while (i < totalPeriods) {
+    // Consider cycles only (even values)
+    if (i % 2 === 0) {
+      // Setup cycle node template
+      dotNode = document.createElement('span');
+      dotNode.id = 'cycle-' + i;
+      dotNode.setAttribute('title', `${cycleTitleString} ${i}`);
+      dotNode.classList.add('dot');
+
+      if (i === period) {
+        // Decide on styles for current period with 'status'
+        if (status === 'initial' || status === 'break') {
+          dotNode.classList.add('pending');
+        } else if (status === 'running' || status === 'paused') {
+          dotNode.classList.add('running');
+        } else if (status === 'complete') {
+          dotNode.classList.add('complete');
+        }
+      } else if (i < period) {
+        // All previous periods
+        dotNode.classList.add('complete');
+      } else if (i > period) {
+        // All periods that have not started
+        dotNode.classList.add('pending');
+      }
+      // Append node to cyclesNode group
+      cyclesNode.appendChild(dotNode);
+    }
+    i += 1;
+  }
 }

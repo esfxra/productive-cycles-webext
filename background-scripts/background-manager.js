@@ -1,155 +1,140 @@
 'use strict';
 
 // Defaults
-const defaultTime = 25;
-const defaultBreak = 5;
-const defaultCycles = 4;
-const defaultAutoStart = true;
+const defaultValues = {
+  cycleMinutes: 25,
+  breakMinutes: 5,
+  totalCycles: 4,
+  autoStart: true,
+};
 
-// Dev mode and debug messages
-// This is also run in background-timer
 const devMode = true;
-function debug(message) {
-  if (devMode) {
-    console.debug(message);
-  }
-}
-
-const cycles = new Timer(
-  defaultTime,
-  defaultBreak,
-  defaultCycles,
-  defaultAutoStart
-);
-
-cycles.init();
 
 let port = 0;
 let popUpOpen = false;
 let uiInterval = 0;
 let update = false;
 
-/*  
-    Register all listeners
+const timer = new Timer(defaultValues);
+timer.init();
 
-    - runtime.onInstalled
-    - runtime.onConnect
-    - idle.onStateChanged
-    - storage.onChanged
-
+/*
+|--------------------------------------------------------------------------
+| Register manager's listeners
+|--------------------------------------------------------------------------
+|
+| - runtime.onInstalled
+| - runtime.onConnect
+| - idle.onStateChanged
+| - storage.onChanged
+|
 */
-
-// Listen for "install" or "update" event
-chrome.runtime.onInstalled.addListener(install);
-
-// Listen for communications from PopUp
-chrome.runtime.onConnect.addListener(connect);
-
-// Listen for the system changing states, and update time
+chrome.runtime.onInstalled.addListener(handleOnInstalled);
+chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.idle.onStateChanged.addListener((state) => {
   debug(`System is '${state}'`);
-  cycles.sync();
+  timer.sync();
 });
+chrome.storage.onChanged.addListener(Storage.handleChanges);
 
-// Listen for changes in the options, report and reload
-chrome.storage.onChanged.addListener(newSettings);
-
-/* 
-    Function definitions
-
-    - install
-    - connect
-    - disconnect
-    - handleMessage
-    - newSettings
-
+/*
+|--------------------------------------------------------------------------
+| Install & Update operations
+|--------------------------------------------------------------------------
 */
-
-// Handle install and reload/update events for onInstalled
-function install(details) {
+function handleOnInstalled(details) {
   if (details.reason === 'install') {
+    runInstall();
   } else if (details.reason === 'update') {
-    // Future release: Open new tab with changes for this version
-    update = true;
-    debug(`update set to ${update}`);
-    cycles.clearNotifications(true);
+    runUpdate();
   }
 }
 
-function connect(portFromPopUp) {
+function runInstall() {
+  debug('Install');
+  debug('---------------');
+  // Initialize storage
+  // Set update flag to true
+  update = true;
+}
+
+function runUpdate() {
+  debug('Update');
+  debug('---------------');
+  // Upgrade storage
+  // Storage.upgrade()
+  // Set update flag to true
+  update = true;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Port communications
+|--------------------------------------------------------------------------
+*/
+function handleOnConnect(portFromPopUp) {
+  debug('On Connect - Port connected');
+  debug('---------------');
   port = portFromPopUp;
-  port.onDisconnect.addListener(disconnect);
+  port.onDisconnect.addListener(handleOnDisconnect);
   port.onMessage.addListener(handleMessage);
 
   popUpOpen = true;
 
-  cycles.updatePort(port, popUpOpen);
+  timer.updatePort(port, popUpOpen);
 }
 
-function disconnect() {
+function handleOnDisconnect() {
+  debug('On Disconnect - Port disconnected');
+  debug('---------------');
   popUpOpen = false;
-  cycles.updatePort(port, popUpOpen);
+  timer.updatePort(port, popUpOpen);
 }
 
 function handleMessage(message) {
-  debug(message);
+  debug(`Handle Message - Message received: ${message.command}`);
+  debug('---------------');
   if (message.command === 'preload' && update === true) {
+    // Disable flag until next update
     update = false;
-    let message = cycles.status();
+
+    // Communicate with PopUp to open update view
+    let message = timer.formatState();
     message.update = true;
-    debug(message);
     port.postMessage(message);
   } else {
-    cycles.input(message.command);
-  }
-}
-
-// Identify changes in the user settings through storage.onChanged listener
-function newSettings(changes, namespace) {
-  let settingsChanged = false;
-  for (let key in changes) {
-    let storageChange = changes[key];
-    debug(
-      `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
-    );
-
-    // Update Settings
-    switch (key) {
-      case 'minutes':
-        cycles.settings.cycleTime =
-          storageChange.newValue * 60000 - cycles.settings.cycleDevOffset;
-        settingsChanged = true;
+    /*
+    |--------------------------------------------------------------------------
+    | Forward all other commands to timer
+    |--------------------------------------------------------------------------
+    |
+    | - 'start'
+    | - 'pause'
+    | - 'reset-cycle'
+    | - 'reset-all'
+    | - 'skip'
+    | - 'preload'
+    |
+    */
+    switch (message.command) {
+      case 'start':
+        timer.startCycle();
         break;
-      case 'break':
-        cycles.settings.breakTime =
-          storageChange.newValue * 60000 - cycles.settings.breakDevOffset;
-        settingsChanged = true;
+      case 'pause':
+        timer.pauseCycle();
         break;
-      case 'totalCycles':
-        cycles.settings.totalCycles = storageChange.newValue;
-        cycles.settings.totalBreaks = storageChange.newValue - 1;
-        settingsChanged = true;
+      case 'skip':
+        timer.skipBreak();
         break;
-      case 'autoStart':
-        cycles.settings.autoStart = storageChange.newValue;
-        settingsChanged = true;
+      case 'reset-cycle':
+        timer.resetCycle();
         break;
-      // Different behavior for notification settings - Timer is not reset
-      case 'notificationSound':
-        cycles.notification.sound = storageChange.newValue;
+      case 'reset-all':
+        timer.resetAll();
+        break;
+      case 'preload':
+        timer.postState();
         break;
     }
-  }
-  if (settingsChanged) {
-    // Clear all intervals and Timeouts
-    clearTimeout(cycles.timeouts.cycle);
-    clearTimeout(cycles.timeouts.break);
-    clearTimeout(cycles.timeouts.count);
-
-    // Clear all notifications
-    cycles.clearNotifications(true);
-
-    // Set runtime properties to defaults
-    cycles.reset('all');
   }
 }
