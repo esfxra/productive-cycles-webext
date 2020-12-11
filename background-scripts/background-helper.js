@@ -278,10 +278,9 @@ class Utilities {
 */
 class Diagnostics {
   static compareTargets(period, timeline) {
-    // Need to upgrade to support calculating 'Skip break'
-
     if (devMode) {
       debug('Diagnostics - compareTargets');
+
       debug(`Diagnostics - Running diagnostics on period: ${period}`);
       let targetTime = timeline[period];
       const testTime = Date.now();

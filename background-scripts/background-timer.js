@@ -110,14 +110,8 @@ class Timer {
   |--------------------------------------------------------------------------
   */
   buildTimeline() {
-    const { period, time, status } = this.getState();
+    const { period, time } = this.getState();
     const { cycleTime, breakTime, totalPeriods } = this.getSettings();
-
-    // Note that checking if autoStart is enabled / disabled could be important in the future
-    if (status !== 'initial' && status !== 'paused') {
-      debug('Timeline - Skipping build');
-      return;
-    }
 
     debug('Timeline - Building timeline');
     let newTimeline = [...this.timeline];
@@ -154,9 +148,10 @@ class Timer {
       const newTime = time - 1000;
       this.setState({ time: newTime });
 
-      this.postState();
-
-      if (newTime < 0) {
+      if (newTime >= 0) {
+        this.postState();
+        return;
+      } else {
         this.stopSubtractor();
         this.next();
         return;
@@ -203,9 +198,14 @@ class Timer {
   |--------------------------------------------------------------------------
   */
   startCycle() {
+    const { status } = this.getState();
+    const { autoStart } = this.getSettings();
+
     debug('Start Cycle');
 
-    this.buildTimeline();
+    if (autoStart === false || status === 'initial' || status === 'paused') {
+      this.buildTimeline();
+    }
 
     this.setState({ status: 'running' });
 
@@ -218,7 +218,7 @@ class Timer {
 
     debug('End Cycle');
 
-    Diagnostics.compareTargets(period, this.timeline);
+    Diagnostics.compareTargets(period, false, this.timeline);
 
     Notifications.notify(this.getState(), this.getSettings());
 
@@ -236,24 +236,22 @@ class Timer {
   }
 
   endBreak() {
-    const { period } = this.getState();
-    const { cycleTime, autoStart } = this.getSettings();
     debug('End Break');
 
-    Diagnostics.compareTargets(period, this.timeline);
+    const { period } = this.getState();
+    const { cycleTime, autoStart } = this.getSettings();
 
+    Diagnostics.compareTargets(period, this.timeline);
     Notifications.notify(this.getState(), this.getSettings());
 
     this.setState({ period: period + 1, time: cycleTime });
 
-    setTimeout(() => {
-      if (autoStart) {
-        this.startCycle();
-      } else {
-        this.setState({ status: 'initial' });
-        this.postState();
-      }
-    }, 1000);
+    if (autoStart) {
+      this.startCycle();
+    } else {
+      this.setState({ status: 'initial' });
+      this.postState();
+    }
   }
 
   endTimer() {
@@ -286,9 +284,22 @@ class Timer {
   }
 
   skipBreak() {
+    debug('Skip break');
+
     this.stopSubtractor();
 
-    this.endBreak();
+    const { period } = this.getState();
+    const { cycleTime, autoStart } = this.getSettings();
+
+    this.setState({ period: period + 1, time: cycleTime });
+
+    if (autoStart) {
+      this.buildTimeline();
+      this.startCycle();
+    } else {
+      this.setState({ status: 'initial' });
+      this.postState();
+    }
   }
 
   resetCycle() {
