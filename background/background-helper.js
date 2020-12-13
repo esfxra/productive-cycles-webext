@@ -31,9 +31,6 @@ class NotificationInterface {
     debug('Building notification');
     debug('---------------');
 
-    console.log(breakTime);
-    console.log(autoStart);
-
     let id = `${this.idTemplate}-${period}`;
     let title;
     let message;
@@ -66,8 +63,6 @@ class NotificationInterface {
       title: title,
       message: message,
     };
-
-    console.log(notification);
 
     return notification;
   }
