@@ -2,9 +2,8 @@
   "name": "productive-cycles-webext",
   "version": "0.3.0",
   "scripts": {
-    "test": "jest"
+    "test": "jest --watchAll"
   },
-  "keywords": [],
   "author": "Diego Serrano",
   "license": "MIT",
   "devDependencies": {
