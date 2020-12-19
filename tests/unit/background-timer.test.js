@@ -187,3 +187,74 @@ describe('Subtractor', () => {
     expect(clearInterval).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('State Operations', () => {
+  let timer;
+  beforeAll(() => {
+    timer = new Timer(defaultValues);
+  });
+  beforeEach(() => {
+    timer.resetAll();
+  });
+
+  test('Can retrieve the current state with getState', () => {
+    timer.state.period = 3;
+    timer.state.time = 44000;
+    timer.state.status = 'break';
+
+    const test = {
+      period: 3,
+      time: 44000,
+      status: 'break',
+    };
+
+    const result = timer.getState();
+
+    expect(result).toEqual(test);
+  });
+
+  test('Can set the current state with setState', () => {
+    const test = {
+      period: 5,
+      time: 10000,
+      status: 'running',
+    };
+
+    timer.setState(test);
+
+    expect(timer.state).toEqual(test);
+  });
+
+  test('Correctly formats the state before posting', () => {
+    timer.state.period = 1;
+    timer.state.time = 20000;
+    timer.state.status = 'running';
+
+    const result = timer.formatState();
+
+    expect(result.period).toBe(1);
+    expect(result.time).toBe('00:20');
+    expect(result.status).toBe('running');
+    expect(result.totalPeriods).toBe(7);
+  });
+
+  test('Posts the state if comms are open', () => {
+    timer.comms.portOpen = true;
+    timer.comms.port = {};
+    timer.comms.port.postMessage = jest.fn();
+
+    timer.postState();
+
+    expect(timer.comms.port.postMessage).toHaveBeenCalledTimes(1);
+  });
+
+  test('Does not post the state if comms are open', () => {
+    timer.comms.portOpen = false;
+    timer.comms.port = {};
+    timer.comms.port.postMessage = jest.fn();
+
+    timer.postState();
+
+    expect(timer.comms.port.postMessage).toHaveBeenCalledTimes(0);
+  });
+});
