@@ -101,6 +101,7 @@ describe('Subtractor', () => {
     timer.resetAll();
     runSubtractor.mockClear();
     postState.mockClear();
+    jest.useFakeTimers();
   });
 
   test('Subtracts 1 second immediately after call', () => {
@@ -110,8 +111,6 @@ describe('Subtractor', () => {
   });
 
   test('Subtracts seconds according to time passed', () => {
-    jest.useFakeTimers();
-
     timer.state.time = 10000;
     timer.runSubtractor();
 
@@ -133,8 +132,6 @@ describe('Subtractor', () => {
   });
 
   test('Posts state according to time passed', () => {
-    jest.useFakeTimers();
-
     const seconds = 10;
     timer.state.time = seconds * 1000;
     timer.runSubtractor();
@@ -146,8 +143,6 @@ describe('Subtractor', () => {
   });
 
   test('Stops the subtractor when the time is less than 0', () => {
-    jest.useFakeTimers();
-
     const seconds = 10;
     timer.state.time = seconds * 1000;
     timer.runSubtractor();
