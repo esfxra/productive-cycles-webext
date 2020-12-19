@@ -146,13 +146,7 @@ class Timer {
   |--------------------------------------------------------------------------
   */
   runSubtractor() {
-    let { time } = this.getState();
-    const newTime = time - 1000;
-    this.setState({ time: newTime });
-
-    this.postState();
-
-    this.subtractor = setInterval(() => {
+    const subtractAndCheck = () => {
       let { time } = this.getState();
       const newTime = time - 1000;
       this.setState({ time: newTime });
@@ -165,6 +159,11 @@ class Timer {
         this.next();
         return;
       }
+    };
+
+    subtractAndCheck();
+    this.subtractor = setInterval(() => {
+      subtractAndCheck();
     }, 1000);
   }
 
