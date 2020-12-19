@@ -142,7 +142,19 @@ describe('Subtractor', () => {
     expect(postState).toHaveBeenCalledTimes(seconds);
   });
 
-  test('Stops the subtractor when the time is less than 0', () => {
+  test('Gets run when a cycle starts', () => {
+    timer.startCycle();
+
+    expect(runSubtractor).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gets run when a break starts', () => {
+    timer.startBreak();
+
+    expect(runSubtractor).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gets stopped when the time is less than 0', () => {
     const seconds = 10;
     timer.state.time = seconds * 1000;
     timer.runSubtractor();
@@ -151,15 +163,27 @@ describe('Subtractor', () => {
     expect(clearInterval).toHaveBeenCalledTimes(1);
   });
 
-  test('Gets called when a cycle starts', () => {
-    timer.startCycle();
+  test('Gets stopped when a cycle is paused', () => {
+    timer.pauseCycle();
 
-    expect(runSubtractor).toHaveBeenCalledTimes(1);
+    expect(clearInterval).toHaveBeenCalledTimes(1);
   });
 
-  test('Gets called when a break starts', () => {
-    timer.startBreak();
+  test('Gets stopped when a cycle is reset', () => {
+    timer.resetCycle();
 
-    expect(runSubtractor).toHaveBeenCalledTimes(1);
+    expect(clearInterval).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gets stopped when a break is skipped', () => {
+    timer.skipBreak();
+
+    expect(clearInterval).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gets stopped when the timer is reset', () => {
+    timer.resetAll();
+
+    expect(clearInterval).toHaveBeenCalledTimes(1);
   });
 });
