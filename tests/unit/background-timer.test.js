@@ -79,3 +79,92 @@ describe('Timeline', () => {
     expect(buildTimeline).toHaveBeenCalledTimes(0);
   });
 });
+
+describe('Subtractor', () => {
+  const subtractSeconds = (seconds) => {
+    let i = 1;
+    while (i <= seconds) {
+      jest.advanceTimersByTime(1000);
+      i += 1;
+    }
+  };
+
+  let timer;
+  let runSubtractor;
+  let postState;
+  beforeAll(() => {
+    timer = new Timer(defaultValues);
+    runSubtractor = jest.spyOn(timer, 'runSubtractor');
+    postState = jest.spyOn(timer, 'postState');
+  });
+  beforeEach(() => {
+    timer.resetAll();
+    runSubtractor.mockClear();
+    postState.mockClear();
+  });
+
+  test('Subtracts 1 second immediately after call', () => {
+    timer.state.time = 10000;
+    timer.runSubtractor();
+    expect(timer.state.time).toBe(9000);
+  });
+
+  test('Subtracts seconds according to time passed', () => {
+    jest.useFakeTimers();
+
+    timer.state.time = 10000;
+    timer.runSubtractor();
+
+    expect(timer.state.time).toBe(9000);
+
+    subtractSeconds(4);
+    expect(timer.state.time).toBe(5000);
+
+    subtractSeconds(5);
+    expect(timer.state.time).toBe(0);
+  });
+
+  test('Posts state 1 time after 1st subtraction', () => {
+    timer.state.time = 1000;
+    timer.runSubtractor();
+
+    // ONLY takes into account the call outside the interval
+    expect(postState).toHaveBeenCalledTimes(1);
+  });
+
+  test('Posts state according to time passed', () => {
+    jest.useFakeTimers();
+
+    const seconds = 10;
+    timer.state.time = seconds * 1000;
+    timer.runSubtractor();
+
+    subtractSeconds(seconds);
+
+    // ALSO takes into account the call outside the interval
+    expect(postState).toHaveBeenCalledTimes(seconds);
+  });
+
+  test('Stops the subtractor when the time is less than 0', () => {
+    jest.useFakeTimers();
+
+    const seconds = 10;
+    timer.state.time = seconds * 1000;
+    timer.runSubtractor();
+
+    subtractSeconds(seconds);
+    expect(clearInterval).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gets called when a cycle starts', () => {
+    timer.startCycle();
+
+    expect(runSubtractor).toHaveBeenCalledTimes(1);
+  });
+
+  test('Gets called when a break starts', () => {
+    timer.startBreak();
+
+    expect(runSubtractor).toHaveBeenCalledTimes(1);
+  });
+});
