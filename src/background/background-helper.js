@@ -195,22 +195,13 @@ class Utilities {
   }
 
   static mapCycle(period) {
-    const map = {
-      0: 1,
-      2: 2,
-      4: 3,
-      6: 4,
-    };
-    return map[period];
+    const cycle = period / 2 + 1;
+    return cycle;
   }
 
   static mapBreak(period) {
-    const map = {
-      1: 1,
-      3: 2,
-      5: 3,
-    };
-    return map[period];
+    const breakVal = period / 2 + 1 / 2;
+    return breakVal;
   }
 }
 
