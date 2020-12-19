@@ -14,7 +14,7 @@ class NotificationInterface {
     this.soundAudio.src = '../audio/metal-mallet.mp3';
 
     chrome.storage.local.get(['notificationSound'], (storage) => {
-      if (storage.soundEnabled !== undefined) {
+      if (storage.notificationSound !== undefined) {
         this.soundEnabled = storage.notificationSound;
       } else {
         this.soundEnabled = true;
@@ -73,6 +73,9 @@ class NotificationInterface {
 
     // Play sound
     // Play before notifications.create to prevent interference
+
+    console.log(`soundEnabled: ${this.soundEnabled}`);
+
     if (this.soundEnabled) {
       this.soundAudio
         .play()
