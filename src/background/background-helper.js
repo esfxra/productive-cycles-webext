@@ -73,9 +73,6 @@ class NotificationInterface {
 
     // Play sound
     // Play before notifications.create to prevent interference
-
-    console.log(`soundEnabled: ${this.soundEnabled}`);
-
     if (this.soundEnabled) {
       this.soundAudio
         .play()
@@ -255,7 +252,7 @@ class Diagnostics {
 |--------------------------------------------------------------------------
 */
 function debug(message) {
-  let devMode = false;
+  let devMode = true;
   if (devMode) {
     console.debug(message);
   }
