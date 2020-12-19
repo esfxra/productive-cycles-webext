@@ -290,7 +290,7 @@ function adjustCycleTracker(period, status, totalPeriods) {
       // Setup cycle node template
       dotNode = document.createElement('span');
       dotNode.id = 'cycle-' + i;
-      dotNode.setAttribute('title', `${cycleTitleString} ${i}`);
+      dotNode.setAttribute('title', `${cycleTitleString} ${i / 2 + 1}`);
       dotNode.classList.add('dot');
 
       if (i === period) {
