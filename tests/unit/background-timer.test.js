@@ -258,3 +258,25 @@ describe('State Operations', () => {
     expect(timer.comms.port.postMessage).toHaveBeenCalledTimes(0);
   });
 });
+
+describe('Comms', () => {
+  let timer;
+  beforeAll(() => {
+    timer = new Timer(defaultValues);
+  });
+
+  test('Port is initialized as closed', () => {
+    expect(timer.comms.portOpen).toBe(false);
+  });
+
+  test('Port and portOpen can be updated properly', () => {
+    const postMessage = jest.fn();
+    const testPort = { postMessage: postMessage };
+
+    timer.updatePort(testPort, true);
+
+    // Using toBe because we want the identity to be the same
+    expect(timer.comms.port).toBe(testPort);
+    expect(timer.comms.portOpen).toBe(true);
+  });
+});
