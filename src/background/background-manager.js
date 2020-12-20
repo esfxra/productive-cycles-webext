@@ -35,7 +35,7 @@ chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.storage.onChanged.addListener(handleStorageChanges);
 chrome.idle.onStateChanged.addListener((state) => {
   debug(`System is '${state}'`);
-  timer.sync();
+  timer.sync(Date.now());
 });
 
 /*
