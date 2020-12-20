@@ -161,7 +161,6 @@ class Timer {
       }
     };
 
-    subtractAndCheck();
     this.subtractor = setInterval(() => {
       subtractAndCheck();
     }, 1000);
@@ -351,7 +350,7 @@ class Timer {
   | Sync
   |--------------------------------------------------------------------------
   */
-  sync() {
+  sync(reference) {
     const { period, status } = this.getState();
     const { totalPeriods, autoStart } = this.getSettings();
 
@@ -359,7 +358,7 @@ class Timer {
 
     if (!(status === 'running' || status === 'break')) {
       debug(`Sync - Timer is ${status}. No corrections made.`);
-      return;
+      return false;
     }
 
     debug('Sync - Correcting timer');
@@ -368,7 +367,7 @@ class Timer {
       this.stopSubtractor();
 
       // Get reference
-      const reference = Date.now();
+      // const reference = Date.now();
 
       // Determine the correct period
       let correctedPeriod = period;
@@ -391,7 +390,7 @@ class Timer {
           status: 'complete',
         });
         this.postState();
-        return;
+        return true;
       }
 
       this.diagnostics.checkRange(correctedPeriod, this.timeline);
@@ -410,9 +409,8 @@ class Timer {
 
       this.postState();
       this.runSubtractor();
-      return;
     } else {
-      const correctedTime = this.timeline[period] - Date.now();
+      const correctedTime = this.timeline[period] - reference;
       if (correctedTime < 0) {
         this.stopSubtractor();
         this.next();
@@ -422,6 +420,7 @@ class Timer {
         });
       }
     }
+    return true;
   }
 
   /*
