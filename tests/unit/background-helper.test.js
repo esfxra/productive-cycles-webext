@@ -71,32 +71,26 @@ describe('Notification Interface', () => {
   });
 });
 
-describe('Utilities', () => {
+describe('Milliseconds Parser', () => {
   test.each([
     [60000, 1],
     [2100000, 35],
     [3600000, 60],
     [5940000, 99],
-  ])(
-    'Can correctly extract minutes from a duration in milliseconds',
-    (ms, min) => {
-      const result = Utilities.msToMin(ms);
-      expect(result).toBe(min);
-    }
-  );
+  ])('Can correctly take the duration %i and extract %i minutes', (ms, min) => {
+    const result = Utilities.msToMin(ms);
+    expect(result).toBe(min);
+  });
 
   test.each([
     [55000, 55],
     [75000, 15],
     [3659000, 59],
     [5940000, 0],
-  ])(
-    'Can correctly extract seconds from a duration in milliseconds',
-    (ms, sec) => {
-      const result = Utilities.msToSec(ms);
-      expect(result).toBe(sec);
-    }
-  );
+  ])('Can correctly take the duration %i and extract %i seconds', (ms, sec) => {
+    const result = Utilities.msToSec(ms);
+    expect(result).toBe(sec);
+  });
 
   test.each([
     [1000, '00:01'],
@@ -108,13 +102,10 @@ describe('Utilities', () => {
     [3600000, '60:00'],
     [3601000, '60:01'],
     [5999000, '99:59'],
-  ])(
-    'Can correctly parse a duration in milliseconds to a string MM:SS',
-    (ms, mmss) => {
-      const result = Utilities.parseMs(ms);
-      expect(result).toBe(mmss);
-    }
-  );
+  ])('Can correctly parse %i to the string %s', (ms, mmss) => {
+    const result = Utilities.parseMs(ms);
+    expect(result).toBe(mmss);
+  });
 });
 
 describe('Period Maps', () => {
@@ -123,7 +114,7 @@ describe('Period Maps', () => {
     [4, 3],
     [12, 7],
     [22, 12],
-  ])('Cycles are mapped correctly', (period, cycle) => {
+  ])('Period %i is mapped correctly to cycle %i', (period, cycle) => {
     const result = Utilities.mapCycle(period);
     expect(result).toBe(cycle);
   });
@@ -133,7 +124,7 @@ describe('Period Maps', () => {
     [5, 3],
     [13, 7],
     [21, 11],
-  ])('Breaks are mapped correctly', (period, breakVal) => {
+  ])('Period %i is mapped correctly to break %i', (period, breakVal) => {
     const result = Utilities.mapBreak(period);
     expect(result).toBe(breakVal);
   });
