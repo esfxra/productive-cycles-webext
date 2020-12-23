@@ -2,12 +2,12 @@
 
 .option-light {
   background-color: #f5f5f5;
-  border-color: #666666;
+  border-color: #282828;
 }
 
 .option-dark {
   background-color: #202124;
-  border-color: #666666;
+  border-color: rgb(129, 65, 247);
 }
 
 .settings-view label {
@@ -16,8 +16,6 @@
 
 input[type='number'] {
   color: #f5f5f5;
-  /* border: 1px solid #282828; */
-  /* border-bottom: 1px solid #f5f5f5; */
   border-color: #282828;
   background-color: #808080;
 }
@@ -27,18 +25,18 @@ input[type='number'] {
   border-color: #f5f5f5;
 }
 
-/* On mouse-over */
 .container:hover input ~ .checkmark {
-  background-color: #f5f5f5;
+  /* background-color: #f5f5f5; */
+  /* border-color: rgb(129, 65, 247); */
 }
 
-/* When the checkbox is checked, add a blue background */
 .container input:checked ~ .checkmark {
   background-color: #808080;
   border-color: #808080;
+  /* background-color: rgb(129, 65, 247);
+  border-color: rgb(129, 65, 247); */
 }
 
-/* Style the checkmark/indicator */
 .container .checkmark:after {
   border: solid #f5f5f5;
 }

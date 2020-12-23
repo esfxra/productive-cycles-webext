@@ -24,30 +24,40 @@ window.addEventListener('DOMContentLoaded', () => {
 const restoreOptions = () => {
   chrome.storage.local.get(
     {
-      notificationSound: true,
+      notificationsEnabled: true,
+      notificationsSound: true,
       minutes: 25,
       break: 5,
       totalCycles: 4,
-      autoStart: true,
+      autoStartCycles: true,
+      autoStartBreaks: true,
     },
     (storage) => {
-      document.querySelector('#notification-sound').checked =
-        storage.notificationSound;
+      // Notifications
+      document.querySelector('#notifications-enabled').checked =
+        storage.notificationsEnabled;
+      document.querySelector('#notifications-sound').checked =
+        storage.notificationsSound;
+
+      // Behavior
+      document.querySelector('#autostart-cycles').checked =
+        storage.autoStartCycles;
+      document.querySelector('#autostart-breaks').checked =
+        storage.autoStartBreaks;
 
       // Timer settings
       document.querySelector('#cycle-minutes').value = storage.minutes;
       document.querySelector('#break-minutes').value = storage.break;
       document.querySelector('#total-cycles').value = storage.totalCycles;
-      document.querySelector('#auto-start').checked = storage.autoStart;
     }
   );
 };
 
 // Register an 'on change' event listener for sound checkmark, and save changes
 const registerSoundCheckmark = () => {
-  const soundCheckmark = document.querySelector('#notification-sound');
+  const soundCheckmark = document.querySelector('#notifications-sound');
   soundCheckmark.addEventListener('change', (e) => {
-    chrome.storage.local.set({ notificationSound: e.target.checked });
+    chrome.storage.local.set({ notificationsSound: e.target.checked });
   });
 };
 
@@ -98,10 +108,10 @@ const registerTimerOptions = () => {
   });
 
   // Auto-start
-  const autoStartCheckmark = document.querySelector('#auto-start');
-  autoStartCheckmark.addEventListener('change', (e) => {
-    chrome.storage.local.set({ autoStart: e.target.checked });
-  });
+  // const autoStartCheckmark = document.querySelector('#auto-start');
+  // autoStartCheckmark.addEventListener('change', (e) => {
+  //   chrome.storage.local.set({ autoStart: e.target.checked });
+  // });
 };
 
 // Load theme and register theme toggles (toggles only in settings page)

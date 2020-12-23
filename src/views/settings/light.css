@@ -2,7 +2,7 @@
 
 .option-light {
   background-color: #f5f5f5;
-  border-color: #d4d4d4;
+  border-color: rgb(129, 65, 247);
 }
 
 .option-dark {
@@ -34,17 +34,17 @@ input[type='number'] {
   border-color: #666666;
 }
 
-/* On mouse-over */
 .container:hover input ~ .checkmark {
-  background-color: #666666;
+  /* background-color: #666666; */
+  /* border-color: rgb(129, 65, 247); */
 }
 
-/* When the checkbox is checked, add a blue background */
 .container input:checked ~ .checkmark {
   background-color: #666666;
+  /* background-color: rgb(129, 65, 247);
+  border-color: rgb(129, 65, 247); */
 }
 
-/* Style the checkmark/indicator */
 .container .checkmark:after {
   border: solid white;
 }

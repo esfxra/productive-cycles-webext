@@ -21,32 +21,59 @@
 
     <div class="settings-view">
       <div class="section-container section-margin">
-        <h1>Theme</h1>
-        <div
-          alt="Light mode toggle"
-          title="Light mode"
-          class="theme-option option-light"
-        ></div>
-        <div
-          alt="Dark mode toggle"
-          title="Dark mode"
-          class="theme-option option-dark"
-        ></div>
+        <h1>Appearance</h1>
+        <div class="theme">
+          <div
+            alt="Light mode toggle"
+            title="Light mode"
+            class="theme-option option-light"
+          ></div>
+          <div
+            alt="Dark mode toggle"
+            title="Dark mode"
+            class="theme-option option-dark"
+          ></div>
+        </div>
       </div>
 
       <div class="section-container section-margin">
         <h1>Notifications</h1>
-        <div class="option">
-          <label for="notification-sounds">Notification ping</label>
+        <div class="option option-margin">
+          <label for="notifications-enabled">Allow notifications</label>
           <label class="container">
-            <input type="checkbox" id="notification-sound" />
+            <input type="checkbox" id="notifications-enabled" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="option">
+          <label for="notifications-sound">Enable sound</label>
+          <label class="container">
+            <input type="checkbox" id="notifications-sound" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+      </div>
+
+      <div class="section-container section-margin">
+        <h1>Behavior</h1>
+        <div class="option option-margin">
+          <label for="autostart-cycles">Auto-start cycles</label>
+          <label class="container">
+            <input type="checkbox" id="autostart-cycles" />
+            <span class="checkmark"></span>
+          </label>
+        </div>
+        <div class="option">
+          <label for="autostart-breaks">Auto-start breaks</label>
+          <label class="container">
+            <input type="checkbox" id="autostart-breaks" />
             <span class="checkmark"></span>
           </label>
         </div>
       </div>
 
       <div class="section-container">
-        <h1>Timer options</h1>
+        <h1>Timer</h1>
 
         <div class="option option-margin">
           <label for="cycle-minutes">Cycle minutes</label>
@@ -70,7 +97,7 @@
           />
         </div>
 
-        <div class="option option-margin">
+        <div class="option">
           <label for="total-cycles">Total cycles</label>
           <input
             type="number"
@@ -79,14 +106,6 @@
             min="1"
             max="12"
           />
-        </div>
-
-        <div class="option">
-          <label for="auto-start">Auto-start</label>
-          <label class="container">
-            <input type="checkbox" id="auto-start" />
-            <span class="checkmark"></span>
-          </label>
         </div>
       </div>
     </div>

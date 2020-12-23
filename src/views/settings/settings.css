@@ -2,13 +2,17 @@
 
 /* Settings View */
 .settings-view {
-  --margin-elements: 15px;
+  --margin-elements: 10px;
 
   font-size: 13px;
 }
 
+.theme {
+  display: flex;
+  flex-direction: row;
+}
+
 .theme-option {
-  display: inline-block;
   cursor: pointer;
   width: 14px;
   height: 14px;
@@ -29,7 +33,7 @@
 .option {
   display: grid;
   align-items: center;
-  grid-template-columns: 110px 40px;
+  grid-template-columns: 120px 40px;
   column-gap: 15px;
 }
 
@@ -106,7 +110,7 @@ input[type='number']:focus {
   border-width: 1px;
   height: 13px;
   width: 13px;
-  margin-left: 1px;
+  margin: 0 auto;
 }
 
 .container input:checked ~ .checkmark {
