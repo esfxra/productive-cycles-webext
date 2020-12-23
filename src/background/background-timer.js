@@ -35,8 +35,8 @@ class Timer {
     this.diagnostics = Diagnostics;
 
     this.dev = {
-      cycleOffset: 0,
-      breakOffset: 0,
+      cycleOffset: 40000,
+      breakOffset: 40000,
     };
 
     this.settings = {
@@ -126,14 +126,15 @@ class Timer {
     let newTimeline = [...this.timeline];
 
     const reference = Date.now();
+    const buffer = 1000; // Considers interval in between
 
     for (let i = period; i < totalPeriods; i += 1) {
       if (i === period) {
         newTimeline[i] = reference + time;
       } else if (i % 2 === 0) {
-        newTimeline[i] = newTimeline[i - 1] + cycleTime;
+        newTimeline[i] = newTimeline[i - 1] + cycleTime + buffer;
       } else if (i % 2 !== 0) {
-        newTimeline[i] = newTimeline[i - 1] + breakTime;
+        newTimeline[i] = newTimeline[i - 1] + breakTime + buffer;
       }
     }
 
@@ -152,9 +153,11 @@ class Timer {
       this.setState({ time: newTime });
 
       if (newTime >= 0) {
+        console.log(`Posting: ${newTime}`);
         this.postState();
         return;
       } else {
+        console.log(`Not Posting: ${newTime}`);
         this.stopSubtractor();
         this.next();
         return;
@@ -215,6 +218,8 @@ class Timer {
     }
 
     this.setState({ status: 'running' });
+    debug(`Posting: ${this.state.time}`);
+    this.postState();
 
     this.runSubtractor();
   }
@@ -238,6 +243,8 @@ class Timer {
     debug('Start Break');
 
     this.setState({ status: 'break' });
+    debug(`Posting: ${this.state.time}`);
+    this.postState();
 
     this.runSubtractor();
   }
@@ -350,77 +357,83 @@ class Timer {
   | Sync
   |--------------------------------------------------------------------------
   */
-  sync(reference) {
-    const { period, status } = this.getState();
-    const { totalPeriods, autoStart } = this.getSettings();
+  determineAdjustments(reference) {
+    const { period } = this.getState();
+    const { autoStart, totalPeriods } = this.getSettings();
 
-    debug('Sync');
+    let adjustedPeriod;
+    let adjustedStatus;
+    let adjustedTime;
 
-    if (!(status === 'running' || status === 'break')) {
-      debug(`Sync - Timer is ${status}. No corrections made.`);
-      return false;
-    }
-
-    debug('Sync - Correcting timer');
-    if (autoStart) {
-      // Stop the subtractor
-      this.stopSubtractor();
-
-      // Get reference
-      // const reference = Date.now();
-
-      // Determine the correct period
-      let correctedPeriod = period;
+    if (!autoStart) {
+      adjustedPeriod = period;
+      adjustedStatus = adjustedPeriod % 2 === 0 ? 'running' : 'break';
+      adjustedTime = this.timeline[period] - reference;
+    } else {
+      // Determine period adjustment
+      adjustedPeriod = period;
       for (let i = period; i < totalPeriods; i += 1) {
         const target = this.timeline[i];
         if (reference > target) {
-          correctedPeriod = i + 1;
+          adjustedPeriod = i + 1;
         } else {
           break;
         }
       }
 
-      // Handle 'complete' case
-      if (correctedPeriod === totalPeriods) {
-        this.diagnostics.checkRange(correctedPeriod, this.timeline);
+      // Determine status adjustment
+      adjustedStatus = adjustedPeriod % 2 === 0 ? 'running' : 'break';
 
-        this.setState({
-          period: correctedPeriod,
-          time: 0,
-          status: 'complete',
-        });
-        this.postState();
-        return true;
-      }
+      // Determine time adjustment
+      adjustedTime = this.timeline[adjustedPeriod] - reference;
+    }
 
-      this.diagnostics.checkRange(correctedPeriod, this.timeline);
+    return {
+      period: adjustedPeriod,
+      status: adjustedStatus,
+      time: adjustedTime,
+    };
+  }
 
-      // Handle other cases
-      const correctedState = correctedPeriod % 2 === 0 ? 'running' : 'break';
-      // Determine the correct time
-      const correctedTime = this.timeline[correctedPeriod] - reference;
+  applyAdjustments(adjustments) {
+    const { period } = this.getState();
+    const { autoStart } = this.getSettings();
 
-      // Set the timer to the corrected values
-      this.setState({
-        period: correctedPeriod,
-        time: correctedTime,
-        status: correctedState,
-      });
-
+    const applyAndRestart = () => {
+      this.setState(adjustments);
+      debug(`Posting ${this.state.time}`);
       this.postState();
       this.runSubtractor();
-    } else {
-      const correctedTime = this.timeline[period] - reference;
-      if (correctedTime < 0) {
-        this.stopSubtractor();
+    };
+
+    if (!autoStart) {
+      if (adjustments.time < 0) {
         this.next();
       } else {
-        this.setState({
-          time: correctedTime,
-        });
+        applyAndRestart();
       }
+    } else {
+      applyAndRestart();
     }
-    return true;
+  }
+
+  sync(reference) {
+    this.stopSubtractor();
+
+    // Determine the adjustments needed
+    let adjustments = this.determineAdjustments(reference);
+
+    // Make sure the time has been adjusted to the nearest second
+    const remaining = adjustments.time;
+    const surplus = remaining - Math.floor(remaining / 1000) * 1000;
+    adjustments.time = remaining - surplus;
+
+    debug(adjustments);
+    debug(`Surplus: ${surplus}`);
+
+    setTimeout(() => {
+      this.applyAdjustments(adjustments);
+    }, surplus);
   }
 
   /*

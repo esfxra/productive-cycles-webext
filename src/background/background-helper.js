@@ -93,13 +93,11 @@ class NotificationInterface {
   }
 
   clear(period) {
-    debug(`Clearing notification for period: ${period}`);
     const clearID = `${this.idTemplate}-${period}`;
     chrome.notifications.clear(clearID);
   }
 
   clearAll(periods) {
-    debug('Clearing all notifications');
     let i = 0;
     while (i < periods) {
       this.clear(i);
@@ -215,7 +213,7 @@ class Diagnostics {
     debug('Diagnostics - compareTargets');
 
     debug(`Diagnostics - Running diagnostics on period: ${period}`);
-    let targetTime = timeline[period];
+    let targetTime = timeline[period] + 1000; // Runs one second after period is actually over
     const testTime = Date.now();
 
     if (testTime > targetTime) {

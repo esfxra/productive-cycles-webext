@@ -34,7 +34,13 @@ chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.storage.onChanged.addListener(handleStorageChanges);
 chrome.idle.onStateChanged.addListener((state) => {
-  debug(`System is '${state}'`);
+  const { status } = timer.getState();
+  if (!(status === 'running' || status === 'break')) {
+    debug(`State ${state} - Timer status is ${status}. No need to sync.`);
+    return;
+  }
+
+  debug(`State ${state} - Timer status is ${status}. Making adjustments.`);
   timer.sync(Date.now());
 });
 

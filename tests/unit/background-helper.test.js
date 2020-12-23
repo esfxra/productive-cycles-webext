@@ -3,7 +3,7 @@ import {
   Utilities,
 } from '../../src/background/background-helper.js';
 
-describe('Notification Interface', () => {
+describe.skip('Notification Interface', () => {
   // Important: Improve these tests in the future using pattern matching
   // Add a test for send() that tests the sound check, and whether it is played or not
 
@@ -71,7 +71,7 @@ describe('Notification Interface', () => {
   });
 });
 
-describe('Milliseconds Parser', () => {
+describe.skip('Milliseconds Parser', () => {
   test.each([
     [60000, 1],
     [2100000, 35],
@@ -108,7 +108,7 @@ describe('Milliseconds Parser', () => {
   });
 });
 
-describe('Period Maps', () => {
+describe.skip('Period Maps', () => {
   test.each([
     [0, 1],
     [4, 3],
