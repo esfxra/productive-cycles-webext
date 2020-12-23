@@ -11,7 +11,7 @@ class NotificationInterface {
     this.idTemplate = 'notification-for-period';
 
     this.soundAudio = new Audio();
-    this.soundAudio.src = '../audio/metal-mallet.mp3';
+    this.soundAudio.src = '../assets/audio/metal-mallet.mp3';
 
     chrome.storage.local.get(['notificationSound'], (storage) => {
       if (storage.notificationSound !== undefined) {
@@ -86,7 +86,7 @@ class NotificationInterface {
     // Post notification to web browser
     chrome.notifications.create(id, {
       type: 'basic',
-      iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
+      iconUrl: chrome.runtime.getURL('assets/icons/icon-128.png'),
       title: title,
       message: message,
     });
