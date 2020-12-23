@@ -1,10 +1,14 @@
 @import '../common-styles.css';
 
+.section-container {
+  padding: 14px 12px;
+}
+
 .timer-view {
   --margin-elements: 25px;
   --margin-elements-shorter: 18px;
 
-  width: 142px;
+  width: 140px;
 }
 
 .time-container {
