@@ -1,23 +1,28 @@
 'use strict';
 
-import { debug } from './background-helper.js';
-import { Timer } from './background-timer.js';
+import { Timer } from './Timer.js';
 
 // Defaults
 const defaultValues = {
-  cycleMinutes: 25,
-  breakMinutes: 5,
+  cycleMinutes: 1,
+  breakMinutes: 1,
   totalCycles: 4,
-  autoStart: true,
+  autoStart: {
+    cycles: true,
+    breaks: true,
+  },
 };
 
-let port = 0;
-let popUpOpen = false;
+let comms = {
+  port: null,
+  open: false,
+};
+
 let update = false;
 
 // Initialiaze timer
 const timer = new Timer(defaultValues);
-timer.init();
+// timer.init();
 
 /*
 |--------------------------------------------------------------------------
@@ -34,14 +39,16 @@ chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.storage.onChanged.addListener(handleStorageChanges);
 chrome.idle.onStateChanged.addListener((state) => {
-  const { status } = timer.getState();
-  if (!(status === 'running' || status === 'break')) {
-    debug(`State ${state} - Timer status is ${status}. No need to sync.`);
+  const status = timer.period.status;
+  if (!(status === 'running')) {
+    console.log(`State ${state} - Timer status is ${status}. No need to sync.`);
     return;
   }
-
-  debug(`State ${state} - Timer status is ${status}. Making adjustments.`);
-  timer.sync(Date.now());
+  console.log(
+    `State ${state} - Timer status is ${status}. Making adjustments.`
+  );
+  const reference = Date.now();
+  timer.sync(reference);
 });
 
 /*
@@ -58,16 +65,12 @@ function handleOnInstalled(details) {
 }
 
 function runInstall() {
-  debug('Install');
-  debug('---------------');
   // Initialize storage
   // Set update flag to true
   update = true;
 }
 
 function runUpdate() {
-  debug('Update');
-  debug('---------------');
   // Upgrade storage
   // Storage.upgrade()
   // Set update flag to true
@@ -80,27 +83,20 @@ function runUpdate() {
 |--------------------------------------------------------------------------
 */
 function handleOnConnect(portFromPopUp) {
-  debug('On Connect - Port connected');
-  debug('---------------');
-  port = portFromPopUp;
-  port.onDisconnect.addListener(handleOnDisconnect);
-  port.onMessage.addListener(handleMessage);
+  comms.port = portFromPopUp;
+  comms.port.onDisconnect.addListener(handleOnDisconnect);
+  comms.port.onMessage.addListener(handleMessage);
+  comms.open = true;
 
-  popUpOpen = true;
-
-  timer.updatePort(port, popUpOpen);
+  timer.updateComms(comms.port, comms.open);
 }
 
 function handleOnDisconnect() {
-  debug('On Disconnect - Port disconnected');
-  debug('---------------');
-  popUpOpen = false;
-  timer.updatePort(port, popUpOpen);
+  comms.open = false;
+  timer.updateComms(comms.port, comms.open);
 }
 
 function handleMessage(message) {
-  debug(`Handle Message - Message received: ${message.command}`);
-  debug('---------------');
   if (message.command === 'preload' && update === true) {
     // Disable flag until next update
     update = false;
@@ -108,7 +104,7 @@ function handleMessage(message) {
     // Communicate with PopUp to open update view
     let message = timer.formatState();
     message.update = true;
-    port.postMessage(message);
+    comms.port.postMessage(message);
   } else {
     /*
     |--------------------------------------------------------------------------
@@ -125,16 +121,16 @@ function handleMessage(message) {
     */
     switch (message.command) {
       case 'start':
-        timer.startCycle();
+        timer.start();
         break;
       case 'pause':
-        timer.pauseCycle();
+        timer.pause();
         break;
       case 'skip':
-        timer.skipBreak();
+        timer.skip();
         break;
       case 'reset-cycle':
-        timer.resetCycle();
+        timer.reset();
         break;
       case 'reset-all':
         timer.resetAll();
@@ -150,7 +146,7 @@ function handleStorageChanges(changes, namespace) {
   let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
-    debug(
+    console.log(
       `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
     );
 

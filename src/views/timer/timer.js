@@ -65,7 +65,7 @@ function handleMessage(message) {
 
   if (state.changed) {
     // UI changes for control buttons and time styles - Based on status
-    adjustControlAndTime(state.status);
+    adjustControlAndTime(state.period, state.status);
 
     // Tracker
     adjustCycleTracker(state.period, state.status, message.totalPeriods);
@@ -147,49 +147,99 @@ function updateTime(newTime) {
   time.textContent = newTime;
 }
 
-function adjustControlAndTime(status) {
+function adjustControlAndTime(period, status) {
   switch (status) {
     case 'initial': {
-      // Remove 'break' styles
-      const time = document.querySelector('.time-container');
-      if (time.classList.contains('break')) {
-        time.classList.remove('break');
-      }
+      const setupCycle = () => {
+        // Remove 'break' styles
+        const time = document.querySelector('.time-container');
+        if (time.classList.contains('break')) {
+          time.classList.remove('break');
+        }
 
-      // Adjust .control spacing to 'space-between'
-      const control = document.querySelector('.control');
-      control.style.justifyContent = 'space-between';
+        // Adjust .control spacing to 'space-between'
+        const control = document.querySelector('.control');
+        control.style.justifyContent = 'space-between';
 
-      // Hide necessary elements
-      hideElement('#skip');
-      hideElement('#pause');
+        // Hide necessary elements
+        hideElement('#skip');
+        hideElement('#pause');
 
-      // Show necessary elements
-      showElement('#start');
-      showElement('#reset-cycle');
-      showElement('#reset-all');
+        // Show necessary elements
+        showElement('#start');
+        showElement('#reset-cycle');
+        showElement('#reset-all');
+      };
+      const setupBreak = () => {
+        // Add 'break' styles
+        const time = document.querySelector('.time-container');
+        if (!time.classList.contains('break')) {
+          time.classList.add('break');
+        }
+
+        // Adjust .control spacing to 'center'
+        const control = document.querySelector('.control');
+        control.style.justifyContent = 'center';
+
+        // Hide necessary elements
+        hideElement('#pause');
+        hideElement('#skip');
+        hideElement('#reset-cycle');
+        hideElement('#reset-all');
+
+        // Show necessary elements
+        showElement('#start');
+        // showElement('#skip');
+      };
+
+      period % 2 === 0 ? setupCycle() : setupBreak();
       return;
     }
 
     case 'running': {
-      // Remove 'break' styles
-      const time = document.querySelector('.time-container');
-      if (time.classList.contains('break')) {
-        time.classList.remove('break');
-      }
+      const setupCycle = () => {
+        // Remove 'break' styles
+        const time = document.querySelector('.time-container');
+        if (time.classList.contains('break')) {
+          time.classList.remove('break');
+        }
 
-      // Adjust .control spacing to 'space-between'
-      const control = document.querySelector('.control');
-      control.style.justifyContent = 'space-between';
+        // Adjust .control spacing to 'space-between'
+        const control = document.querySelector('.control');
+        control.style.justifyContent = 'space-between';
 
-      // Hide necessary elements
-      hideElement('#skip');
-      hideElement('#start');
+        // Hide necessary elements
+        hideElement('#skip');
+        hideElement('#start');
 
-      // Show necessary elements
-      showElement('#pause');
-      showElement('#reset-cycle');
-      showElement('#reset-all');
+        // Show necessary elements
+        showElement('#pause');
+        showElement('#reset-cycle');
+        showElement('#reset-all');
+      };
+      const setupBreak = () => {
+        // Add 'break' styles
+        const time = document.querySelector('.time-container');
+        if (!time.classList.contains('break')) {
+          time.classList.add('break');
+        }
+
+        // Adjust .control spacing to 'center'
+        const control = document.querySelector('.control');
+        control.style.justifyContent = 'center';
+
+        // Hide necessary elements
+        hideElement('#start');
+        hideElement('#pause');
+        hideElement('#skip');
+        hideElement('#reset-cycle');
+        hideElement('#reset-all');
+
+        // Show necessary elements
+        showElement('#skip');
+      };
+
+      period % 2 === 0 ? setupCycle() : setupBreak();
       return;
     }
     case 'paused': {

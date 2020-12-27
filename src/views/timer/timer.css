@@ -33,7 +33,8 @@
   position: relative;
   width: 100%;
   top: -2px;
-  margin-bottom: calc(var(--margin-elements) + 2px);
+  /* margin-bottom: calc(var(--margin-elements) + 2px); */
+  margin-bottom: var(--margin-elements);
 }
 
 .control-button {
