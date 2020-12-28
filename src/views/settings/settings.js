@@ -117,7 +117,7 @@ const registerTimerOptions = () => {
       return;
     } else {
       cycleMinutes.classList.remove('input-error-outline');
-      chrome.storage.local.set({ minutes: value });
+      chrome.storage.local.set({ cycleMinutes: value });
       return;
     }
   });
@@ -132,7 +132,7 @@ const registerTimerOptions = () => {
       return;
     } else {
       breakMinutes.classList.remove('input-error-outline');
-      chrome.storage.local.set({ break: value });
+      chrome.storage.local.set({ breakMinutes: value });
       return;
     }
   });
