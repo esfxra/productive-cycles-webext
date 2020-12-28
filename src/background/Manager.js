@@ -65,16 +65,42 @@ function handleOnInstalled(details) {
 }
 
 function runInstall() {
-  // Initialize storage
   // Set update flag to true
   update = true;
+
+  const newSettings = {
+    theme: 'light',
+    notificationsEnabled: true,
+    notificationsSound: true,
+    autoStartCycles: true,
+    autoStartBreaks: true,
+    cycleMinutes: 25,
+    breakMinutes: 5,
+    totalCycles: 4,
+  };
+
+  // Initialize storage
+  chrome.storage.local.set(newSettings);
 }
 
 function runUpdate() {
-  // Upgrade storage
-  // Storage.upgrade()
   // Set update flag to true
   update = true;
+
+  const newSettings = {
+    theme: 'light',
+    notificationsEnabled: true,
+    notificationsSound: true,
+    autoStartCycles: true,
+    autoStartBreaks: true,
+    cycleMinutes: 25,
+    breakMinutes: 5,
+    totalCycles: 4,
+  };
+
+  // Upgrade storage
+  chrome.storage.local.clear();
+  chrome.storage.local.set(newSettings);
 }
 
 /*
@@ -143,7 +169,6 @@ function handleMessage(message) {
 }
 
 function handleStorageChanges(changes, namespace) {
-  let settingsChanged = false;
   for (let key in changes) {
     let storageChange = changes[key];
     console.log(
@@ -152,37 +177,22 @@ function handleStorageChanges(changes, namespace) {
 
     // Update Settings
     switch (key) {
-      case 'minutes':
-        timer.settings.cycleTime =
-          storageChange.newValue * 60000 - timer.dev.cycleOffset;
-        settingsChanged = true;
+      case 'notificationsEnabled':
         break;
-      case 'break':
-        timer.settings.breakTime =
-          storageChange.newValue * 60000 - timer.dev.breakOffset;
-        settingsChanged = true;
+      case 'notificationsSound':
+        break;
+      case 'autoStartCycles':
+        break;
+      case 'autoStartBreaks':
+        break;
+      case 'cycleMinutes':
+        timer.settings.cycleTime = storageChange.newValue * 60000;
+        break;
+      case 'breakMinutes':
+        timer.settings.breakTime = storageChange.newValue * 60000;
         break;
       case 'totalCycles':
-        timer.settings.totalCycles = storageChange.newValue;
-        timer.settings.totalBreaks = storageChange.newValue - 1;
-        settingsChanged = true;
-        break;
-      case 'autoStart':
-        timer.settings.autoStart = storageChange.newValue;
-        settingsChanged = true;
-        break;
-      // Different behavior for notification settings - Timer is not reset
-      case 'notificationSound':
-        timer.notifications.soundEnabled = storageChange.newValue;
         break;
     }
-  }
-  if (settingsChanged) {
-    // Clear the subtractor
-    timer.stopSubtractor();
-
-    // Set runtime properties to defaults
-    // The resetAll() function will clear notifications too
-    timer.resetAll();
   }
 }

@@ -11,7 +11,9 @@ window.addEventListener('DOMContentLoaded', () => {
   // Register listeners for menu
   registerNavigation('settings');
 
-  registerSoundCheckmark();
+  registerNotificationCheckmarks();
+
+  registerBehaviorCheckmarks();
 
   registerTimerOptions();
 
@@ -26,11 +28,11 @@ const restoreOptions = () => {
     {
       notificationsEnabled: true,
       notificationsSound: true,
-      minutes: 25,
-      break: 5,
-      totalCycles: 4,
       autoStartCycles: true,
       autoStartBreaks: true,
+      cycleMinutes: 25,
+      breakMinutes: 5,
+      totalCycles: 4,
     },
     (storage) => {
       // Notifications
@@ -46,18 +48,61 @@ const restoreOptions = () => {
         storage.autoStartBreaks;
 
       // Timer settings
-      document.querySelector('#cycle-minutes').value = storage.minutes;
-      document.querySelector('#break-minutes').value = storage.break;
+      document.querySelector('#cycle-minutes').value = storage.cycleMinutes;
+      document.querySelector('#break-minutes').value = storage.breakMinutes;
       document.querySelector('#total-cycles').value = storage.totalCycles;
     }
   );
 };
 
+const registerThemeToggles = () => {
+  let stylesheet = document.querySelector('#theme');
+
+  // Theme toggle (light / dark)
+  const light = document.querySelector('.option-light');
+  const dark = document.querySelector('.option-dark');
+  light.addEventListener('click', () => {
+    if (!stylesheet.href.includes('light')) {
+      stylesheet.href = 'light.css';
+
+      chrome.storage.local.set({
+        theme: 'light',
+      });
+    }
+  });
+  dark.addEventListener('click', () => {
+    if (!stylesheet.href.includes('dark')) {
+      stylesheet.href = 'dark.css';
+
+      chrome.storage.local.set({
+        theme: 'dark',
+      });
+    }
+  });
+};
+
 // Register an 'on change' event listener for sound checkmark, and save changes
-const registerSoundCheckmark = () => {
-  const soundCheckmark = document.querySelector('#notifications-sound');
-  soundCheckmark.addEventListener('change', (e) => {
+const registerNotificationCheckmarks = () => {
+  const notificationsEnabled = document.querySelector('#notifications-enabled');
+  notificationsEnabled.addEventListener('change', (e) => {
+    chrome.storage.local.set({ notificationsEnabled: e.target.checked });
+  });
+
+  const notificationsSound = document.querySelector('#notifications-sound');
+  notificationsSound.addEventListener('change', (e) => {
     chrome.storage.local.set({ notificationsSound: e.target.checked });
+  });
+};
+
+const registerBehaviorCheckmarks = () => {
+  const autoStartCycles = document.querySelector('#autostart-cycles');
+  autoStartCycles.addEventListener('change', (e) => {
+    chrome.storage.local.set({ autoStartCycles: e.target.checked });
+  });
+
+  const autoStartBreaks = document.querySelector('#autostart-breaks');
+  autoStartBreaks.addEventListener('change', (e) => {
+    chrome.storage.local.set({ autoStartBreaks: e.target.checked });
   });
 };
 
@@ -104,39 +149,6 @@ const registerTimerOptions = () => {
       totalCycles.classList.remove('input-error-outline');
       chrome.storage.local.set({ totalCycles: value });
       return;
-    }
-  });
-
-  // Auto-start
-  // const autoStartCheckmark = document.querySelector('#auto-start');
-  // autoStartCheckmark.addEventListener('change', (e) => {
-  //   chrome.storage.local.set({ autoStart: e.target.checked });
-  // });
-};
-
-// Load theme and register theme toggles (toggles only in settings page)
-const registerThemeToggles = () => {
-  let stylesheet = document.querySelector('#theme');
-
-  // Theme toggle (light / dark)
-  const light = document.querySelector('.option-light');
-  const dark = document.querySelector('.option-dark');
-  light.addEventListener('click', () => {
-    if (!stylesheet.href.includes('light')) {
-      stylesheet.href = 'light.css';
-
-      chrome.storage.local.set({
-        theme: 'light',
-      });
-    }
-  });
-  dark.addEventListener('click', () => {
-    if (!stylesheet.href.includes('dark')) {
-      stylesheet.href = 'dark.css';
-
-      chrome.storage.local.set({
-        theme: 'dark',
-      });
     }
   });
 };
