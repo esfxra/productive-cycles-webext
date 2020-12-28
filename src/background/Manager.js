@@ -2,15 +2,15 @@
 
 import { Timer } from './Timer.js';
 
-// Defaults
-const defaultValues = {
-  cycleMinutes: 1,
-  breakMinutes: 1,
+const defaultSettings = {
+  theme: 'light',
+  notificationsEnabled: true,
+  notificationsSound: true,
+  autoStartCycles: true,
+  autoStartBreaks: true,
+  cycleMinutes: 25,
+  breakMinutes: 5,
   totalCycles: 4,
-  autoStart: {
-    cycles: true,
-    breaks: true,
-  },
 };
 
 let comms = {
@@ -21,8 +21,8 @@ let comms = {
 let update = false;
 
 // Initialiaze timer
-const timer = new Timer(defaultValues);
-// timer.init();
+const timer = new Timer();
+timer.init();
 
 /*
 |--------------------------------------------------------------------------
@@ -67,40 +67,16 @@ function handleOnInstalled(details) {
 function runInstall() {
   // Set update flag to true
   update = true;
-
-  const newSettings = {
-    theme: 'light',
-    notificationsEnabled: true,
-    notificationsSound: true,
-    autoStartCycles: true,
-    autoStartBreaks: true,
-    cycleMinutes: 25,
-    breakMinutes: 5,
-    totalCycles: 4,
-  };
-
   // Initialize storage
-  chrome.storage.local.set(newSettings);
+  chrome.storage.local.set(defaultSettings);
 }
 
 function runUpdate() {
   // Set update flag to true
   update = true;
-
-  const newSettings = {
-    theme: 'light',
-    notificationsEnabled: true,
-    notificationsSound: true,
-    autoStartCycles: true,
-    autoStartBreaks: true,
-    cycleMinutes: 25,
-    breakMinutes: 5,
-    totalCycles: 4,
-  };
-
   // Upgrade storage
   chrome.storage.local.clear();
-  chrome.storage.local.set(newSettings);
+  chrome.storage.local.set(defaultSettings);
 }
 
 /*

@@ -3,16 +3,15 @@
 import { Utilities } from './Utilities.js';
 
 class Timer {
-  constructor(settings) {
-    const { totalCycles, cycleMinutes, breakMinutes, autoStart } = settings;
+  constructor() {
     this.settings = {
-      totalPeriods: totalCycles * 2 - 1,
-      cycleTime: cycleMinutes * 60000,
-      breakTime: breakMinutes * 60000,
       autoStart: {
-        cycles: autoStart.cycles,
-        breaks: autoStart.breaks,
+        cycles: true,
+        breaks: true,
       },
+      cycleTime: 0,
+      breakTime: 0,
+      totalPeriods: 0,
     };
 
     this.comms = {
@@ -21,7 +20,7 @@ class Timer {
     };
 
     this.current = 0;
-    this.timeline = Utilities.buildTimeline(this.settings);
+    this.timeline = [];
     this.subtractor = 0;
   }
 
@@ -31,6 +30,12 @@ class Timer {
 
   get isLast() {
     return this.current === this.settings.totalPeriods - 1;
+  }
+
+  async init() {
+    const settings = await Utilities.getStoredSettings();
+    this.settings = settings;
+    this.timeline = Utilities.buildTimeline(this.settings);
   }
 
   start() {

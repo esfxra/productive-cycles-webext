@@ -3,6 +3,32 @@
 import { Cycle, Break } from './Period.js';
 
 class Utilities {
+  static getStoredSettings() {
+    return new Promise((resolve) => {
+      chrome.storage.local.get(
+        [
+          'autoStartCycles',
+          'autoStartBreaks',
+          'cycleMinutes',
+          'breakMinutes',
+          'totalCycles',
+        ],
+        (storage) => {
+          const settings = {
+            autoStart: {
+              cycles: storage.autoStartCycles,
+              breaks: storage.autoStartBreaks,
+            },
+            cycleTime: storage.cycleMinutes * 60000,
+            breakTime: storage.breakMinutes * 60000,
+            totalPeriods: storage.totalCycles * 2 - 1,
+          };
+          resolve(settings);
+        }
+      );
+    });
+  }
+
   static buildTimeline(settings) {
     const { totalPeriods, cycleTime, breakTime } = { ...settings };
 
