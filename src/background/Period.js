@@ -1,15 +1,15 @@
 'use strict';
 
 class Period {
-  constructor(id, remaining, target) {
+  constructor(id, duration) {
     this.id = id;
-    this.remaining = remaining;
-    this.target = target;
+    this.duration = duration;
+
+    this.remaining = duration;
+    this.target = 0;
 
     this.status = 'initial';
     this.enabled = false;
-
-    this.duration = remaining;
   }
 
   get isCycle() {
@@ -40,14 +40,6 @@ class Period {
     this.status = 'initial';
     this.remaining = this.duration;
   }
-
-  enable() {
-    this.enabled = true;
-  }
-
-  disable() {
-    this.enabled = false;
-  }
 }
 
 class Cycle extends Period {
@@ -58,6 +50,10 @@ class Cycle extends Period {
   pause() {
     this.status = 'paused';
   }
+
+  autoStart(autoStart) {
+    this.enabled = autoStart.cycles;
+  }
 }
 
 class Break extends Period {
@@ -67,6 +63,10 @@ class Break extends Period {
 
   skip() {
     this.end();
+  }
+
+  autoStart(autoStart) {
+    this.enabled = autoStart.breaks;
   }
 }
 

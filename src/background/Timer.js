@@ -1,5 +1,6 @@
 'use strict';
 
+import { Timeline } from './Timeline.js';
 import { Utilities } from './Utilities.js';
 
 class Timer {
@@ -19,105 +20,100 @@ class Timer {
       open: false,
     };
 
-    this.current = 0;
-    this.timeline = [];
+    this.periods = new Timeline();
     this.subtractor = 0;
-  }
-
-  get period() {
-    return this.timeline[this.current];
-  }
-
-  get isLast() {
-    return this.current === this.settings.totalPeriods - 1;
   }
 
   init(settings) {
     this.settings = settings;
-    this.timeline = Utilities.buildTimeline(this.settings);
+    this.periods.build(this.settings);
+  }
+
+  updateCycleTime(time) {
+    this.settings.cycleTime = time;
+    this.periods.update(Date.now(), this.settings);
+  }
+
+  updateBreakTime(time) {
+    this.settings.breakTime = time;
+    this.periods.update(Date.now(), this.settings);
   }
 
   start() {
-    this.timeline = Utilities.updateTimeline(
-      this.current,
-      this.timeline,
-      Date.now(),
-      this.settings
-    );
-
-    this.period.start();
+    this.periods.update(Date.now(), this.settings);
+    this.periods.current.start();
     this.runSubtractor();
     this.postState();
   }
 
   end() {
     this.stopSubtractor();
-    console.log(
-      `Diagnostic - Difference is ${Date.now() - this.period.target - 1000}`
-    );
-    this.period.end();
-    if (this.isLast) this.postState();
+    // console.log(
+    //   `Diagnostic - Difference is ${Date.now() - this.period.target - 1000}`
+    // );
+    this.periods.current.end();
+    if (this.periods.isLast) this.postState();
     else this.next();
   }
 
   pause() {
     this.stopSubtractor();
-    this.period.pause();
+    this.periods.current.pause();
     this.postState();
   }
 
   skip() {
     this.stopSubtractor();
-    this.period.skip();
+    this.periods.current.skip();
     this.next();
   }
 
   reset() {
     this.stopSubtractor();
-    if (this.period.status === 'initial' && this.current > 0) {
+    if (this.periods.current.status === 'initial' && this.periods.index > 0) {
       [1, 2].forEach(() => {
-        this.current -= 1;
-        this.period.reset();
+        this.periods.index -= 1;
+        this.periods.current.reset();
       });
     } else {
-      this.period.reset();
+      this.periods.current.reset();
     }
     this.postState();
   }
 
   resetAll() {
     this.stopSubtractor();
-    this.timeline.forEach((period) => period.reset());
-    this.current = 0;
+    this.periods.timeline.forEach((period) => period.reset());
+    this.periods.index = 0;
     this.postState();
   }
 
   next() {
-    this.current += 1;
-    if (this.period.enabled) this.start();
+    this.periods.index += 1;
+    if (this.periods.current.enabled) this.start();
     else this.postState();
   }
 
   sync(reference) {
     this.stopSubtractor();
 
-    if (this.period.actual < 0) {
+    if (this.periods.current.actual < 0) {
       const period = Utilities.determinePeriod(
-        this.current,
-        this.timeline,
+        this.periods.index,
+        this.periods.timeline,
         reference
       );
 
-      this.current = period;
+      this.periods.index = period;
 
-      if (this.period.actual < 0) {
+      if (this.periods.current.actual < 0) {
         this.end();
       } else {
-        const surplus = this.period.adjust;
+        const surplus = this.periods.current.adjust;
         setTimeout(() => this.start(), surplus);
       }
     } else {
-      const surplus = this.period.adjust;
+      const surplus = this.periods.current.adjust;
       setTimeout(() => {
         this.postState();
         this.runSubtractor();
@@ -127,8 +123,8 @@ class Timer {
 
   runSubtractor() {
     this.subtractor = setInterval(() => {
-      this.period.remaining -= 1000;
-      if (this.period.remaining < 0) {
+      this.periods.current.remaining -= 1000;
+      if (this.periods.current.remaining < 0) {
         this.end();
       } else {
         this.postState();
@@ -153,9 +149,9 @@ class Timer {
 
   formatState() {
     return {
-      period: this.period.id,
-      time: Utilities.parseMs(this.period.remaining),
-      status: this.period.status,
+      period: this.periods.current.id,
+      time: Utilities.parseMs(this.periods.current.remaining),
+      status: this.periods.current.status,
       totalPeriods: this.settings.totalPeriods,
     };
   }

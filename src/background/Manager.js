@@ -23,9 +23,12 @@ let update = false;
 
 // Initialiaze timer
 const timer = new Timer();
-Utilities.getStoredSettings().then((settings) => {
-  timer.init(settings);
-});
+// Delay to prevent conflict with install and update events
+setTimeout(() => {
+  Utilities.getStoredSettings().then((settings) => {
+    timer.init(settings);
+  });
+}, 200);
 
 /*
 |--------------------------------------------------------------------------
@@ -42,7 +45,7 @@ chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.storage.onChanged.addListener(handleStorageChanges);
 chrome.idle.onStateChanged.addListener((state) => {
-  const status = timer.period.status;
+  const status = timer.periods.current.status;
   if (!(status === 'running')) {
     console.log(`State ${state} - Timer status is ${status}. No need to sync.`);
     return;
@@ -170,10 +173,10 @@ function handleStorageChanges(changes, namespace) {
       case 'autoStartBreaks':
         break;
       case 'cycleMinutes':
-        timer.adjustCycleTime(storageChange.newValue * 60000);
+        timer.updateCycleTime(storageChange.newValue * 60000);
         break;
       case 'breakMinutes':
-        timer.adjustBreakTime(storageChange.newValue * 60000);
+        timer.updateBreakTime(storageChange.newValue * 60000);
         break;
       case 'totalCycles':
         // timer.adjustTotalPeriods(storageChange.newValue * 2 - 1);

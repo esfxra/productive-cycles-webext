@@ -29,50 +29,6 @@ class Utilities {
     });
   }
 
-  static buildTimeline(settings) {
-    const { totalPeriods, cycleTime, breakTime } = { ...settings };
-
-    let timeline = [totalPeriods];
-    for (let i = 0; i < totalPeriods; i += 1) {
-      if (i % 2 === 0) {
-        timeline[i] = new Cycle(i, cycleTime, 0);
-      } else {
-        timeline[i] = new Break(i, breakTime, 0);
-      }
-    }
-    return [...timeline];
-  }
-
-  static updateTimeline(current, timeline, reference, settings) {
-    const { totalPeriods, cycleTime, breakTime, autoStart } = { ...settings };
-    const buffer = 1000;
-
-    let newTimeline = [...timeline];
-    for (let i = current; i < totalPeriods; i += 1) {
-      const period = newTimeline[i];
-
-      if (i === current) {
-        // Current period
-        period.target = reference + period.remaining;
-        period.enable();
-      } else {
-        // Consecutive periods
-        const previousPeriod = timeline[i - 1];
-        const offset = period.isCycle ? cycleTime + buffer : breakTime + buffer;
-        period.target = previousPeriod.target + offset;
-
-        // Enable or disable per autoStart settings
-        if (previousPeriod.enabled) {
-          period.enabled = period.isCycle ? autoStart.cycles : autoStart.breaks;
-        } else {
-          period.disable();
-        }
-      }
-    }
-
-    return [...newTimeline];
-  }
-
   static determinePeriod(current, timeline, reference) {
     let period = current;
     for (let i = period; i < timeline.length - 1; i += 1) {
