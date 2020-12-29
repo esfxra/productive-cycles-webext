@@ -1,6 +1,7 @@
 'use strict';
 
 import { Timer } from './Timer.js';
+import { Utilities } from './Utilities.js';
 
 const defaultSettings = {
   theme: 'light',
@@ -22,7 +23,9 @@ let update = false;
 
 // Initialiaze timer
 const timer = new Timer();
-timer.init();
+Utilities.getStoredSettings().then((settings) => {
+  timer.init(settings);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -147,9 +150,14 @@ function handleMessage(message) {
 function handleStorageChanges(changes, namespace) {
   for (let key in changes) {
     let storageChange = changes[key];
-    console.log(
-      `Key '${key}' in '${namespace} changed\nOld value: '${storageChange.oldValue}', New value: '${storageChange.newValue}'`
-    );
+    const oldValue = storageChange.oldValue;
+    const newValue = storageChange.newValue;
+
+    if (oldValue === undefined || newValue === undefined) return;
+
+    console.log(`Key '${key}' in '${namespace}' changed
+    \nOld value: '${oldValue}'
+    \nNew value: '${newValue}'`);
 
     // Update Settings
     switch (key) {
@@ -162,12 +170,13 @@ function handleStorageChanges(changes, namespace) {
       case 'autoStartBreaks':
         break;
       case 'cycleMinutes':
-        timer.settings.cycleTime = storageChange.newValue * 60000;
+        timer.adjustCycleTime(storageChange.newValue * 60000);
         break;
       case 'breakMinutes':
-        timer.settings.breakTime = storageChange.newValue * 60000;
+        timer.adjustBreakTime(storageChange.newValue * 60000);
         break;
       case 'totalCycles':
+        // timer.adjustTotalPeriods(storageChange.newValue * 2 - 1);
         break;
     }
   }

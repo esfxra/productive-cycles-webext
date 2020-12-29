@@ -32,8 +32,7 @@ class Timer {
     return this.current === this.settings.totalPeriods - 1;
   }
 
-  async init() {
-    const settings = await Utilities.getStoredSettings();
+  init(settings) {
     this.settings = settings;
     this.timeline = Utilities.buildTimeline(this.settings);
   }
