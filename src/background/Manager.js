@@ -169,14 +169,16 @@ function handleStorageChanges(changes, namespace) {
       case 'notificationsSound':
         break;
       case 'autoStartCycles':
+        timer.updateAutoStart({ cycles: storageChange.newValue });
         break;
       case 'autoStartBreaks':
+        timer.updateAutoStart({ breaks: storageChange.newValue });
         break;
       case 'cycleMinutes':
-        timer.updateCycleTime(storageChange.newValue * 60000);
+        timer.updateTime({ cycleTime: storageChange.newValue * 60000 });
         break;
       case 'breakMinutes':
-        timer.updateBreakTime(storageChange.newValue * 60000);
+        timer.updateTime({ breakTime: storageChange.newValue * 60000 });
         break;
       case 'totalCycles':
         // timer.adjustTotalPeriods(storageChange.newValue * 2 - 1);

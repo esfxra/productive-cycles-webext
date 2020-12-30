@@ -29,18 +29,29 @@ class Timer {
     this.periods.build(this.settings);
   }
 
-  updateCycleTime(time) {
-    this.settings.cycleTime = time;
+  updateTime(time) {
+    this.settings = { ...this.settings, ...time };
+
+    // const updates = { time: true, targets: true, autoStart: false };
     this.periods.update(Date.now(), this.settings);
   }
 
-  updateBreakTime(time) {
-    this.settings.breakTime = time;
+  // updateTotalPeriods(periods) {
+  //   const updates = { time: true, targets: true, autoStart: true };
+  //   this.periods.update(Date.now(), this.settings, updates);
+  // }
+
+  updateAutoStart(autoStart) {
+    this.settings.autoStart = { ...this.settings.autoStart, ...autoStart };
+
+    // const updates = { time: false, targets: false, autoStart: true };
     this.periods.update(Date.now(), this.settings);
   }
 
   start() {
+    // const updates = { time: false, targets: true, autoStart: true };
     this.periods.update(Date.now(), this.settings);
+
     this.periods.current.start();
     this.runSubtractor();
     this.postState();
