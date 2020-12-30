@@ -62,9 +62,6 @@ class Timer {
 
   end() {
     this.stopSubtractor();
-    // console.log(
-    //   `Diagnostic - Difference is ${Date.now() - this.period.target - 1000}`
-    // );
     this.periods.current.end();
     if (this.periods.isLast) this.postState();
     else this.next();
@@ -87,17 +84,17 @@ class Timer {
     if (this.periods.current.status === 'initial' && this.periods.index > 0) {
       [1, 2].forEach(() => {
         this.periods.index -= 1;
-        this.periods.current.reset();
+        this.periods.current.reset(this.settings);
       });
     } else {
-      this.periods.current.reset();
+      this.periods.current.reset(this.settings);
     }
     this.postState();
   }
 
   resetAll() {
     this.stopSubtractor();
-    this.periods.timeline.forEach((period) => period.reset());
+    this.periods.timeline.forEach((period) => period.reset(this.settings));
     this.periods.index = 0;
     this.postState();
   }

@@ -35,16 +35,17 @@ class Period {
   end() {
     this.status = 'complete';
   }
-
-  reset() {
-    this.status = 'initial';
-    this.remaining = this.duration;
-  }
 }
 
 class Cycle extends Period {
   constructor(id, remaining, target) {
     super(id, remaining, target);
+  }
+
+  reset(settings) {
+    this.status = 'initial';
+    this.duration = settings.cycleTime;
+    this.remaining = settings.cycleTime;
   }
 
   pause() {
@@ -59,6 +60,12 @@ class Cycle extends Period {
 class Break extends Period {
   constructor(id, remaining, target) {
     super(id, remaining, target);
+  }
+
+  reset(settings) {
+    this.status = 'initial';
+    this.duration = settings.breakTime;
+    this.remaining = settings.breakTime;
   }
 
   skip() {
