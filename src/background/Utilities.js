@@ -1,7 +1,5 @@
 'use strict';
 
-import { Cycle, Break } from './Period.js';
-
 class Utilities {
   static getStoredSettings() {
     return new Promise((resolve) => {

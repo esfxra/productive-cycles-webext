@@ -29,23 +29,26 @@ class Timer {
     this.periods.build(this.settings);
   }
 
+  updateAutoStart(autoStart) {
+    this.settings.autoStart = { ...this.settings.autoStart, ...autoStart };
+    // const updates = { time: false, targets: false, autoStart: true };
+    this.periods.update(Date.now(), this.settings);
+  }
+
   updateTime(time) {
     this.settings = { ...this.settings, ...time };
-
     // const updates = { time: true, targets: true, autoStart: false };
     this.periods.update(Date.now(), this.settings);
   }
 
-  // updateTotalPeriods(periods) {
-  //   const updates = { time: true, targets: true, autoStart: true };
-  //   this.periods.update(Date.now(), this.settings, updates);
-  // }
+  updateTotalPeriods(totalPeriods) {
+    this.settings.totalPeriods = totalPeriods;
 
-  updateAutoStart(autoStart) {
-    this.settings.autoStart = { ...this.settings.autoStart, ...autoStart };
-
-    // const updates = { time: false, targets: false, autoStart: true };
-    this.periods.update(Date.now(), this.settings);
+    if (totalPeriods < this.periods.timeline.length) {
+      this.periods.shorten(this.settings);
+    } else if (totalPeriods > this.periods.timeline.length) {
+      this.periods.lengthen(this.settings);
+    }
   }
 
   start() {

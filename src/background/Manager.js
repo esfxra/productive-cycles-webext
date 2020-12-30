@@ -181,7 +181,7 @@ function handleStorageChanges(changes, namespace) {
         timer.updateTime({ breakTime: storageChange.newValue * 60000 });
         break;
       case 'totalCycles':
-        // timer.adjustTotalPeriods(storageChange.newValue * 2 - 1);
+        timer.updateTotalPeriods(storageChange.newValue * 2 - 1);
         break;
     }
   }
