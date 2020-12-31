@@ -55,16 +55,16 @@ class Timeline {
     }
   }
 
-  update(reference, settings) {
+  update(updates, reference, settings) {
     const { cycleTime, breakTime, autoStart } = { ...settings };
     const updated = [...this.timeline];
 
     for (let i = this.index; i < updated.length; i += 1) {
       const current = updated[i];
       const previous = updated[i - 1];
-      this.updateTime(current, cycleTime, breakTime);
-      this.udpateTarget(current, previous, reference);
-      this.updateEnabled(current, previous, autoStart);
+      if (updates.time) this.updateTime(current, cycleTime, breakTime);
+      if (updates.targets) this.udpateTarget(current, previous, reference);
+      if (updates.autoStart) this.updateEnabled(current, previous, autoStart);
     }
 
     this.timeline = [...updated];

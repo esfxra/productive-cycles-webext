@@ -31,14 +31,14 @@ class Timer {
 
   updateAutoStart(autoStart) {
     this.settings.autoStart = { ...this.settings.autoStart, ...autoStart };
-    // const updates = { time: false, targets: false, autoStart: true };
-    this.periods.update(Date.now(), this.settings);
+    const updates = { time: false, targets: true, autoStart: true };
+    this.periods.update(updates, Date.now(), this.settings);
   }
 
   updateTime(time) {
     this.settings = { ...this.settings, ...time };
-    // const updates = { time: true, targets: true, autoStart: false };
-    this.periods.update(Date.now(), this.settings);
+    const updates = { time: true, targets: true, autoStart: false };
+    this.periods.update(updates, Date.now(), this.settings);
   }
 
   updateTotalPeriods(totalPeriods) {
@@ -52,8 +52,8 @@ class Timer {
   }
 
   start() {
-    // const updates = { time: false, targets: true, autoStart: true };
-    this.periods.update(Date.now(), this.settings);
+    const updates = { time: false, targets: true, autoStart: true };
+    this.periods.update(updates, Date.now(), this.settings);
 
     this.periods.current.start();
     this.runSubtractor();
@@ -115,13 +115,14 @@ class Timer {
         reference
       );
 
+      // Mark previous periods as complete
       this.periods.index = period;
 
       if (this.periods.current.actual < 0) {
         this.end();
       } else {
         const surplus = this.periods.current.adjust;
-        setTimeout(() => this.start(), surplus);
+        setTimeout(() => this.start(), surplus); // It has already been determined whether it is enabled or not
       }
     } else {
       const surplus = this.periods.current.adjust;

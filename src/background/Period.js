@@ -38,8 +38,8 @@ class Period {
 }
 
 class Cycle extends Period {
-  constructor(id, remaining, target) {
-    super(id, remaining, target);
+  constructor(id, remaining) {
+    super(id, remaining);
   }
 
   reset(settings) {
@@ -58,8 +58,8 @@ class Cycle extends Period {
 }
 
 class Break extends Period {
-  constructor(id, remaining, target) {
-    super(id, remaining, target);
+  constructor(id, remaining) {
+    super(id, remaining);
   }
 
   reset(settings) {
