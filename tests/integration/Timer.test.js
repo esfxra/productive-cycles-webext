@@ -20,18 +20,18 @@ describe('Autostart behavior', () => {
       timer.start();
       jest.advanceTimersByTime(timer.settings.cycleTime);
 
-      expect(timer.period.id).toBe(0);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(0);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Cycle ends after 1 additional second, and break does not start', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('initial');
-      expect(timer.period.remaining).toBe(timer.settings.breakTime);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('initial');
+      expect(timer.periods.current.remaining).toBe(timer.settings.breakTime);
     });
 
     test('No changes occur after more time passes since next break is disabled', () => {
@@ -39,9 +39,9 @@ describe('Autostart behavior', () => {
 
       jest.advanceTimersByTime(5000);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('initial');
-      expect(timer.period.remaining).toBe(timer.settings.breakTime);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('initial');
+      expect(timer.periods.current.remaining).toBe(timer.settings.breakTime);
     });
 
     test('Break is started manually, runs for break time, ends after 1 additional second', () => {
@@ -49,15 +49,15 @@ describe('Autostart behavior', () => {
       timer.start();
       jest.advanceTimersByTime(timer.settings.breakTime);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
 
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(2);
-      expect(timer.period.status).toBe('initial');
-      expect(timer.period.remaining).toBe(timer.settings.cycleTime);
+      expect(timer.periods.current.id).toBe(2);
+      expect(timer.periods.current.status).toBe('initial');
+      expect(timer.periods.current.remaining).toBe(timer.settings.cycleTime);
     });
   });
 
@@ -78,36 +78,36 @@ describe('Autostart behavior', () => {
       timer.start();
       jest.advanceTimersByTime(timer.settings.cycleTime);
 
-      expect(timer.period.id).toBe(0);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(0);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Cycle ends after 1 additional second, and break is automatically started', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(timer.settings.breakTime);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(timer.settings.breakTime);
     });
 
     test('Break runs for break time', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(timer.settings.breakTime);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Break ends after 1 additional second, and cycle does not start', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(2);
-      expect(timer.period.status).toBe('initial');
-      expect(timer.period.remaining).toBe(timer.settings.cycleTime);
+      expect(timer.periods.current.id).toBe(2);
+      expect(timer.periods.current.status).toBe('initial');
+      expect(timer.periods.current.remaining).toBe(timer.settings.cycleTime);
     });
   });
 
@@ -128,18 +128,18 @@ describe('Autostart behavior', () => {
       timer.start();
       jest.advanceTimersByTime(timer.settings.cycleTime);
 
-      expect(timer.period.id).toBe(0);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(0);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Cycle ends after 1 additional second, and break does not start', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('initial');
-      expect(timer.period.remaining).toBe(timer.settings.breakTime);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('initial');
+      expect(timer.periods.current.remaining).toBe(timer.settings.breakTime);
     });
 
     test('Break is started manually, runs for break time', () => {
@@ -147,18 +147,18 @@ describe('Autostart behavior', () => {
       timer.start();
       jest.advanceTimersByTime(timer.settings.breakTime);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Break ends after 1 additional second, and cycle is automatically started', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(2);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(timer.settings.cycleTime);
+      expect(timer.periods.current.id).toBe(2);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(timer.settings.cycleTime);
     });
   });
 
@@ -179,36 +179,36 @@ describe('Autostart behavior', () => {
       timer.start();
       jest.advanceTimersByTime(timer.settings.cycleTime);
 
-      expect(timer.period.id).toBe(0);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(0);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Cycle ends after 1 additional second, and break is automatically started', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(timer.settings.breakTime);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(timer.settings.breakTime);
     });
 
     test('Break runs for break time', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(timer.settings.breakTime);
 
-      expect(timer.period.id).toBe(1);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(0);
+      expect(timer.periods.current.id).toBe(1);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(0);
     });
 
     test('Break ends after 1 additional second, and cycle is automatically started', () => {
       jest.useFakeTimers();
       jest.advanceTimersByTime(1000);
 
-      expect(timer.period.id).toBe(2);
-      expect(timer.period.status).toBe('running');
-      expect(timer.period.remaining).toBe(timer.settings.cycleTime);
+      expect(timer.periods.current.id).toBe(2);
+      expect(timer.periods.current.status).toBe('running');
+      expect(timer.periods.current.remaining).toBe(timer.settings.cycleTime);
     });
   });
 });
