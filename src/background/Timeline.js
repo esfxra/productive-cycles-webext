@@ -27,7 +27,7 @@ class Timeline {
     }
 
     this.timeline = [...timeline];
-    this.log();
+    // this.log();
   }
 
   updateTime(current, cycleTime, breakTime) {
@@ -37,7 +37,7 @@ class Timeline {
     }
   }
 
-  udpateTarget(current, previous, reference) {
+  updateTarget(current, previous, reference) {
     if (current.id === this.index) {
       current.target = current.remaining + reference;
     } else {
@@ -63,12 +63,12 @@ class Timeline {
       const current = updated[i];
       const previous = updated[i - 1];
       if (updates.time) this.updateTime(current, cycleTime, breakTime);
-      if (updates.targets) this.udpateTarget(current, previous, reference);
+      if (updates.targets) this.updateTarget(current, previous, reference);
       if (updates.autoStart) this.updateEnabled(current, previous, autoStart);
     }
 
     this.timeline = [...updated];
-    this.log();
+    // this.log();
   }
 
   shorten(settings) {
@@ -79,7 +79,7 @@ class Timeline {
     if (this.index > updated.length - 1) this.index = updated.length - 1;
 
     this.timeline = [...updated];
-    this.log();
+    // this.log();
   }
 
   lengthen(settings) {
@@ -90,7 +90,7 @@ class Timeline {
       if (i % 2 === 0) updated[i] = new Cycle(i, cycleTime);
       else updated[i] = new Break(i, breakTime);
 
-      this.udpateTarget(updated[i], updated[i - 1], Date.now());
+      this.updateTarget(updated[i], updated[i - 1], Date.now());
       this.updateEnabled(updated[i], updated[i - 1], autoStart);
     }
 
@@ -107,7 +107,7 @@ class Timeline {
       }
     }
 
-    this.log();
+    // this.log();
   }
 
   log() {
