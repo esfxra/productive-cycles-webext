@@ -1,6 +1,7 @@
 'use strict';
 
 import { Timer } from './Timer.js';
+import { Adjuster } from './Adjuster.js';
 import { Utilities } from './Utilities.js';
 
 const defaultSettings = {
@@ -54,7 +55,7 @@ chrome.idle.onStateChanged.addListener((state) => {
     `State ${state} - Timer status is ${status}. Making adjustments.`
   );
   const reference = Date.now();
-  timer.sync(reference);
+  Adjuster.adjust(timer, reference);
 });
 
 /*

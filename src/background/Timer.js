@@ -105,34 +105,6 @@ class Timer {
     else this.postState();
   }
 
-  sync(reference) {
-    this.stopSubtractor();
-
-    if (this.periods.current.actual < 0) {
-      const period = Utilities.determinePeriod(
-        this.periods.index,
-        this.periods.timeline,
-        reference
-      );
-
-      // Mark previous periods as complete
-      this.periods.index = period;
-
-      if (this.periods.current.actual < 0) {
-        this.end();
-      } else {
-        const surplus = this.periods.current.adjust;
-        setTimeout(() => this.start(), surplus); // It has already been determined whether it is enabled or not
-      }
-    } else {
-      const surplus = this.periods.current.adjust;
-      setTimeout(() => {
-        this.postState();
-        this.runSubtractor();
-      }, surplus);
-    }
-  }
-
   runSubtractor() {
     this.subtractor = setInterval(() => {
       this.periods.current.remaining -= 1000;

@@ -16,24 +16,25 @@ class Period {
     return this.id % 2 === 0;
   }
 
-  get actual() {
-    return this.target - Date.now();
-  }
-
-  get adjust() {
-    const actual = this.actual;
-    const surplus = actual - Math.floor(actual / 1000) * 1000;
-    this.remaining = actual - surplus;
-
-    return surplus;
-  }
-
   start() {
     this.status = 'running';
   }
 
   end() {
     this.status = 'complete';
+    this.remaining = 0;
+  }
+
+  actual(reference) {
+    return this.target - reference;
+  }
+
+  adjust(reference) {
+    const actual = this.actual(reference);
+    const surplus = actual - Math.floor(actual / 1000) * 1000;
+    this.remaining = actual - surplus;
+
+    return surplus;
   }
 }
 
