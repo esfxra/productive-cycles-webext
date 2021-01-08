@@ -10,7 +10,7 @@ describe('Cycles', () => {
   });
 
   describe('Instantiation', () => {
-    test('New cycle gets instantiated correctly', () => {
+    test('Instantiates a new cycle', () => {
       expect(cycle.id).toBe(0);
       expect(cycle.duration).toBe(1000);
       expect(cycle.remaining).toBe(1000);
@@ -18,29 +18,29 @@ describe('Cycles', () => {
   });
 
   describe('Status setters', () => {
-    test('Can start', () => {
+    test('Starts', () => {
       cycle.start();
       expect(cycle.status).toBe('running');
     });
 
-    test('Can be paused', () => {
+    test('Pauses', () => {
       cycle.pause();
       expect(cycle.status).toBe('paused');
     });
 
-    test('Can be reset', () => {
+    test('Resets', () => {
       cycle.reset({ cycleTime: 1000 });
       expect(cycle.status).toBe('initial');
     });
 
-    test('Can end', () => {
+    test('Ends', () => {
       cycle.end();
       expect(cycle.status).toBe('complete');
     });
   });
 
   describe('Autostart setter', () => {
-    test('Properly updates enabled with autostart break setting', () => {
+    test('Updates enabled with autostart cycle setting', () => {
       cycle.enabled = false;
       cycle.autoStart({ cycles: true, breaks: false });
 
@@ -49,22 +49,25 @@ describe('Cycles', () => {
   });
 
   describe('Getters', () => {
-    test('Is this period a cycle?', () => {
+    test('Confirms this period is a cycle', () => {
       expect(cycle.isCycle).toBe(true);
     });
 
-    test('Actual time is calculated properly', () => {
+    test('Calculates actual time with reference', () => {
+      const reference = Date.now();
       const offset = 1000;
-      cycle.target = Date.now() + offset;
-      expect(cycle.actual).toBe(offset);
+      cycle.target = reference + offset;
+
+      expect(cycle.actual(reference)).toBe(offset);
     });
 
-    test('Actual time is used to adjust remaining to the nearest whole second (Math.floor)', () => {
+    test('Adjusts remaining by rounding down actual time', () => {
+      const reference = Date.now();
       const surplus = 300;
       const offset = 1000 + surplus;
+      cycle.target = reference + offset;
 
-      cycle.target = Date.now() + offset;
-      const result = cycle.adjust;
+      const result = cycle.adjust(reference);
 
       expect(cycle.remaining).toBe(offset - surplus);
       expect(result).toBe(surplus);
@@ -80,7 +83,7 @@ describe('Breaks', () => {
   });
 
   describe('Instantiation', () => {
-    test('New break gets instantiated correctly', () => {
+    test('Instantiates a new break', () => {
       expect(_break.id).toBe(1);
       expect(_break.duration).toBe(1000);
       expect(_break.remaining).toBe(1000);
@@ -88,29 +91,29 @@ describe('Breaks', () => {
   });
 
   describe('Status setters', () => {
-    test('Can start', () => {
+    test('Starts', () => {
       _break.start();
       expect(_break.status).toBe('running');
     });
 
-    test('Can be skipped', () => {
+    test('Skips', () => {
       _break.skip();
       expect(_break.status).toBe('complete');
     });
 
-    test('Can be reset', () => {
+    test('Resets', () => {
       _break.reset({ breakTime: 1000 });
       expect(_break.status).toBe('initial');
     });
 
-    test('Can end', () => {
+    test('Ends', () => {
       _break.end();
       expect(_break.status).toBe('complete');
     });
   });
 
   describe('Autostart setter', () => {
-    test('Properly updates enabled with autostart break setting', () => {
+    test('Updates enabled with autostart break setting', () => {
       _break.enabled = false;
       _break.autoStart({ cycles: false, breaks: true });
 
@@ -119,22 +122,25 @@ describe('Breaks', () => {
   });
 
   describe('Getters', () => {
-    test('Is this period not a cycle?', () => {
+    test('Confirms this period is not a cycle', () => {
       expect(_break.isCycle).toBe(false);
     });
 
-    test('Actual time is calculated properly', () => {
+    test('Calculates actual time with reference', () => {
+      const reference = Date.now();
       const offset = 1000;
-      _break.target = Date.now() + offset;
-      expect(_break.actual).toBe(offset);
+      _break.target = reference + offset;
+
+      expect(_break.actual(reference)).toBe(offset);
     });
 
-    test('Actual time is used to adjust remaining to the nearest whole second (Math.floor)', () => {
+    test('Adjusts remaining by rounding down actual time', () => {
+      const reference = Date.now();
       const surplus = 300;
       const offset = 1000 + surplus;
+      _break.target = reference + offset;
 
-      _break.target = Date.now() + offset;
-      const result = _break.adjust;
+      const result = _break.adjust(reference);
 
       expect(_break.remaining).toBe(offset - surplus);
       expect(result).toBe(surplus);
