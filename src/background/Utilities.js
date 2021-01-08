@@ -27,19 +27,6 @@ class Utilities {
     });
   }
 
-  static determinePeriod(current, timeline, reference) {
-    let period = current;
-    for (let i = period; i < timeline.length - 1; i += 1) {
-      const target = timeline[i].target;
-      const nextIsEnabled = timeline[i + 1].enabled;
-
-      if (reference > target && nextIsEnabled) {
-        period = i + 1;
-      } else break;
-    }
-    return period;
-  }
-
   static msToMin(ms) {
     let minutes = Math.floor((ms % (1000 * 60 * 60)) / (1000 * 60));
     if (ms >= 60 * 60000) {
