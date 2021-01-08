@@ -3,7 +3,7 @@
 import { Timer } from '../../src/background/Timer';
 
 describe('Autostart behavior', () => {
-  describe('{Cycles: false, Breaks: false}', () => {
+  describe('{ cycles: false, breaks: false }', () => {
     let timer;
     beforeAll(() => {
       timer = new Timer();
@@ -61,7 +61,7 @@ describe('Autostart behavior', () => {
     });
   });
 
-  describe('{Cycles: false, Breaks: true}', () => {
+  describe('{ cycles: false, breaks: true }', () => {
     let timer;
     beforeAll(() => {
       timer = new Timer();
@@ -111,7 +111,7 @@ describe('Autostart behavior', () => {
     });
   });
 
-  describe('{Cycles: true, Breaks: false}', () => {
+  describe('{ cycles: true, breaks: false }', () => {
     let timer;
     beforeAll(() => {
       timer = new Timer();
@@ -162,7 +162,7 @@ describe('Autostart behavior', () => {
     });
   });
 
-  describe('{Cycles: true, Breaks: true}', () => {
+  describe('{ cycles: true, breaks: true }', () => {
     let timer;
     beforeAll(() => {
       timer = new Timer();
