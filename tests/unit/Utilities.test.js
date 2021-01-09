@@ -38,3 +38,25 @@ describe('Time Parser', () => {
     expect(result).toBe(mmss);
   });
 });
+
+describe('Period Mapper', () => {
+  test.each([
+    [0, 1],
+    [4, 3],
+    [12, 7],
+    [22, 12],
+  ])('Maps period %i to cycle %i', (period, cycle) => {
+    const result = Utilities.mapCycle(period);
+    expect(result).toBe(cycle);
+  });
+
+  test.each([
+    [1, 1],
+    [5, 3],
+    [13, 7],
+    [21, 11],
+  ])('Maps period %i to break %i', (period, breakVal) => {
+    const result = Utilities.mapBreak(period);
+    expect(result).toBe(breakVal);
+  });
+});

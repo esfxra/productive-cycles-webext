@@ -28,6 +28,7 @@ class Timer {
   init(settings) {
     this.settings = settings;
     this.periods.build(this.settings);
+    Notifications.clearAll(this.settings.totalPeriods);
   }
 
   updateAutoStart(autoStart) {
@@ -87,6 +88,7 @@ class Timer {
       [1, 2].forEach(() => {
         this.periods.index -= 1;
         this.periods.current.reset(this.settings);
+        Notifications.clear(this.periods.index);
       });
     } else {
       this.periods.current.reset(this.settings);
@@ -99,6 +101,7 @@ class Timer {
     this.periods.timeline.forEach((period) => period.reset(this.settings));
     this.periods.index = 0;
     this.postState();
+    Notifications.clearAll(this.settings.totalPeriods);
   }
 
   next() {
@@ -147,7 +150,7 @@ class Timer {
     if (this.periods.isLast) type = 'complete';
     else type = this.periods.current.isCycle ? 'cycle' : 'break';
 
-    Notifications.send(this.periods.current.id, type);
+    Notifications.send(this.periods.current.id, this.settings.breakTime, type);
   }
 }
 

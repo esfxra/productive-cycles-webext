@@ -52,6 +52,14 @@ class Utilities {
 
     return `${minutes}:${seconds}`;
   }
+
+  static mapCycle(period) {
+    return period / 2 + 1;
+  }
+
+  static mapBreak(period) {
+    return period / 2 + 1 / 2;
+  }
 }
 
 export { Utilities };

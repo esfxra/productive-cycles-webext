@@ -10,6 +10,7 @@ describe('Notifications API', () => {
 
     expect(notification.title).toMatch(/Cycle/);
   });
+
   test('Builds a notification for completed breaks', () => {
     const period = 1;
 
@@ -17,6 +18,7 @@ describe('Notifications API', () => {
 
     expect(notification.title).toMatch(/Break/);
   });
+
   test('Builds a notification for a completed timer', () => {
     const period = 6;
 
@@ -24,5 +26,6 @@ describe('Notifications API', () => {
 
     expect(notification.title).toMatch(/complete/);
   });
+
   test.skip('Builds a notification that reminds the user to check the timer', () => {});
 });
