@@ -63,7 +63,7 @@ class Notifications {
   static publish(notification) {
     chrome.notifications.create(notification.id, {
       type: 'basic',
-      iconUrl: chrome.runtime.getURL('icons/icon-128.png'),
+      iconUrl: chrome.runtime.getURL('../assets/icons/icon-128.png'),
       title: notification.title,
       message: notification.message,
     });
