@@ -51,8 +51,7 @@ class Notifications {
   }
 
   static playSound() {
-    const sound = new Audio();
-    sound.src = '../assets/audio/metal-mallet.mp3';
+    const sound = document.querySelector('#notifications');
 
     sound
       .play()
