@@ -5,27 +5,28 @@ import { Notifications } from '../../src/background/Notifications';
 describe('Notifications API', () => {
   test('Builds a notification for completed cycles', () => {
     const period = 0;
+    const breakTime = 1000;
 
-    const notification = Notifications.build(period, 'cycle');
+    const notification = Notifications.build(period, breakTime, 'cycle');
 
     expect(notification.title).toMatch(/Cycle/);
   });
 
   test('Builds a notification for completed breaks', () => {
     const period = 1;
+    const breakTime = 1000;
 
-    const notification = Notifications.build(period, 'break');
+    const notification = Notifications.build(period, breakTime, 'break');
 
     expect(notification.title).toMatch(/Break/);
   });
 
   test('Builds a notification for a completed timer', () => {
     const period = 6;
+    const breakTime = 1000;
 
-    const notification = Notifications.build(period, 'complete');
+    const notification = Notifications.build(period, breakTime, 'complete');
 
     expect(notification.title).toMatch(/complete/);
   });
-
-  test.skip('Builds a notification that reminds the user to check the timer', () => {});
 });
