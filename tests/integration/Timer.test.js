@@ -13,6 +13,7 @@ describe('Autostart behavior', () => {
         breakTime: 5 * 60000,
         totalPeriods: 7,
       });
+      timer.notify = jest.fn();
     });
 
     test('Cycle is started, runs for cycle time', () => {
@@ -71,6 +72,7 @@ describe('Autostart behavior', () => {
         breakTime: 5 * 60000,
         totalPeriods: 7,
       });
+      timer.notify = jest.fn();
     });
 
     test('Cycle is started, runs for cycle time', () => {
@@ -121,6 +123,7 @@ describe('Autostart behavior', () => {
         breakTime: 5 * 60000,
         totalPeriods: 7,
       });
+      timer.notify = jest.fn();
     });
 
     test('Cycle is started, runs for cycle time', () => {
@@ -172,6 +175,7 @@ describe('Autostart behavior', () => {
         breakTime: 5 * 60000,
         totalPeriods: 7,
       });
+      timer.notify = jest.fn();
     });
 
     test('Cycle is started, runs for cycle time', () => {

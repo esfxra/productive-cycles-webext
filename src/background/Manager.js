@@ -165,10 +165,10 @@ function handleStorageChanges(changes, namespace) {
 
     // Update Settings
     switch (key) {
-      case 'notificationsEnabled':
-        break;
-      case 'notificationsSound':
-        break;
+      // case 'notificationsEnabled':
+      //   break;
+      // case 'notificationsSound':
+      //   break;
       case 'autoStartCycles':
         timer.updateAutoStart({ cycles: storageChange.newValue });
         break;

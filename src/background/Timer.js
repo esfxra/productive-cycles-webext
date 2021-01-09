@@ -1,6 +1,7 @@
 'use strict';
 
 import { Timeline } from './Timeline.js';
+import { Notifications } from './Notifications.js';
 import { Utilities } from './Utilities.js';
 
 class Timer {
@@ -63,6 +64,7 @@ class Timer {
   end() {
     this.stopSubtractor();
     this.periods.current.end();
+    this.notify();
     if (this.periods.isLast) this.postState();
     else this.next();
   }
@@ -138,6 +140,14 @@ class Timer {
       status: this.periods.current.status,
       totalPeriods: this.settings.totalPeriods,
     };
+  }
+
+  notify() {
+    let type = '';
+    if (this.periods.isLast) type = 'complete';
+    else type = this.periods.current.isCycle ? 'cycle' : 'break';
+
+    Notifications.send(this.periods.current.id, type);
   }
 }
 

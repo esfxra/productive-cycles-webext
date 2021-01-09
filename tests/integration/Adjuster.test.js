@@ -14,6 +14,7 @@ describe('Adjuster', () => {
   beforeEach(() => {
     timer = new Timer();
     timer.init(settings);
+    timer.notify = jest.fn();
   });
 
   describe('When the target for the current period has not passed yet', () => {
