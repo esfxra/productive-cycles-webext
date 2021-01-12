@@ -27,7 +27,7 @@ describe('Timeline', () => {
 
   describe('Time updates', () => {
     test.each([[0], [2], [4], [6]])(
-      'Cycle %i can be updated if it has not been started yet',
+      'Duration and remaining time for Cycle %i can be updated if it has not been started yet',
       (index) => {
         const period = periods.timeline[index];
 
@@ -43,7 +43,7 @@ describe('Timeline', () => {
     );
 
     test.each([[1], [3], [5]])(
-      'Break %i can be updated if it has not been started yet',
+      'Duration and remaining time for Break %i can be updated if it has not been started yet',
       (index) => {
         const period = periods.timeline[index];
 
@@ -80,7 +80,7 @@ describe('Timeline', () => {
   });
 
   describe('Target updates', () => {
-    test('The current index period updates the target based on time remaining', () => {
+    test('The target for the current period gets updated based on time remaining', () => {
       periods.index = 5;
       const period = periods.current;
       const previous = periods.timeline[periods.index - 1];

@@ -151,7 +151,7 @@ function handleMessage(message) {
   }
 }
 
-function handleStorageChanges(changes, namespace) {
+function handleStorageChanges(changes) {
   for (let key in changes) {
     let storageChange = changes[key];
     const oldValue = storageChange.oldValue;
@@ -159,16 +159,8 @@ function handleStorageChanges(changes, namespace) {
 
     if (oldValue === undefined || newValue === undefined) return;
 
-    console.log(`Key '${key}' in '${namespace}' changed
-    \nOld value: '${oldValue}'
-    \nNew value: '${newValue}'`);
-
     // Update Settings
     switch (key) {
-      // case 'notificationsEnabled':
-      //   break;
-      // case 'notificationsSound':
-      //   break;
       case 'autoStartCycles':
         timer.updateAutoStart({ cycles: storageChange.newValue });
         break;
