@@ -79,6 +79,7 @@ class Timer {
   skip() {
     this.stopSubtractor();
     this.periods.current.skip();
+    this.notify();
     this.next();
   }
 
