@@ -4,8 +4,9 @@
 .updates-view {
   --margin-elements: 16px;
 
-  width: 225px;
+  width: 350px;
   font-size: 13px;
+  line-height: 1.25rem;
 }
 
 /* .updates-view h1 {
