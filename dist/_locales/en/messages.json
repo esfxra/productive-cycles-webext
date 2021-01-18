@@ -1,0 +1,110 @@
+{
+  "appName": {
+    "message": "Productive Cycles",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Maximize your productivity with this simple-yet-complete Pomodoro timer. Track your effort and get reminded to take breaks.", 
+    "description":"The description of the application, displayed in the web store."
+  },
+
+  "start": {
+    "message": "Start"
+  },
+  "pause": {
+    "message": "Pause"
+  },
+  "resetCycle": {
+    "message":"Reset cycle"
+  },
+  "resetAll": {
+    "message": "Reset all"
+  },
+  "skipBreak": {
+    "message": "Skip break"
+  },
+  "cycle": {
+    "message": "Cycle"
+  },
+
+  "options": {
+    "message": "Options"
+  },
+  "statistics": {
+    "message": "Statistics"
+  },
+  "back": {
+    "message": "Back"
+  },
+
+  "themeTitle": {
+    "message": "Theme"
+  },
+  "themeLightTitle": {
+    "message": "Light mode"
+  },
+  "themeDarkTitle": {
+    "message": "Dark mode"
+  },
+
+  "optionsTitle": {
+    "message": "Timer options"
+  },
+  "optionsNote": {
+    "message": "Changes will reset the timer"
+  },
+  "optionsMinutes": {
+    "message": "Cycle minutes"
+  },
+  "optionsBreak": {
+    "message": "Break minutes"
+  },
+  "optionsCycles": {
+    "message": "Total cycles"
+  },
+  "optionsAutoStart": {
+    "message": "Auto-start"
+  },
+
+  "saveButton": {
+    "message": "Save"
+  },
+  "statusSaved": {
+    "message": "Saved"
+  },
+
+  "updatesTitle": {
+    "message": "Updates"
+  },
+  "upcomingTitle": {
+    "message": "Upcoming features"
+  },
+
+  "cycleCompleteTitle_Fragment_1": {
+    "message": "Cycle"
+  },
+  "cycleCompleteTitle_Fragment_2": {
+    "message": "complete"
+  },
+  "cycleCompleteMessage": {
+    "message": "Great job! Everyone, take"
+  },
+  "timerCompleteTitle": {
+    "message": "All cycles complete!"
+  },
+  "timerCompleteMessage": {
+    "message": "Take a long break :)"
+  },
+  "autoStartTitle": {
+    "message": "Starting cycle"
+  },
+  "autoStartMessage": {
+    "message": "Time to grind"
+  },
+  "breakCompleteTitle": {
+    "message": "Don't forget to start cycle"
+  },
+  "breakCompleteMessage": {
+    "message": "Time to grind"
+  }
+}
