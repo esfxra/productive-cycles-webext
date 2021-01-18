@@ -1,9 +1,10 @@
 'use strict';
 
 import React, { useState, useEffect, useRef } from 'react';
-import Counter from './Counter';
-import Control from './Control';
-import Cycles from './Cycles';
+import Section from './Common/Section';
+import Counter from './Timer/Counter';
+import Control from './Timer/Control';
+import Cycles from './Timer/Cycles';
 
 const Timer = () => {
   const port = useRef();
@@ -40,7 +41,7 @@ const Timer = () => {
   };
 
   return (
-    <div>
+    <Section>
       <Counter time={time} />
       <Control
         period={period}
@@ -52,7 +53,7 @@ const Timer = () => {
         skip={skip}
       />
       <Cycles period={period} status={status} totalPeriods={total.current} />
-    </div>
+    </Section>
   );
 
   function handleMessage(message) {
