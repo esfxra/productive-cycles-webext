@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 const StyledNav = styled.nav`
@@ -62,21 +62,43 @@ const MenuItem = styled.li`
 
 const Nav = ({ navigate }) => {
   const [open, setOpen] = useState(false);
+  const iconRef = useRef();
+  const listRef = useRef();
+
+  useEffect(() => {
+    if (open) document.addEventListener('mousedown', handleOutsideClick);
+    else document.removeEventListener('mousedown', handleOutsideClick);
+
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [open]);
 
   const toggleMenu = () => setOpen((open) => !open);
+
+  const navigateTo = (input) => {
+    navigate(input);
+    setOpen(false);
+  };
+
+  const handleOutsideClick = (e) => {
+    const clickOnIcon = iconRef.current.contains(e.target);
+    const clickOnList = listRef.current.contains(e.target);
+
+    if (clickOnIcon || clickOnList) return;
+    else setOpen(false);
+  };
 
   return (
     <StyledNav>
       <Menu>
-        <MenuIcon onClick={toggleMenu}>
+        <MenuIcon ref={iconRef} onClick={toggleMenu}>
           <Dot />
           <Dot />
           <Dot />
         </MenuIcon>
         {open && (
-          <MenuList>
-            <MenuItem onClick={() => navigate('timer')}>Timer</MenuItem>
-            <MenuItem onClick={() => navigate('settings')}>Settings</MenuItem>
+          <MenuList ref={listRef}>
+            <MenuItem onClick={() => navigateTo('timer')}>Timer</MenuItem>
+            <MenuItem onClick={() => navigateTo('settings')}>Settings</MenuItem>
           </MenuList>
         )}
       </Menu>
