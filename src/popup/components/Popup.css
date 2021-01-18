@@ -1,0 +1,36 @@
+@font-face {
+  font-family: 'Open Sans';
+  src: url(../../assets/fonts/OpenSans-Regular.ttf);
+}
+
+@font-face {
+  font-family: 'Open Sans';
+  src: url(../../assets/fonts/OpenSans-SemiBold.ttf);
+  font-weight: 600;
+}
+
+@font-face {
+  font-family: 'Roboto Mono';
+  src: url(../../assets/fonts/RobotoMono-Regular.ttf);
+}
+
+body,
+html {
+  min-width: fit-content;
+  font-family: 'Open Sans', sans-serif;
+  overflow: hidden;
+}
+
+body {
+  padding-right: 13px;
+  padding-left: 13px;
+  padding-bottom: 13px;
+  margin: 0;
+  background-color: #eeeeee;
+}
+
+h1 {
+  font-size: 14px;
+  font-weight: 600;
+  margin-top: 0;
+}
