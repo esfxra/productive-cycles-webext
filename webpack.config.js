@@ -7,6 +7,7 @@ module.exports = {
   entry: {
     popup: path.resolve(__dirname, './src/popup/popup.js'),
   },
+  devtool: 'inline-source-map',
   output: {
     filename: 'popup.bundle.js',
     path: path.resolve(__dirname, 'dist'),
@@ -24,6 +25,10 @@ module.exports = {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader'],
       },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: 'asset/resource',
+      },
     ],
   },
   plugins: [
@@ -35,7 +40,6 @@ module.exports = {
       patterns: [
         { from: 'src/_locales/en', to: '_locales/en/[name].[ext]' },
         { from: 'src/assets/audio', to: 'assets/audio/[name].[ext]' },
-        { from: 'src/assets/fonts', to: 'assets/fonts/[name].[ext]' },
         { from: 'src/assets/icons', to: 'assets/icons/[name].[ext]' },
         { from: 'src/background', to: 'background/[name].[ext]' },
         { from: 'src/manifest.json', to: '[name].[ext]' },
