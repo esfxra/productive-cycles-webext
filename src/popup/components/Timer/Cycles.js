@@ -1,23 +1,58 @@
 'use strict';
 
 import React from 'react';
-import './Cycles.css';
+import styled, { keyframes } from 'styled-components';
+
+const StyledCycles = styled.div`
+  min-height: 17px;
+  display: grid;
+  grid-template-columns: auto auto auto auto;
+  grid-auto-flow: row;
+  grid-auto-rows: 16px;
+  gap: 16px;
+`;
+
+const Dot = styled.div`
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: inline-block;
+  justify-self: center;
+`;
+
+const running = keyframes`
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+`;
+
+const Running = styled(Dot)`
+  background-color: #666666;
+  animation: ${running} 2s infinite;
+`;
+
+const Pending = styled(Dot)`
+  background-color: #b3b3b3;
+  opacity: 0.5;
+`;
+
+const Complete = styled(Dot)`
+  background-color: #666666;
+`;
+
+const Fade = styled.div``;
 
 const Cycle = ({ status }) => {
-  console.log(`Status is ${status}`);
   let cycle;
-  switch (status) {
-    case 'running':
-    case 'pause':
-      cycle = <div className="cycle-dot running"></div>;
-      break;
-    case 'initial':
-      cycle = <div className="cycle-dot pending"></div>;
-      break;
-    case 'complete':
-      cycle = <div className="cycle-dot complete"></div>;
-      break;
-  }
+  if (status === 'running' || status === 'paused') cycle = <Running />;
+  else if (status === 'initial') cycle = <Pending />;
+  else if (status === 'complete') cycle = <Complete />;
 
   return cycle;
 };
@@ -26,7 +61,6 @@ const Cycles = ({ period, status, totalPeriods }) => {
   const totalCycles = Math.ceil(totalPeriods / 2);
   let cycles = [];
   let i = 0;
-  console.log(totalPeriods);
   while (cycles.length < totalCycles) {
     if (i % 2 === 0) {
       if (i === period) {
@@ -41,7 +75,7 @@ const Cycles = ({ period, status, totalPeriods }) => {
     i += 1; // Will skip odd indexes (aka breaks)
   }
 
-  return <div className="cycles">{cycles}</div>;
+  return <StyledCycles>{cycles}</StyledCycles>;
 };
 
 export default Cycles;

@@ -1,13 +1,24 @@
 'use strict';
 
 import React from 'react';
-import './Counter.css';
+import styled from 'styled-components';
+
+const StyledCounter = styled.div`
+  margin-bottom: 25px;
+  text-align: center;
+`;
+
+const Time = styled.div`
+  font-family: 'Roboto Mono', monospace;
+  min-height: 23px;
+  font-size: 23px;
+`;
 
 const Counter = ({ time }) => {
   return (
-    <div class="counter">
-      <div id="time">{time}</div>
-    </div>
+    <StyledCounter>
+      <Time>{time}</Time>
+    </StyledCounter>
   );
 };
 
