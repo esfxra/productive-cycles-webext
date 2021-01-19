@@ -17,7 +17,12 @@ const Timer = () => {
     port.current = chrome.runtime.connect({ name: 'port-from-popup' });
     port.current.onMessage.addListener(handleMessage);
     port.current.postMessage({ command: 'preload' });
-  });
+
+    return () => {
+      port.current.onMessage.removeListener(handleMessage);
+      port.current.disconnect();
+    };
+  }, []);
 
   // Improvement: Use a reducer to handle the input
   const start = () => {
