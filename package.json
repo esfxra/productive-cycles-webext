@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "test": "jest --watchAll",
-    "watch": "webpack --watch --progress --mode development",
+    "dev": "webpack --watch --progress --mode development",
     "build": "webpack --mode production"
   },
   "author": "Diego Serrano",

@@ -26,14 +26,14 @@ module.exports = {
         use: ['style-loader', 'css-loader'],
       },
       {
-        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        test: /\.(ttf|otf)$/i,
         type: 'asset/resource',
       },
     ],
   },
   plugins: [
     new HtmlWebpackPlugin({
-      filename: 'popup/popup.html',
+      filename: 'popup.html',
       template: 'src/popup/popup.html',
     }),
     new CopyWebpackPlugin({
