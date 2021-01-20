@@ -12,7 +12,7 @@ const light = {
   foreground: '#666666',
   background: '#eeeeee',
   accent: '#8141f7',
-  elevation: '#fffffff',
+  elevation: '#ffffff',
   menu: '#b3b3b3',
   button: '#666666',
   button_alt: '#b3b3b3',
