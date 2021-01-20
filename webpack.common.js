@@ -28,6 +28,10 @@ module.exports = {
         test: /\.(ttf|otf)$/i,
         type: 'asset/resource',
       },
+      {
+        test: /\.(png|svg)$/i,
+        type: 'asset/resource',
+      },
     ],
   },
   plugins: [
@@ -35,9 +39,8 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/_locales/en', to: '_locales/en/[name].[ext]' },
-        { from: 'src/assets/audio', to: 'assets/audio/[name].[ext]' },
-        { from: 'src/assets/icons', to: 'assets/icons/[name].[ext]' },
         { from: 'src/background', to: 'background/[name].[ext]' },
+        { from: 'src/manifest-icons', to: 'manifest-icons/[name].[ext]' },
         { from: 'src/manifest.json', to: '[name].[ext]' },
       ],
     }),

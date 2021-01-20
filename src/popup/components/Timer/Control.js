@@ -2,18 +2,30 @@
 
 import React from 'react';
 import styled from 'styled-components';
+import startIcon from '../../assets/control-start.svg';
+import pauseIcon from '../../assets/control-pause.svg';
+import resetIcon from '../../assets/control-reset-cycle.svg';
+import resetAllIcon from '../../assets/control-reset-all.svg';
+
+const icons = {
+  start: startIcon,
+  pause: pauseIcon,
+  'reset-cycle': resetIcon,
+  'reset-all': resetAllIcon,
+};
 
 const StyledControl = styled.div`
   position: relative;
   top: -2px;
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: ${(props) =>
+    props.period % 2 === 0 ? 'space-between' : 'center'};
   width: 100%;
   margin-bottom: 25px;
 `;
 
-const Button = styled.div`
+const StyledButton = styled.div`
   border-radius: 5px;
   background-color: ${(props) =>
     props.highlight ? props.theme.button : props.theme.button_alt};
@@ -21,20 +33,12 @@ const Button = styled.div`
 `;
 
 const Icon = styled.img.attrs((props) => ({
-  alt: props.alt,
-  title: props.title,
   src: props.src,
 }))`
   display: block;
   width: 17px;
   height: 17px;
   padding: 4px;
-`;
-
-const ResetAllIcon = styled(Icon)`
-  width: 18px;
-  height: 18px;
-  padding: 3.5px;
 `;
 
 const StyledSkip = styled.div`
@@ -52,64 +56,48 @@ const StyledSkip = styled.div`
   }
 `;
 
-const Start = ({ onClick }) => (
-  <Button highlight={true} onClick={onClick}>
-    <Icon
-      alt="Start button"
-      title="Start"
-      src="../assets/icons/control-start.svg"
-    />
-  </Button>
-);
-
-const Pause = ({ onClick }) => (
-  <Button onClick={onClick}>
-    <Icon
-      alt="Pause button"
-      title="Pause"
-      src="../assets/icons/control-pause.svg"
-    />
-  </Button>
-);
-
-const Reset = ({ onClick }) => (
-  <Button onClick={onClick}>
-    <Icon
-      alt="Reset cycle button"
-      title="Reset cycle"
-      src="../assets/icons/control-reset-cycle.svg"
-    />
-  </Button>
-);
-
-const ResetAll = ({ onClick }) => (
-  <Button onClick={onClick}>
-    <ResetAllIcon
-      alt="Reset all button"
-      title="Reset all"
-      src="../assets/icons/control-reset-all.svg"
-    />
-  </Button>
-);
+const Button = ({ name, onClick }) => {
+  const highlight = name === 'start';
+  return (
+    <StyledButton
+      highlight={highlight}
+      onClick={() => onClick({ command: name })}
+    >
+      <Icon src={icons[name]} />
+    </StyledButton>
+  );
+};
 
 const Skip = ({ onClick }) => (
-  <StyledSkip onClick={onClick}>Skip break</StyledSkip>
+  <StyledSkip onClick={() => onClick({ command: 'skip' })}>
+    Skip break
+  </StyledSkip>
 );
 
-const Control = ({ period, status, start, pause, reset, resetAll, skip }) => {
+const Control = ({ period, status, handleInput }) => {
   const isCycle = period % 2 === 0;
+  const isRunning = status === 'running';
 
-  return (
-    <StyledControl>
-      {isCycle && (status === 'initial' || status === 'paused') && (
-        <Start onClick={start} />
-      )}
-      {isCycle && status === 'running' && <Pause onClick={pause} />}
-      {isCycle && <Reset onClick={reset} />}
-      {isCycle && <ResetAll onClick={resetAll} />}
-      {!isCycle && status === 'running' && <Skip onClick={skip} />}
-    </StyledControl>
-  );
+  const start = <Button name="start" onClick={handleInput} />;
+  const pause = <Button name="pause" onClick={handleInput} />;
+  const reset = <Button name="reset-cycle" onClick={handleInput} />;
+  const resetAll = <Button name="reset-all" onClick={handleInput} />;
+  const skip = <Skip onClick={handleInput} />;
+
+  let control;
+  if (isCycle) {
+    control = (
+      <>
+        {isRunning ? pause : start}
+        {reset}
+        {resetAll}
+      </>
+    );
+  } else {
+    control = isRunning ? skip : start;
+  }
+
+  return <StyledControl period={period}>{control}</StyledControl>;
 };
 
 export default Control;

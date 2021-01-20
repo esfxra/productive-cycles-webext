@@ -6,15 +6,15 @@
   "default_locale": "en",
 
   "icons": {
-    "16": "assets/icons/icon-16.png",
-    "48": "assets/icons/icon-48.png",
-    "128": "assets/icons/icon-128.png",
-    "512": "assets/icons/icon-512.png"
+    "16": "manifest-icons/icon-16.png",
+    "48": "manifest-icons/icon-48.png",
+    "128": "manifest-icons/icon-128.png",
+    "512": "manifest-icons/icon-512.png"
   },
 
   "browser_action": {
     "default_title": "__MSG_appName__",
-    "default_icon": "assets/icons/icon-512.png",
+    "default_icon": "manifest-icons/icon-512.png",
     "default_popup": "popup.html"
   },
 

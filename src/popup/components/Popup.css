@@ -1,17 +1,17 @@
 @font-face {
   font-family: 'Open Sans';
-  src: url(../../assets/fonts/OpenSans-Regular.ttf);
+  src: url(../assets/OpenSans-Regular.ttf);
 }
 
 @font-face {
   font-family: 'Open Sans';
-  src: url(../../assets/fonts/OpenSans-SemiBold.ttf);
+  src: url(../assets/OpenSans-SemiBold.ttf);
   font-weight: 600;
 }
 
 @font-face {
   font-family: 'Roboto Mono';
-  src: url(../../assets/fonts/RobotoMono-Regular.ttf);
+  src: url(../assets/RobotoMono-Regular.ttf);
 }
 
 body,

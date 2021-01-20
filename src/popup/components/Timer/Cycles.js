@@ -5,10 +5,14 @@ import styled, { keyframes } from 'styled-components';
 
 const StyledCycles = styled.div`
   display: grid;
-  grid-template-columns: auto auto auto auto;
+  grid-template-columns: ${(props) =>
+    props.total >= 4 ? 'repeat(4, auto)' : `repeat(${props.total}, auto)`};
   grid-auto-flow: row;
   grid-auto-rows: 16px;
   gap: 16px;
+  justify-content: ${(props) =>
+    props.total >= 3 ? 'space-between' : 'space-evenly'};
+  min-width: 114px;
   min-height: 17px;
 `;
 
@@ -48,8 +52,8 @@ const Cycle = ({ status }) => {
   return cycle;
 };
 
-const Cycles = ({ period, status, totalPeriods }) => {
-  const totalCycles = Math.ceil(totalPeriods / 2);
+const Cycles = ({ period, status, total }) => {
+  const totalCycles = Math.ceil(total / 2);
   let cycles = [];
   let i = 0;
   while (cycles.length < totalCycles) {
@@ -66,7 +70,7 @@ const Cycles = ({ period, status, totalPeriods }) => {
     i += 1; // Will skip odd indexes (aka breaks)
   }
 
-  return <StyledCycles>{cycles}</StyledCycles>;
+  return <StyledCycles total={totalCycles}>{cycles}</StyledCycles>;
 };
 
 export default Cycles;
