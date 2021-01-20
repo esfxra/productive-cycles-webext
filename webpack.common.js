@@ -1,15 +1,16 @@
 const path = require('path');
+const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
-const { CleanWebpackPlugin } = require('clean-webpack-plugin');
+const BundleAnalyzerPlugin = require('webpack-bundle-analyzer')
+  .BundleAnalyzerPlugin;
 
 module.exports = {
   entry: {
     popup: path.resolve(__dirname, './src/popup/popup.js'),
   },
-  devtool: 'inline-source-map',
   output: {
-    filename: 'popup.bundle.js',
+    filename: '[name].bundle.js',
     path: path.resolve(__dirname, 'dist'),
   },
   module: {
@@ -32,10 +33,7 @@ module.exports = {
     ],
   },
   plugins: [
-    new HtmlWebpackPlugin({
-      filename: 'popup.html',
-      template: 'src/popup/popup.html',
-    }),
+    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
     new CopyWebpackPlugin({
       patterns: [
         { from: 'src/_locales/en', to: '_locales/en/[name].[ext]' },
@@ -45,6 +43,10 @@ module.exports = {
         { from: 'src/manifest.json', to: '[name].[ext]' },
       ],
     }),
-    new CleanWebpackPlugin({ cleanStaleWebpackAssets: false }),
+    new HtmlWebpackPlugin({
+      filename: 'popup.html',
+      template: 'src/popup/popup.html',
+    }),
+    new BundleAnalyzerPlugin({ analyzerMode: 'static' }),
   ],
 };
