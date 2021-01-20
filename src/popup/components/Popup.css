@@ -22,11 +22,8 @@ html {
 }
 
 body {
-  padding-right: 13px;
-  padding-left: 13px;
-  padding-bottom: 13px;
+  padding: 0;
   margin: 0;
-  background-color: #eeeeee;
 }
 
 h1 {

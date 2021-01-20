@@ -12,6 +12,7 @@ const Time = styled.div`
   font-family: 'Roboto Mono', monospace;
   min-height: 23px;
   font-size: 23px;
+  color: ${(props) => props.theme.foreground};
 `;
 
 const Counter = ({ time }) => {

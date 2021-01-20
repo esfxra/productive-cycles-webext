@@ -18,35 +18,26 @@ const Dot = styled.div`
   border-radius: 50%;
   display: inline-block;
   justify-self: center;
+  background-color: ${(props) => props.theme.foreground};
 `;
 
 const running = keyframes`
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
+  0% { opacity: 1; }
+  50% { opacity: 0.3; }
+  100% { opacity: 1; }
 `;
 
 const Running = styled(Dot)`
-  background-color: #666666;
   animation: ${running} 2s infinite;
 `;
 
 const Pending = styled(Dot)`
-  background-color: #b3b3b3;
-  opacity: 0.5;
+  opacity: 0.3;
 `;
 
 const Complete = styled(Dot)`
-  background-color: #666666;
+  background-color: ${(props) => props.theme.foreground};
 `;
-
-const Fade = styled.div``;
 
 const Cycle = ({ status }) => {
   let cycle;

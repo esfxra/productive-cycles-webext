@@ -1,7 +1,8 @@
 'use strict';
 
-import React, { useState, useEffect, Children } from 'react';
+import React, { useState, useEffect } from 'react';
 import Section from './Common/Section';
+import Appearance from './Settings/Appearance';
 import Checkbox from './Settings/Checkbox';
 import NumberInput from './Settings/NumberInput';
 import styled from 'styled-components';
@@ -16,7 +17,7 @@ const StyledOption = styled.div`
 
 const Label = styled.div`
   font-size: 13px;
-  color: #666666;
+  color: ${(props) => props.theme.foreground};
 `;
 
 const Option = ({ children, name, margin }) => {
@@ -45,7 +46,7 @@ const settings = {
   },
 };
 
-const Settings = () => {
+const Settings = ({ changeTheme }) => {
   const [theme, setTheme] = useState(settings.theme);
   const [notifications, setNotifications] = useState(settings.notifications);
   const [autoStart, setAutoStart] = useState(settings.autoStart);
@@ -86,6 +87,12 @@ const Settings = () => {
       }
     );
   }, []);
+
+  const updateTheme = (update) => {
+    chrome.storage.local.set({ theme: update });
+    setTheme(update);
+    changeTheme(update);
+  };
 
   const updateNotifications = {
     toggleEnabled: (update) => {
@@ -128,19 +135,7 @@ const Settings = () => {
     <>
       <Section margin={true}>
         <h1>Appearance</h1>
-        <div className="theme">
-          <div
-            alt="Light mode toggle"
-            title="Light mode"
-            className="theme-option option-light"
-          ></div>
-
-          <div
-            alt="Dark mode toggle"
-            title="Dark mode"
-            className="theme-option option-dark"
-          ></div>
-        </div>
+        <Appearance onChange={updateTheme} />
       </Section>
 
       <Section margin={true}>

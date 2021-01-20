@@ -18,9 +18,9 @@ const Input = styled.input.attrs((props) => ({
   border-radius: 4px;
   border-width: 1px;
   border-style: solid;
-  border-color: #ffffff;
-  color: #666666;
-  background-color: #f2f2f2;
+  border-color: ${(props) => props.theme.elevation};
+  color: ${(props) => props.theme.foreground};
+  background-color: ${(props) => props.theme.input};
 
   -moz-appearance: textfield;
 
@@ -32,7 +32,7 @@ const Input = styled.input.attrs((props) => ({
 
   &:focus {
     outline: none;
-    border-color: ${(props) => (props.valid ? 'rgb(129, 65, 247)' : 'red')};
+    border-color: ${(props) => (props.valid ? props.theme.accent : 'red')};
   }
 `;
 

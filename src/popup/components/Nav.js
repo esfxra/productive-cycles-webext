@@ -6,8 +6,8 @@ import styled from 'styled-components';
 const StyledNav = styled.nav`
   width: 100%;
   min-height: 19px;
-  margin-top: 11px;
-  margin-bottom: 11px;
+  padding-top: 11px;
+  padding-bottom: 11px;
 `;
 
 const Menu = styled.div`
@@ -28,7 +28,7 @@ const Dot = styled.div`
   border-radius: 50%;
   margin-bottom: 2px;
   display: block;
-  background-color: #666666;
+  background-color: ${(props) => props.theme.foreground};
 `;
 
 const MenuList = styled.ul`
@@ -47,7 +47,7 @@ const MenuList = styled.ul`
   box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14),
     0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
   color: #ffffff;
-  background-color: #b3b3b3;
+  background-color: ${(props) => props.theme.menu};
 `;
 
 const MenuItem = styled.li`
@@ -56,7 +56,7 @@ const MenuItem = styled.li`
 
   &: hover {
     border-radius: 5px;
-    background-color: #666666;
+    background-color: ${(props) => props.theme.foreground};
   }
 `;
 

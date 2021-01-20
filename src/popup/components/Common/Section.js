@@ -9,7 +9,7 @@ const StyledSection = styled.div`
   border-radius: 5px;
   padding: 13px;
   margin-bottom: ${(props) => (props.margin ? '13px' : '0')};
-  background-color: #ffffff;
+  background-color: ${(props) => props.theme.elevation};
 `;
 
 const Section = ({ children, margin }) => {

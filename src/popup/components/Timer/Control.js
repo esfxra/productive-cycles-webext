@@ -16,7 +16,8 @@ const StyledControl = styled.div`
 const Button = styled.div`
   cursor: pointer;
   border-radius: 5px;
-  background-color: ${(props) => (props.highlight ? '#666666' : '#b3b3b3')};
+  background-color: ${(props) =>
+    props.highlight ? props.theme.button : props.theme.button_alt};
 `;
 
 const Icon = styled.img.attrs((props) => ({

@@ -12,8 +12,9 @@ const Box = styled.div`
   height: 13px;
   width: 13px;
   margin: 0 auto;
-  border-color: #666666;
-  background-color: ${(props) => (props.checked ? '#666666' : '#ffffff')};
+  border-color: ${(props) => props.theme.input};
+  background-color: ${(props) =>
+    props.checked ? props.theme.input : props.theme.elevation};
   cursor: pointer;
 `;
 
@@ -26,7 +27,7 @@ const Checkmark = styled.div`
     top: 0px;
     width: 3px;
     height: 7px;
-    border: solid white;
+    border: solid ${(props) => props.theme.foreground};
     border-radius: 1px;
     border-width: 0 3px 3px 0 !important;
     -webkit-transform: rotate(45deg);
