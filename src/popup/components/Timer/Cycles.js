@@ -4,20 +4,20 @@ import React from 'react';
 import styled, { keyframes } from 'styled-components';
 
 const StyledCycles = styled.div`
-  min-height: 17px;
   display: grid;
   grid-template-columns: auto auto auto auto;
   grid-auto-flow: row;
   grid-auto-rows: 16px;
   gap: 16px;
+  min-height: 17px;
 `;
 
 const Dot = styled.div`
+  display: inline-block;
+  justify-self: center;
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  display: inline-block;
-  justify-self: center;
   background-color: ${(props) => props.theme.foreground};
 `;
 

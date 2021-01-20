@@ -4,20 +4,20 @@ import React from 'react';
 import styled from 'styled-components';
 
 const StyledControl = styled.div`
+  position: relative;
+  top: -2px;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  position: relative;
   width: 100%;
-  top: -2px;
   margin-bottom: 25px;
 `;
 
 const Button = styled.div`
-  cursor: pointer;
   border-radius: 5px;
   background-color: ${(props) =>
     props.highlight ? props.theme.button : props.theme.button_alt};
+  cursor: pointer;
 `;
 
 const Icon = styled.img.attrs((props) => ({
@@ -38,14 +38,14 @@ const ResetAllIcon = styled(Icon)`
 `;
 
 const StyledSkip = styled.div`
-  font-size: 14px;
   position: relative;
   top: -2px;
   padding-bottom: 4px;
-  cursor: pointer;
+  font-size: 14px;
   opacity: 0.5;
   color: #666666;
   border-bottom: 1px dashed #666666;
+  cursor: pointer;
 
   &:hover {
     opacity: 1;

@@ -66,7 +66,7 @@ const Settings = ({ changeTheme }) => {
       },
       (storage) => {
         // Theme
-        setTheme({ theme: storage.theme });
+        setTheme(storage.theme);
 
         // Notifications
         setNotifications({
@@ -135,7 +135,7 @@ const Settings = ({ changeTheme }) => {
     <>
       <Section margin={true}>
         <h1>Appearance</h1>
-        <Appearance onChange={updateTheme} />
+        <Appearance selected={theme} onChange={updateTheme} />
       </Section>
 
       <Section margin={true}>

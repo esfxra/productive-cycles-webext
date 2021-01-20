@@ -10,17 +10,17 @@ const Input = styled.input.attrs((props) => ({
   max: props.max,
   onChange: props.onChange,
 }))`
+  padding: 3px;
   text-align: center;
-  box-shadow: none;
   font-family: 'Open Sans', sans-serif;
   font-size: 13px;
-  padding: 3px;
   border-radius: 4px;
   border-width: 1px;
   border-style: solid;
   border-color: ${(props) => props.theme.elevation};
   color: ${(props) => props.theme.foreground};
   background-color: ${(props) => props.theme.input};
+  box-shadow: none;
 
   -moz-appearance: textfield;
 

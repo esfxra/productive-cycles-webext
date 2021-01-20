@@ -6,15 +6,15 @@ import styled from 'styled-components';
 const Box = styled.div`
   position: relative;
   display: block;
-  border-style: solid;
-  border-radius: 3px;
-  border-width: 1px;
   height: 13px;
   width: 13px;
   margin: 0 auto;
-  border-color: ${(props) => props.theme.input};
+  border-style: solid;
+  border-radius: 3px;
+  border-width: 1px;
+  border-color: ${(props) => props.theme.foreground};
   background-color: ${(props) =>
-    props.checked ? props.theme.input : props.theme.elevation};
+    props.checked ? props.theme.foreground : props.theme.elevation};
   cursor: pointer;
 `;
 
@@ -22,16 +22,14 @@ const Checkmark = styled.div`
   &:after {
     content: '';
     position: absolute;
-    display: block;
     left: 3px;
     top: 0px;
+    display: block;
     width: 3px;
     height: 7px;
-    border: solid ${(props) => props.theme.foreground};
+    border: solid ${(props) => props.theme.elevation};
     border-radius: 1px;
     border-width: 0 3px 3px 0 !important;
-    -webkit-transform: rotate(45deg);
-    -ms-transform: rotate(45deg);
     transform: rotate(45deg);
   }
 `;

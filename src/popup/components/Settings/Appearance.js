@@ -9,26 +9,36 @@ const Options = styled.div`
 `;
 
 const Theme = styled.div`
-  cursor: pointer;
   width: 14px;
   height: 14px;
   margin-right: 5px;
   border-radius: 50%;
+  border: 1px solid
+    ${(props) =>
+      props.selected === props.name
+        ? props.theme.accent
+        : props.theme.background};
   background-color: ${(props) =>
-    props.title === 'Light mode' ? '#f5f5f5' : '#202124'};
+    props.name === 'light' ? '#eeeeee' : '#202124'};
+  cursor: pointer;
 `;
 
-const Appearance = ({ onChange }) => {
+const Appearance = ({ selected, onChange }) => {
+  console.log(selected);
   return (
     <Options>
       <Theme
+        name="light"
         alt="Light mode toggle"
         title="Light mode"
+        selected={selected}
         onClick={() => onChange('light')}
       />
       <Theme
+        name="dark"
         alt="Dark mode toggle"
         title="Dark mode"
+        selected={selected}
         onClick={() => onChange('dark')}
       />
     </Options>

@@ -17,46 +17,45 @@ const Menu = styled.div`
 `;
 
 const MenuIcon = styled.div`
-  padding: 0 7px;
   min-height: 19px;
+  padding: 0 7px;
   cursor: pointer;
 `;
 
 const Dot = styled.div`
+  display: block;
   width: 5px;
   height: 5px;
-  border-radius: 50%;
   margin-bottom: 2px;
-  display: block;
+  border-radius: 50%;
   background-color: ${(props) => props.theme.foreground};
 `;
 
 const MenuList = styled.ul`
   position: absolute;
-  list-style: none;
-  text-transform: capitalize;
+  right: 0;
+  z-index: 200;
   margin-top: 2px;
   margin-left: 0;
   margin-right: -1px;
   margin-bottom: 0;
   padding: 0;
-  z-index: 200;
-  right: 0;
+  list-style: none;
+  text-transform: capitalize;
   border-radius: 5px;
   font-size: 12px;
-  box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14),
-    0 2px 1px -1px rgba(0, 0, 0, 0.12), 0 1px 3px 0 rgba(0, 0, 0, 0.2);
   color: #ffffff;
   background-color: ${(props) => props.theme.menu};
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
 `;
 
 const MenuItem = styled.li`
   margin: 2px;
   padding: 5px 10px;
 
-  &: hover {
+  &:hover {
     border-radius: 5px;
-    background-color: ${(props) => props.theme.foreground};
+    background-color: ${(props) => props.theme.button};
   }
 `;
 
