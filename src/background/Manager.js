@@ -42,21 +42,11 @@ setTimeout(() => {
 | - storage.onChanged
 |
 */
+
 chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.storage.onChanged.addListener(handleStorageChanges);
-chrome.idle.onStateChanged.addListener((state) => {
-  const status = timer.periods.current.status;
-  if (!(status === 'running')) {
-    console.log(`State ${state} - Timer status is ${status}. No need to sync.`);
-    return;
-  }
-  console.log(
-    `State ${state} - Timer status is ${status}. Making adjustments.`
-  );
-  const reference = Date.now();
-  Adjuster.adjust(timer, reference);
-});
+chrome.idle.onStateChanged.addListener(handleStateChange);
 
 /*
 |--------------------------------------------------------------------------
@@ -151,6 +141,11 @@ function handleMessage(message) {
   }
 }
 
+/*
+|--------------------------------------------------------------------------
+| Storage
+|--------------------------------------------------------------------------
+*/
 function handleStorageChanges(changes) {
   for (let key in changes) {
     let storageChange = changes[key];
@@ -177,5 +172,25 @@ function handleStorageChanges(changes) {
         timer.updateTotalPeriods(storageChange.newValue * 2 - 1);
         break;
     }
+  }
+}
+
+/*
+|--------------------------------------------------------------------------
+| State changes
+|--------------------------------------------------------------------------
+*/
+async function handleStateChange(state) {
+  console.log(`Manager - State is ${state}`);
+
+  const status = timer.periods.current.status;
+
+  if (status === 'running') {
+    chrome.idle.onStateChanged.removeListener(handleStateChange);
+
+    await Adjuster.adjust(timer, Date.now());
+    console.log('Manager - Timer adjusted');
+
+    chrome.idle.onStateChanged.addListener(handleStateChange);
   }
 }

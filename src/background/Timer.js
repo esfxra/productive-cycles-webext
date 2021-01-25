@@ -112,6 +112,7 @@ class Timer {
   }
 
   runSubtractor() {
+    console.debug('Subtractor - Starting ...');
     this.subtractor = setInterval(() => {
       this.periods.current.remaining -= 1000;
       if (this.periods.current.remaining < 0) {
@@ -123,6 +124,7 @@ class Timer {
   }
 
   stopSubtractor() {
+    console.debug('Subtractor - Stopping ...');
     clearInterval(this.subtractor);
   }
 
