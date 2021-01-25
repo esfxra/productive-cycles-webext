@@ -3,35 +3,43 @@
 class Adjuster {
   static adjust(timer, reference) {
     timer.stopSubtractor();
-
-    if (timer.periods.current.actual(reference) < 0) {
-      const adjustedPeriod = this.determinePeriod(
-        timer.periods.index,
-        timer.periods.timeline,
-        reference
-      );
-
-      this.endPrevious(
-        timer.periods.index,
-        timer.periods.timeline,
-        adjustedPeriod
-      );
-
-      timer.periods.index = adjustedPeriod;
-
+    return new Promise(async (resolve) => {
       if (timer.periods.current.actual(reference) < 0) {
-        timer.end();
+        const adjustedPeriod = this.determinePeriod(
+          timer.periods.index,
+          timer.periods.timeline,
+          reference
+        );
+
+        this.endPrevious(
+          timer.periods.index,
+          timer.periods.timeline,
+          adjustedPeriod
+        );
+
+        timer.periods.index = adjustedPeriod;
+
+        if (timer.periods.current.actual(reference) < 0) {
+          timer.end();
+          resolve(true);
+        } else {
+          const surplus = timer.periods.current.adjust(reference);
+          // const result = await this.handleSurplus(surplus);
+          this.handleSurplus(surplus).then(() => {
+            timer.start();
+            resolve(true);
+          });
+        }
       } else {
         const surplus = timer.periods.current.adjust(reference);
-        setTimeout(() => timer.start(), surplus); // It has already been determined whether it is enabled or not
+        // const result = await this.handleSurplus(surplus);
+        this.handleSurplus(surplus).then(() => {
+          timer.postState();
+          timer.runSubtractor();
+          resolve(true);
+        });
       }
-    } else {
-      const surplus = timer.periods.current.adjust(reference);
-      setTimeout(() => {
-        timer.postState();
-        timer.runSubtractor();
-      }, surplus);
-    }
+    });
   }
 
   static determinePeriod(current, timeline, reference) {
@@ -51,6 +59,10 @@ class Adjuster {
     for (let i = current; i < adjusted; i += 1) {
       timeline[i].end();
     }
+  }
+
+  static handleSurplus(surplus) {
+    return new Promise((resolve) => setTimeout(() => resolve(true), surplus));
   }
 }
 
