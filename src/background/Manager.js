@@ -22,6 +22,30 @@ let comms = {
 
 let update = false;
 
+const queue = {
+  operations: [],
+
+  waitInternal: false,
+  waitListener: function (value) {},
+
+  set wait(value) {
+    this.waitInternal = value;
+    this.waitListener(value);
+  },
+  get wait() {
+    return this.waitInternal;
+  },
+
+  registerListener: function (listener) {
+    this.waitListener = listener;
+  },
+
+  add: function (operation) {
+    if (this.waitInternal) this.operations.push(operation);
+    else operation();
+  },
+};
+
 // Initialiaze timer
 const timer = new Timer();
 // Delay to prevent conflict with install and update events
@@ -47,6 +71,18 @@ chrome.runtime.onInstalled.addListener(handleOnInstalled);
 chrome.runtime.onConnect.addListener(handleOnConnect);
 chrome.storage.onChanged.addListener(handleStorageChanges);
 chrome.idle.onStateChanged.addListener(handleStateChange);
+
+queue.registerListener((wait) => {
+  console.log(`Input operations should be queued: ${wait}`);
+
+  if (!wait) {
+    // Run all pending operations
+    queue.operations.forEach((operation) => operation());
+
+    // Clear all operations
+    queue.operations = [];
+  }
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -120,19 +156,19 @@ function handleMessage(message) {
     */
     switch (message.command) {
       case 'start':
-        timer.start();
+        queue.add(() => timer.start());
         break;
       case 'pause':
-        timer.pause();
+        queue.add(() => timer.pause());
         break;
       case 'skip':
-        timer.skip();
+        queue.add(() => timer.skip());
         break;
       case 'reset-cycle':
-        timer.reset();
+        queue.add(() => timer.reset());
         break;
       case 'reset-all':
-        timer.resetAll();
+        queue.add(() => timer.resetAll());
         break;
       case 'preload':
         timer.postState();
@@ -181,6 +217,8 @@ function handleStorageChanges(changes) {
 |--------------------------------------------------------------------------
 */
 async function handleStateChange(state) {
+  queue.wait = true;
+
   console.log(`Manager - State is ${state}`);
 
   const status = timer.periods.current.status;
@@ -193,4 +231,6 @@ async function handleStateChange(state) {
 
     chrome.idle.onStateChanged.addListener(handleStateChange);
   }
+
+  queue.wait = false;
 }

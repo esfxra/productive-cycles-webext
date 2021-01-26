@@ -3,43 +3,13 @@
 class Adjuster {
   static adjust(timer, reference) {
     timer.stopSubtractor();
-    return new Promise(async (resolve) => {
-      if (timer.periods.current.actual(reference) < 0) {
-        const adjustedPeriod = this.determinePeriod(
-          timer.periods.index,
-          timer.periods.timeline,
-          reference
-        );
+    const remaining = timer.periods.current.actual(reference);
 
-        this.endPrevious(
-          timer.periods.index,
-          timer.periods.timeline,
-          adjustedPeriod
-        );
-
-        timer.periods.index = adjustedPeriod;
-
-        if (timer.periods.current.actual(reference) < 0) {
-          timer.end();
-          resolve(true);
-        } else {
-          const surplus = timer.periods.current.adjust(reference);
-          // const result = await this.handleSurplus(surplus);
-          this.handleSurplus(surplus).then(() => {
-            timer.start();
-            resolve(true);
-          });
-        }
-      } else {
-        const surplus = timer.periods.current.adjust(reference);
-        // const result = await this.handleSurplus(surplus);
-        this.handleSurplus(surplus).then(() => {
-          timer.postState();
-          timer.runSubtractor();
-          resolve(true);
-        });
-      }
-    });
+    if (remaining < 0) {
+      return this.adjustActual(timer, reference);
+    } else {
+      return this.adjustCurrent(timer, reference);
+    }
   }
 
   static determinePeriod(current, timeline, reference) {
@@ -55,14 +25,52 @@ class Adjuster {
     return period;
   }
 
-  static endPrevious(current, timeline, adjusted) {
-    for (let i = current; i < adjusted; i += 1) {
+  static endPrevious(range, timeline) {
+    for (let i = range.from; i < range.to; i += 1) {
       timeline[i].end();
     }
   }
 
-  static handleSurplus(surplus) {
-    return new Promise((resolve) => setTimeout(() => resolve(true), surplus));
+  static delay(time) {
+    return new Promise((resolve) => setTimeout(() => resolve(), time));
+  }
+
+  static adjustCurrent(timer, reference, resolve) {
+    const surplus = timer.periods.current.adjust(reference);
+
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        timer.postState();
+        timer.runSubtractor();
+        resolve();
+      }, surplus);
+    });
+  }
+
+  static adjustActual(timer, reference, resolve) {
+    const adjustedPeriod = this.determinePeriod(
+      timer.periods.index,
+      timer.periods.timeline,
+      reference
+    );
+
+    const range = { from: timer.periods.index, to: adjustedPeriod };
+    this.endPrevious(range, timer.periods.timeline);
+
+    timer.periods.index = adjustedPeriod;
+
+    return new Promise((resolve) => {
+      if (timer.periods.current.actual(reference) < 0) {
+        timer.end();
+        resolve();
+      } else {
+        const surplus = timer.periods.current.adjust(reference);
+        setTimeout(() => {
+          timer.start();
+          resolve();
+        }, surplus);
+      }
+    });
   }
 }
 

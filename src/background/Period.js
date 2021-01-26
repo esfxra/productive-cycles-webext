@@ -22,7 +22,7 @@ class Period {
 
   end() {
     this.status = 'complete';
-    this.remaining = 0;
+    this.remaining = -1000;
   }
 
   actual(reference) {
