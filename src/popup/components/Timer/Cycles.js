@@ -12,7 +12,6 @@ const StyledCycles = styled.div`
   gap: 16px;
   justify-content: ${(props) =>
     props.total >= 3 ? 'space-between' : 'space-evenly'};
-  min-width: 114px;
   min-height: 17px;
 `;
 

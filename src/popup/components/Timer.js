@@ -73,7 +73,7 @@ const Timer = () => {
     </>
   );
 
-  return <Section>{isComplete ? complete : normal}</Section>;
+  return <Section width={140}>{isComplete ? complete : normal}</Section>;
 };
 
 export default Timer;
