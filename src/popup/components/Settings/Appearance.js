@@ -17,14 +17,13 @@ const Theme = styled.div`
     ${(props) =>
       props.selected === props.name
         ? props.theme.accent
-        : props.theme.background};
+        : props.theme.elevation};
   background-color: ${(props) =>
     props.name === 'light' ? '#eeeeee' : '#202124'};
   cursor: pointer;
 `;
 
 const Appearance = ({ selected, onChange }) => {
-  console.log(selected);
   return (
     <Options>
       <Theme
