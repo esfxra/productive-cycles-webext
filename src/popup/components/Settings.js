@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Section from './Common/Section';
 import Appearance from './Settings/Appearance';
 import Checkbox from './Settings/Checkbox';
-import NumberInput from './Settings/NumberInput';
+import Number from './Settings/Number';
 import styled from 'styled-components';
 
 const StyledOption = styled.div`
@@ -175,7 +175,7 @@ const Settings = ({ changeTheme }) => {
       <Section>
         <h1>Timer options</h1>
         <Option name="Cycle minutes" margin={true}>
-          <NumberInput
+          <Number
             value={timer.cycleMinutes}
             min="1"
             max="59"
@@ -184,7 +184,7 @@ const Settings = ({ changeTheme }) => {
         </Option>
 
         <Option name="Break minutes" margin={true}>
-          <NumberInput
+          <Number
             value={timer.breakMinutes}
             min="1"
             max="59"
@@ -193,7 +193,7 @@ const Settings = ({ changeTheme }) => {
         </Option>
 
         <Option name="Total cycles">
-          <NumberInput
+          <Number
             value={timer.totalCycles}
             min="1"
             max="12"
