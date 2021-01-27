@@ -35,10 +35,10 @@ class Adjuster {
     return new Promise((resolve) => setTimeout(() => resolve(), time));
   }
 
-  static adjustCurrent(timer, reference, resolve) {
-    const surplus = timer.periods.current.adjust(reference);
-
+  static adjustCurrent(timer, reference) {
     return new Promise((resolve) => {
+      const surplus = timer.periods.current.adjust(reference);
+
       setTimeout(() => {
         timer.postState();
         timer.runSubtractor();
@@ -47,7 +47,7 @@ class Adjuster {
     });
   }
 
-  static adjustActual(timer, reference, resolve) {
+  static adjustActual(timer, reference) {
     const adjustedPeriod = this.determinePeriod(
       timer.periods.index,
       timer.periods.timeline,
