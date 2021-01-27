@@ -15,13 +15,6 @@ const defaultSettings = {
   totalCycles: 4,
 };
 
-let comms = {
-  port: null,
-  open: false,
-};
-
-let update = false;
-
 const queue = {
   operations: [],
 
@@ -44,193 +37,168 @@ const queue = {
     if (this.waitInternal) this.operations.push(operation);
     else operation();
   },
+
+  onValueChange: function () {
+    console.log(`Manager - Input operations should be queued: ${this.wait}`);
+
+    if (!this.wait) {
+      // Run all pending operations
+      this.operations.forEach((operation) => operation());
+
+      // Clear all operations
+      this.operations = [];
+    }
+  },
 };
 
-// Initialiaze timer
 const timer = new Timer();
-// Delay to prevent conflict with install and update events
-setTimeout(() => {
-  Utilities.getStoredSettings().then((settings) => {
+
+class Manager {
+  constructor() {
+    this.update = false;
+    this.comms = { port: null, open: false };
+    this.listeners = { idle: null };
+  }
+
+  async init() {
+    this.registerListeners();
+
+    // Delay to prevent conflict with install and update events
+    await new Promise((resolve) => setTimeout(() => resolve(), 200));
+
+    // Get user settings and initialize timer
+    const settings = await Utilities.getStoredSettings();
     timer.init(settings);
-  });
-}, 200);
-
-/*
-|--------------------------------------------------------------------------
-| Register manager's listeners
-|--------------------------------------------------------------------------
-|
-| - runtime.onInstalled
-| - runtime.onConnect
-| - idle.onStateChanged
-| - storage.onChanged
-|
-*/
-
-chrome.runtime.onInstalled.addListener(handleOnInstalled);
-chrome.runtime.onConnect.addListener(handleOnConnect);
-chrome.storage.onChanged.addListener(handleStorageChanges);
-chrome.idle.onStateChanged.addListener(handleStateChange);
-
-queue.registerListener((wait) => {
-  console.log(`Input operations should be queued: ${wait}`);
-
-  if (!wait) {
-    // Run all pending operations
-    queue.operations.forEach((operation) => operation());
-
-    // Clear all operations
-    queue.operations = [];
   }
-});
 
-/*
-|--------------------------------------------------------------------------
-| Install & Update operations
-|--------------------------------------------------------------------------
-*/
-function handleOnInstalled(details) {
-  if (details.reason === 'install') {
-    runInstall();
-  } else if (details.reason === 'update') {
-    runUpdate();
+  registerListeners() {
+    chrome.runtime.onInstalled.addListener(this.onInstall.bind(this));
+    chrome.runtime.onConnect.addListener(this.onConnect.bind(this));
+    chrome.storage.onChanged.addListener(this.onStorageChange.bind(this));
+    chrome.idle.onStateChanged.addListener(
+      (this.listeners.idle = this.onStateChange.bind(this))
+    );
+    queue.registerListener(queue.onValueChange.bind(queue));
   }
-}
 
-function runInstall() {
-  // Set update flag to true
-  update = true;
-  // Initialize storage
-  chrome.storage.local.set(defaultSettings);
-}
-
-function runUpdate() {
-  // Set update flag to true
-  update = true;
-  // Upgrade storage
-  chrome.storage.local.clear();
-  chrome.storage.local.set(defaultSettings);
-}
-
-/*
-|--------------------------------------------------------------------------
-| Port communications
-|--------------------------------------------------------------------------
-*/
-function handleOnConnect(portFromPopUp) {
-  comms.port = portFromPopUp;
-  comms.port.onDisconnect.addListener(handleOnDisconnect);
-  comms.port.onMessage.addListener(handleMessage);
-  comms.open = true;
-
-  timer.updateComms(comms.port, comms.open);
-}
-
-function handleOnDisconnect() {
-  comms.open = false;
-  timer.updateComms(comms.port, comms.open);
-}
-
-function handleMessage(message) {
-  if (message.command === 'preload' && update === true) {
-    // Disable flag until next update
-    update = false;
-
-    // Communicate with PopUp to open update view
-    let message = timer.formatState();
-    message.update = true;
-    comms.port.postMessage(message);
-  } else {
-    /*
-    |--------------------------------------------------------------------------
-    | Forward all other commands to timer
-    |--------------------------------------------------------------------------
-    |
-    | - 'start'
-    | - 'pause'
-    | - 'reset-cycle'
-    | - 'reset-all'
-    | - 'skip'
-    | - 'preload'
-    |
-    */
-    switch (message.command) {
-      case 'start':
-        queue.add(() => timer.start());
+  onInstall(details) {
+    switch (details.reason) {
+      case 'install':
+        // Set update flag to true
+        this.update = true;
+        // Initialize storage
+        chrome.storage.local.set(defaultSettings);
         break;
-      case 'pause':
-        queue.add(() => timer.pause());
-        break;
-      case 'skip':
-        queue.add(() => timer.skip());
-        break;
-      case 'reset-cycle':
-        queue.add(() => timer.reset());
-        break;
-      case 'reset-all':
-        queue.add(() => timer.resetAll());
-        break;
-      case 'preload':
-        timer.postState();
+      case 'update':
+        // Set update flag to true
+        this.update = true;
+        // Upgrade storage
+        chrome.storage.local.clear();
+        chrome.storage.local.set(defaultSettings);
         break;
     }
   }
-}
 
-/*
-|--------------------------------------------------------------------------
-| Storage
-|--------------------------------------------------------------------------
-*/
-function handleStorageChanges(changes) {
-  for (let key in changes) {
-    let storageChange = changes[key];
-    const oldValue = storageChange.oldValue;
-    const newValue = storageChange.newValue;
+  onConnect(portFromPopUp) {
+    let port = portFromPopUp;
+    port.onDisconnect.addListener(this.onDisconnect.bind(this));
+    port.onMessage.addListener(this.onMessage.bind(this));
 
-    if (oldValue === undefined || newValue === undefined) return;
+    this.comms.port = port;
+    this.comms.open = true;
+    timer.updateComms(this.comms.port, this.comms.open);
+  }
 
-    // Update Settings
-    switch (key) {
-      case 'autoStartCycles':
-        timer.updateAutoStart({ cycles: storageChange.newValue });
-        break;
-      case 'autoStartBreaks':
-        timer.updateAutoStart({ breaks: storageChange.newValue });
-        break;
-      case 'cycleMinutes':
-        timer.updateTime({ cycleTime: storageChange.newValue * 60000 });
-        break;
-      case 'breakMinutes':
-        timer.updateTime({ breakTime: storageChange.newValue * 60000 });
-        break;
-      case 'totalCycles':
-        timer.updateTotalPeriods(storageChange.newValue * 2 - 1);
-        break;
+  onDisconnect() {
+    this.comms.open = false;
+    timer.updateComms(this.comms.port, this.comms.open);
+  }
+
+  onMessage(message) {
+    console.log(message);
+    if (message.command === 'preload' && this.update === true) {
+      // Update view operations
+      // Disable flag until next update
+      this.update = false;
+
+      // Ask popup to navigate to update view
+      let message = timer.formatState();
+      message.update = true;
+      this.comms.port.postMessage(message);
+    } else {
+      // User input cases
+      switch (message.command) {
+        case 'start':
+          queue.add(() => timer.start());
+          break;
+        case 'pause':
+          queue.add(() => timer.pause());
+          break;
+        case 'skip':
+          queue.add(() => timer.skip());
+          break;
+        case 'reset-cycle':
+          queue.add(() => timer.reset());
+          break;
+        case 'reset-all':
+          queue.add(() => timer.resetAll());
+          break;
+        case 'preload':
+          timer.postState();
+          break;
+      }
     }
   }
-}
 
-/*
-|--------------------------------------------------------------------------
-| State changes
-|--------------------------------------------------------------------------
-*/
-async function handleStateChange(state) {
-  queue.wait = true;
+  onStorageChange(changes) {
+    for (let key in changes) {
+      let storageChange = changes[key];
+      const oldValue = storageChange.oldValue;
+      const newValue = storageChange.newValue;
 
-  console.log(`Manager - State is ${state}`);
+      if (oldValue === undefined || newValue === undefined) return;
 
-  const status = timer.periods.current.status;
-
-  if (status === 'running') {
-    chrome.idle.onStateChanged.removeListener(handleStateChange);
-
-    await Adjuster.adjust(timer, Date.now());
-    console.log('Manager - Timer adjusted');
-
-    chrome.idle.onStateChanged.addListener(handleStateChange);
+      // Update settings relevant to timer functionality
+      switch (key) {
+        case 'autoStartCycles':
+          timer.updateAutoStart({ cycles: storageChange.newValue });
+          break;
+        case 'autoStartBreaks':
+          timer.updateAutoStart({ breaks: storageChange.newValue });
+          break;
+        case 'cycleMinutes':
+          timer.updateTime({ cycleTime: storageChange.newValue * 60000 });
+          break;
+        case 'breakMinutes':
+          timer.updateTime({ breakTime: storageChange.newValue * 60000 });
+          break;
+        case 'totalCycles':
+          timer.updateTotalPeriods(storageChange.newValue * 2 - 1);
+          break;
+      }
+    }
   }
 
-  queue.wait = false;
+  async onStateChange(state) {
+    queue.wait = true;
+
+    console.log(`Manager - State is ${state}`);
+
+    const status = timer.periods.current.status;
+
+    if (status === 'running') {
+      chrome.idle.onStateChanged.removeListener(this.listeners.idle);
+
+      await Adjuster.adjust(timer, Date.now());
+      console.log('Manager - Timer adjusted');
+
+      chrome.idle.onStateChanged.addListener(
+        (this.listeners.idle = this.onStateChange.bind(this))
+      );
+    }
+
+    queue.wait = false;
+  }
 }
+
+export { Manager };

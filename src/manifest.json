@@ -19,7 +19,7 @@
   },
 
   "background": {
-    "page": "background/modules.html"
+    "page": "background/background.html"
   },
 
   "permissions": ["notifications", "storage", "idle"]
