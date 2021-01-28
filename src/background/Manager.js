@@ -15,8 +15,8 @@ const defaultSettings = {
   totalCycles: 4,
 };
 
-const queue = {
-  operations: [],
+const operations = {
+  queue: [],
 
   waitInternal: false,
   waitListener: function (value) {},
@@ -34,19 +34,17 @@ const queue = {
   },
 
   add: function (operation) {
-    if (this.waitInternal) this.operations.push(operation);
+    if (this.waitInternal) this.queue.push(operation);
     else operation();
   },
 
   onValueChange: function () {
-    console.log(`Manager - Input operations should be queued: ${this.wait}`);
-
     if (!this.wait) {
       // Run all pending operations
-      this.operations.forEach((operation) => operation());
+      this.queue.forEach((operation) => operation());
 
       // Clear all operations
-      this.operations = [];
+      this.queue = [];
     }
   },
 };
@@ -58,17 +56,23 @@ class Manager {
     this.update = false;
     this.comms = { port: null, open: false };
     this.listeners = { idle: null };
+    this.operations = operations;
   }
 
-  async init() {
+  async init(settings) {
     this.registerListeners();
 
     // Delay to prevent conflict with install and update events
-    await new Promise((resolve) => setTimeout(() => resolve(), 200));
+    // await new Promise((resolve) => setTimeout(() => resolve(), 200));
 
-    // Get user settings and initialize timer
-    const settings = await Utilities.getStoredSettings();
-    timer.init(settings);
+    if (settings) {
+      // Check if settings were passed to init (testing purposes)
+      timer.init(settings);
+    } else {
+      // Get user settings insterad and initialize timer
+      const stored = await Utilities.getStoredSettings();
+      timer.init(stored);
+    }
   }
 
   registerListeners() {
@@ -78,7 +82,9 @@ class Manager {
     chrome.idle.onStateChanged.addListener(
       (this.listeners.idle = this.onStateChange.bind(this))
     );
-    queue.registerListener(queue.onValueChange.bind(queue));
+    this.operations.registerListener(
+      this.operations.onValueChange.bind(this.operations)
+    );
   }
 
   onInstall(details) {
@@ -115,7 +121,6 @@ class Manager {
   }
 
   onMessage(message) {
-    console.log(message);
     if (message.command === 'preload' && this.update === true) {
       // Update view operations
       // Disable flag until next update
@@ -129,19 +134,19 @@ class Manager {
       // User input cases
       switch (message.command) {
         case 'start':
-          queue.add(() => timer.start());
+          this.operations.add(() => timer.start());
           break;
         case 'pause':
-          queue.add(() => timer.pause());
+          this.operations.add(() => timer.pause());
           break;
         case 'skip':
-          queue.add(() => timer.skip());
+          this.operations.add(() => timer.skip());
           break;
         case 'reset-cycle':
-          queue.add(() => timer.reset());
+          this.operations.add(() => timer.reset());
           break;
         case 'reset-all':
-          queue.add(() => timer.resetAll());
+          this.operations.add(() => timer.resetAll());
           break;
         case 'preload':
           timer.postState();
@@ -180,11 +185,12 @@ class Manager {
   }
 
   async onStateChange(state) {
-    queue.wait = true;
+    this.operations.wait = true;
 
     console.log(`Manager - State is ${state}`);
 
     const status = timer.periods.current.status;
+    console.log(status);
 
     if (status === 'running') {
       chrome.idle.onStateChanged.removeListener(this.listeners.idle);
@@ -197,7 +203,7 @@ class Manager {
       );
     }
 
-    queue.wait = false;
+    this.operations.wait = false;
   }
 }
 
