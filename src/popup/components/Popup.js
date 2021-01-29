@@ -31,6 +31,18 @@ const dark = {
   input: '#808080',
 };
 
+const dark_alt = {
+  name: 'dark',
+  foreground: '#fffffe',
+  background: '#1b1c22',
+  accent: '#3c50fa',
+  elevation: '#25262c',
+  menu: '#434552',
+  button: '#3c50fa',
+  button_alt: '#434552',
+  input: '#787d8a',
+};
+
 const StyledPopup = styled.div`
   padding-right: 13px;
   padding-left: 13px;
