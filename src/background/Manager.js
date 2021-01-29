@@ -63,7 +63,7 @@ class Manager {
     this.registerListeners();
 
     // Delay to prevent conflict with install and update events
-    // await new Promise((resolve) => setTimeout(() => resolve(), 200));
+    await new Promise((resolve) => setTimeout(() => resolve(), 200));
 
     if (settings) {
       // Check if settings were passed to init (testing purposes)
@@ -164,39 +164,41 @@ class Manager {
       if (oldValue === undefined || newValue === undefined) return;
 
       // Update settings relevant to timer functionality
+      let change;
       switch (key) {
         case 'autoStartCycles':
-          timer.updateAutoStart({ cycles: storageChange.newValue });
+          change = { cycles: storageChange.newValue };
+          this.operations.add(() => timer.updateAutoStart(change));
           break;
         case 'autoStartBreaks':
-          timer.updateAutoStart({ breaks: storageChange.newValue });
+          change = { breaks: storageChange.newValue };
+          this.operations.add(() => timer.updateAutoStart(change));
           break;
         case 'cycleMinutes':
-          timer.updateTime({ cycleTime: storageChange.newValue * 60000 });
+          change = { cycleTime: storageChange.newValue * 60000 };
+          this.operations.add(() => timer.updateTime(change));
           break;
         case 'breakMinutes':
-          timer.updateTime({ breakTime: storageChange.newValue * 60000 });
+          change = { breakTime: storageChange.newValue * 60000 };
+          this.operations.add(() => timer.updateTime(change));
           break;
         case 'totalCycles':
-          timer.updateTotalPeriods(storageChange.newValue * 2 - 1);
+          change = storageChange.newValue * 2 - 1;
+          this.operations.add(() => timer.updateTotalPeriods(change));
           break;
       }
     }
   }
 
-  async onStateChange(state) {
+  async onStateChange() {
     this.operations.wait = true;
 
-    console.log(`Manager - State is ${state}`);
-
     const status = timer.periods.current.status;
-    console.log(status);
 
     if (status === 'running') {
       chrome.idle.onStateChanged.removeListener(this.listeners.idle);
 
       await Adjuster.adjust(timer, Date.now());
-      console.log('Manager - Timer adjusted');
 
       chrome.idle.onStateChanged.addListener(
         (this.listeners.idle = this.onStateChange.bind(this))
