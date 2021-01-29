@@ -35,6 +35,7 @@ describe('Adjuster', () => {
       await Promise.resolve();
 
       expect(timer.periods.current.remaining).toBe(5000);
+      expect(spy).toHaveBeenCalled();
     });
 
     test('Handles surplus milliseconds with a timeout', async () => {
