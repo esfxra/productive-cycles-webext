@@ -57,6 +57,7 @@ class Manager {
     this.comms = { port: null, open: false };
     this.listeners = { idle: null };
     this.operations = operations;
+    this.timer = timer;
   }
 
   async init(settings) {
@@ -67,11 +68,11 @@ class Manager {
 
     if (settings) {
       // Check if settings were passed to init (testing purposes)
-      timer.init(settings);
+      this.timer.init(settings);
     } else {
       // Get user settings insterad and initialize timer
       const stored = await Utilities.getStoredSettings();
-      timer.init(stored);
+      this.timer.init(stored);
     }
   }
 
@@ -112,12 +113,12 @@ class Manager {
 
     this.comms.port = port;
     this.comms.open = true;
-    timer.updateComms(this.comms.port, this.comms.open);
+    this.timer.updateComms(this.comms.port, this.comms.open);
   }
 
   onDisconnect() {
     this.comms.open = false;
-    timer.updateComms(this.comms.port, this.comms.open);
+    this.timer.updateComms(this.comms.port, this.comms.open);
   }
 
   onMessage(message) {
@@ -127,29 +128,29 @@ class Manager {
       this.update = false;
 
       // Ask popup to navigate to update view
-      let message = timer.formatState();
+      let message = this.timer.formatState();
       message.update = true;
       this.comms.port.postMessage(message);
     } else {
       // User input cases
       switch (message.command) {
         case 'start':
-          this.operations.add(() => timer.start());
+          this.operations.add(() => this.timer.start());
           break;
         case 'pause':
-          this.operations.add(() => timer.pause());
+          this.operations.add(() => this.timer.pause());
           break;
         case 'skip':
-          this.operations.add(() => timer.skip());
+          this.operations.add(() => this.timer.skip());
           break;
         case 'reset-cycle':
-          this.operations.add(() => timer.reset());
+          this.operations.add(() => this.timer.reset());
           break;
         case 'reset-all':
-          this.operations.add(() => timer.resetAll());
+          this.operations.add(() => this.timer.resetAll());
           break;
         case 'preload':
-          timer.postState();
+          this.timer.postState();
           break;
       }
     }
@@ -168,43 +169,42 @@ class Manager {
       switch (key) {
         case 'autoStartCycles':
           change = { cycles: storageChange.newValue };
-          this.operations.add(() => timer.updateAutoStart(change));
+          this.operations.add(() => this.timer.updateAutoStart(change));
           break;
         case 'autoStartBreaks':
           change = { breaks: storageChange.newValue };
-          this.operations.add(() => timer.updateAutoStart(change));
+          this.operations.add(() => this.timer.updateAutoStart(change));
           break;
         case 'cycleMinutes':
           change = { cycleTime: storageChange.newValue * 60000 };
-          this.operations.add(() => timer.updateTime(change));
+          this.operations.add(() => this.timer.updateTime(change));
           break;
         case 'breakMinutes':
           change = { breakTime: storageChange.newValue * 60000 };
-          this.operations.add(() => timer.updateTime(change));
+          this.operations.add(() => this.timer.updateTime(change));
           break;
         case 'totalCycles':
           change = storageChange.newValue * 2 - 1;
-          this.operations.add(() => timer.updateTotalPeriods(change));
+          this.operations.add(() => this.timer.updateTotalPeriods(change));
           break;
       }
     }
   }
 
   async onStateChange() {
+    // Queue user operations and remove the listener
     this.operations.wait = true;
+    chrome.idle.onStateChanged.removeListener(this.listeners.idle);
 
-    const status = timer.periods.current.status;
+    // Adjust the timer
+    const status = this.timer.periods.current.status;
+    if (status === 'running') await Adjuster.adjust(this.timer, Date.now());
 
-    if (status === 'running') {
-      chrome.idle.onStateChanged.removeListener(this.listeners.idle);
-
-      await Adjuster.adjust(timer, Date.now());
-
-      chrome.idle.onStateChanged.addListener(
-        (this.listeners.idle = this.onStateChange.bind(this))
-      );
-    }
-
+    // Safe to:
+    // - Add the listener
+    // - Resume running operations directly
+    this.listeners.idle = this.onStateChange.bind(this);
+    chrome.idle.onStateChanged.addListener(this.listeners.idle);
     this.operations.wait = false;
   }
 }

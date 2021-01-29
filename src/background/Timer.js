@@ -79,16 +79,12 @@ class Timer {
   }
 
   pause() {
-    console.log('Timer - Pausing ...');
-
     this.stopSubtractor();
     this.periods.current.pause();
     this.postState();
   }
 
   skip() {
-    console.log('Timer - Skipping ...');
-
     this.stopSubtractor();
     this.periods.current.skip();
     this.notify();
@@ -96,8 +92,6 @@ class Timer {
   }
 
   reset() {
-    console.log('Timer - Resetting cycle ...');
-
     this.stopSubtractor();
     if (this.periods.current.status === 'initial' && this.periods.index > 0) {
       [1, 2].forEach(() => {
@@ -112,8 +106,6 @@ class Timer {
   }
 
   resetAll() {
-    console.log('Timer - Resetting all ...');
-
     this.stopSubtractor();
     this.periods.timeline.forEach((period) => period.reset(this.settings));
     this.periods.index = 0;
@@ -124,20 +116,15 @@ class Timer {
   runSubtractor() {
     this.stopSubtractor();
 
-    console.debug('Timer - Subtractor - Starting ...');
-
     this.subtractor = setInterval(() => {
       this.periods.current.remaining -= 1000;
 
       if (this.periods.current.remaining < 0) this.end();
       else this.postState();
-
-      console.log(Utilities.parseMs(this.periods.current.remaining));
     }, 1000);
   }
 
   stopSubtractor() {
-    console.debug('Timer - Subtractor - Stopping ...');
     clearInterval(this.subtractor);
   }
 
