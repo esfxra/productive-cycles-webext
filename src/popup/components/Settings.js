@@ -7,8 +7,12 @@ import Group from './Settings/Group';
 const appearance = { storage: 'theme' };
 
 const notifications = [
-  { name: 'Enable', type: 'checkbox', storage: 'notificationsEnabled' },
-  { name: 'Sound', type: 'checkbox', storage: 'notificationsSound' },
+  {
+    name: 'Enable notifications',
+    type: 'checkbox',
+    storage: 'notificationsEnabled',
+  },
+  { name: 'Enable sound', type: 'checkbox', storage: 'notificationsSound' },
 ];
 
 const autoStart = [
