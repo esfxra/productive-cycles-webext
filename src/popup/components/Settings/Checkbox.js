@@ -1,6 +1,6 @@
 'use strict';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
 const Box = styled.div`
@@ -14,7 +14,7 @@ const Box = styled.div`
   border-width: 1px;
   border-color: ${(props) => props.theme.foreground};
   background-color: ${(props) =>
-    props.checked ? props.theme.foreground : props.theme.elevation};
+    props.check ? props.theme.foreground : props.theme.elevation};
   cursor: pointer;
 `;
 
@@ -34,10 +34,20 @@ const Checkmark = styled.div`
   }
 `;
 
-const Checkbox = ({ checked, onChange }) => {
+const Checkbox = ({ storage }) => {
+  const [check, setCheck] = useState();
+
+  useEffect(() => {
+    chrome.storage.local.get(storage, (stored) => setCheck(stored[storage]));
+  }, []);
+
+  useEffect(() => {
+    chrome.storage.local.set({ [storage]: check });
+  }, [check]);
+
   return (
-    <Box checked={checked} onClick={() => onChange(!checked)}>
-      {checked && <Checkmark />}
+    <Box check={check} onClick={() => setCheck((check) => !check)}>
+      {check && <Checkmark />}
     </Box>
   );
 };

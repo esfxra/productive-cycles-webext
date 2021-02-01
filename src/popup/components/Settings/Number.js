@@ -1,9 +1,15 @@
 'use strict';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 
-const Input = styled.input`
+const boundaries = {
+  cycleMinutes: { min: 1, max: 59 },
+  breakMinutes: { min: 1, max: 59 },
+  totalCycles: { min: 1, max: 8 },
+};
+
+const NumberInput = styled.input`
   padding: 3px;
   text-align: center;
   font-family: 'Open Sans', sans-serif;
@@ -42,21 +48,36 @@ const validate = (value, min, max) => {
   }
 };
 
-const Number = ({ value, min, max, onChange }) => {
-  const [valid, setValid] = useState(true);
+const Number = ({ storage }) => {
+  const [number, setNumber] = useState({ value: 0, valid: true });
 
+  // Get stored value when the Number component is loaded
+  useEffect(() => {
+    chrome.storage.local.get(storage, (stored) => {
+      setNumber((number) => ({ valid: number.valid, value: stored[storage] }));
+    });
+  }, []);
+
+  // Update stored value when the state is updated, and if the input is valid
+  useEffect(() => {
+    if (number.valid) chrome.storage.local.set({ [storage]: number.value });
+  }, [number]);
+
+  // Match boundaries
+  const min = boundaries[storage].min;
+  const max = boundaries[storage].max;
+
+  // Handle changes in input field
   const handleChange = (e) => {
     const result = validate(e.target.value, min, max);
-
-    setValid(result.valid);
-    onChange(result.valid, result.value);
+    setNumber(result);
   };
 
   return (
-    <Input
+    <NumberInput
       type="number"
-      value={value}
-      valid={valid}
+      value={number.value}
+      valid={number.valid}
       min={min}
       max={max}
       onChange={handleChange}

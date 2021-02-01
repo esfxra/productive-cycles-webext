@@ -1,7 +1,8 @@
 'use strict';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
+import Section from '../Common/Section';
 
 const Options = styled.div`
   display: flex;
@@ -23,24 +24,42 @@ const Theme = styled.div`
   cursor: pointer;
 `;
 
-const Appearance = ({ selected, onChange }) => {
+const Appearance = ({ title, options, margin, onChange }) => {
+  const storage = options.storage;
+  console.log(storage);
+
+  const [theme, setTheme] = useState('light');
+
+  useEffect(() => {
+    chrome.storage.local.get([storage], (stored) => setTheme(stored[storage]));
+  }, []);
+
+  useEffect(() => {
+    chrome.storage.local.set({ [storage]: theme });
+    onChange(theme);
+  }, [theme]);
+
   return (
-    <Options>
-      <Theme
-        name="light"
-        alt="Light mode toggle"
-        title="Light mode"
-        selected={selected}
-        onClick={() => onChange('light')}
-      />
-      <Theme
-        name="dark"
-        alt="Dark mode toggle"
-        title="Dark mode"
-        selected={selected}
-        onClick={() => onChange('dark')}
-      />
-    </Options>
+    <Section margin={margin}>
+      <h1>Appearance</h1>
+
+      <Options>
+        <Theme
+          name="light"
+          alt="Light mode toggle"
+          title="Light mode"
+          selected={theme}
+          onClick={() => setTheme('light')}
+        />
+        <Theme
+          name="dark"
+          alt="Dark mode toggle"
+          title="Dark mode"
+          selected={theme}
+          onClick={() => setTheme('dark')}
+        />
+      </Options>
+    </Section>
   );
 };
 
