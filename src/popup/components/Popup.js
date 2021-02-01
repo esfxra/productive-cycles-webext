@@ -1,10 +1,11 @@
 'use strict';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
 import Nav from './Nav';
 import Timer from './Timer';
 import Settings from './Settings';
+import Updates from './Updates';
 import './Popup.css';
 
 const light = {
@@ -62,19 +63,29 @@ const GlobalStyle = createGlobalStyle`
 
 const Popup = () => {
   const [view, setView] = useState('timer');
-  const [theme, setTheme] = useState('timer');
+  const [theme, setTheme] = useState(); // Leave initial value empty on purpose to prevent flicker
 
   useEffect(() => {
-    chrome.storage.local.get(['theme'], (storage) => setTheme(storage.theme));
+    chrome.storage.local.get(['theme', 'updates'], (stored) => {
+      // Set the theme
+      setTheme(stored.theme);
+
+      // Show updates if any have occurred, and disable flag afterwards
+      if (stored.updates) {
+        setView('updates');
+        chrome.storage.local.set({ updates: false });
+      }
+    });
   }, []);
 
   return (
-    <StyledPopup theme={theme}>
+    <StyledPopup>
       <ThemeProvider theme={theme === 'light' ? light : dark}>
         <GlobalStyle />
         <Nav navigate={setView} />
         {view === 'timer' && <Timer />}
         {view === 'settings' && <Settings changeTheme={setTheme} />}
+        {view === 'updates' && <Updates />}
       </ThemeProvider>
     </StyledPopup>
   );

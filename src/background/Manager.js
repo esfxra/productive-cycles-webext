@@ -5,6 +5,7 @@ import { Adjuster } from './Adjuster.js';
 import { Utilities } from './Utilities.js';
 
 const defaultSettings = {
+  updates: true,
   theme: 'light',
   notificationsEnabled: true,
   notificationsSound: true,
@@ -53,7 +54,6 @@ const timer = new Timer();
 
 class Manager {
   constructor() {
-    this.update = false;
     this.comms = { port: null, open: false };
     this.listeners = { idle: null };
     this.operations = operations;
@@ -91,14 +91,10 @@ class Manager {
   onInstall(details) {
     switch (details.reason) {
       case 'install':
-        // Set update flag to true
-        this.update = true;
         // Initialize storage
         chrome.storage.local.set(defaultSettings);
         break;
       case 'update':
-        // Set update flag to true
-        this.update = true;
         // Upgrade storage
         chrome.storage.local.clear();
         chrome.storage.local.set(defaultSettings);
@@ -122,37 +118,26 @@ class Manager {
   }
 
   onMessage(message) {
-    if (message.command === 'preload' && this.update === true) {
-      // Update view operations
-      // Disable flag until next update
-      this.update = false;
-
-      // Ask popup to navigate to update view
-      let message = this.timer.formatState();
-      message.update = true;
-      this.comms.port.postMessage(message);
-    } else {
-      // User input cases
-      switch (message.command) {
-        case 'start':
-          this.operations.add(() => this.timer.start());
-          break;
-        case 'pause':
-          this.operations.add(() => this.timer.pause());
-          break;
-        case 'skip':
-          this.operations.add(() => this.timer.skip());
-          break;
-        case 'reset-cycle':
-          this.operations.add(() => this.timer.reset());
-          break;
-        case 'reset-all':
-          this.operations.add(() => this.timer.resetAll());
-          break;
-        case 'preload':
-          this.timer.postState();
-          break;
-      }
+    // User input cases
+    switch (message.command) {
+      case 'start':
+        this.operations.add(() => this.timer.start());
+        break;
+      case 'pause':
+        this.operations.add(() => this.timer.pause());
+        break;
+      case 'skip':
+        this.operations.add(() => this.timer.skip());
+        break;
+      case 'reset-cycle':
+        this.operations.add(() => this.timer.reset());
+        break;
+      case 'reset-all':
+        this.operations.add(() => this.timer.resetAll());
+        break;
+      case 'preload':
+        this.timer.postState();
+        break;
     }
   }
 

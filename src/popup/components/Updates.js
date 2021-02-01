@@ -1,12 +1,12 @@
 'use strict';
 
 import React from 'react';
-import Section from './Common/Section';
 import styled from 'styled-components';
+import Section from './Common/Section';
 
 const Updates = () => {
   return (
-    <Section>
+    <Section width={350}>
       <h1>Updates</h1>
       <p>Welcome to version 0.4</p>
       <p>
