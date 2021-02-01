@@ -95,9 +95,37 @@ class Manager {
         chrome.storage.local.set(defaultSettings);
         break;
       case 'update':
-        // Upgrade storage
-        chrome.storage.local.clear();
-        chrome.storage.local.set(defaultSettings);
+        // Check for existing settings
+        chrome.storage.local.get(
+          [
+            'updates',
+            'theme',
+            'notificationsEnabled',
+            'notificationsSound',
+            'autoStartCycles',
+            'autoStartBreaks',
+            'cycleMinutes',
+            'breakMinutes',
+            'totalCycles',
+          ],
+          (stored) => {
+            let upgrades = {};
+
+            // Check if there are any default settings that do not exist
+            const settings = Object.keys(defaultSettings);
+            settings.forEach((setting) => {
+              if (typeof stored[setting] === 'undefined') {
+                upgrades[setting] = defaultSettings[setting];
+              }
+            });
+
+            // Set the 'updates' flag to true
+            upgrades.updates = true;
+
+            // Save to storage
+            chrome.storage.local.set(upgrades);
+          }
+        );
         break;
     }
   }
