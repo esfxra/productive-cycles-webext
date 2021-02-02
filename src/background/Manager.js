@@ -198,7 +198,9 @@ class Manager {
 
     // Adjust the timer
     const status = this.timer.periods.current.status;
-    if (status === 'running') await Adjuster.adjust(this.timer, Date.now());
+    if (status === 'running') {
+      await Adjuster.adjust(this.timer, Date.now());
+    }
 
     // Safe to:
     // - Add the listener

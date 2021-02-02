@@ -25,9 +25,8 @@ const Theme = styled.div`
   cursor: pointer;
 `;
 
-const Appearance = ({ title, options, margin, onChange }) => {
+const Appearance = ({ options, margin, onChange }) => {
   const storage = options.storage;
-  console.log(storage);
 
   const [theme, setTheme] = useState('light');
 

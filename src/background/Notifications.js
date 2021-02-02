@@ -57,7 +57,7 @@ class Notifications {
 
     sound
       .play()
-      .then(() => console.log('Played sound.'))
+      .then(() => {})
       .catch((e) => console.log(e));
   }
 
