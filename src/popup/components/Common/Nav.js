@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import MenuIcon from './MenuIcon';
+import NavIcon from './NavIcon';
 
 const StyledNav = styled.nav`
   width: 100%;
@@ -14,6 +14,11 @@ const StyledNav = styled.nav`
 const Menu = styled.div`
   position: relative;
   float: right;
+`;
+
+const IconWrapper = styled.div`
+  min-height: 19px;
+  padding: 0 3px;
   cursor: pointer;
 `;
 
@@ -33,6 +38,7 @@ const MenuList = styled.ul`
   color: #ffffff;
   background-color: ${(props) => props.theme.menu};
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+  cursor: pointer;
 `;
 
 const MenuItem = styled.li`
@@ -75,9 +81,9 @@ const Nav = ({ navigate }) => {
   return (
     <StyledNav>
       <Menu>
-        <div ref={iconRef} onClick={toggleMenu}>
-          <MenuIcon />
-        </div>
+        <IconWrapper ref={iconRef} onClick={toggleMenu}>
+          <NavIcon />
+        </IconWrapper>
         {open && (
           <MenuList ref={listRef}>
             <MenuItem onClick={() => navigateTo('timer')}>Timer</MenuItem>
