@@ -22,6 +22,7 @@ const Updates = () => {
           Fixed a stability issue that made the timer count at an abnormal rate
           🔧
         </li>
+        <li>UI rewrite and tweaks 🎨</li>
       </List>
     </Section>
   );
