@@ -21,6 +21,7 @@ const Theme = styled.div`
         : props.theme.elevation};
   background-color: ${(props) =>
     props.name === 'light' ? '#eeeeee' : '#202124'};
+  background-clip: padding-box;
   cursor: pointer;
 `;
 

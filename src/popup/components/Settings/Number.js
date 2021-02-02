@@ -20,6 +20,7 @@ const NumberInput = styled.input`
   border-color: ${(props) => props.theme.elevation};
   color: ${(props) => props.theme.foreground};
   background-color: ${(props) => props.theme.number};
+  background-clip: padding-box;
   box-shadow: none;
 
   -moz-appearance: textfield;
