@@ -4,6 +4,12 @@ import React from 'react';
 import styled from 'styled-components';
 import Section from './Common/Section';
 
+const List = styled.ul`
+  list-style-position: outside;
+  padding-left: 24px;
+  margin-bottom: 0;
+`;
+
 const Updates = () => {
   return (
     <Section width={350}>
@@ -14,7 +20,7 @@ const Updates = () => {
         under the hood improvements
       </p>
       <span>Release notes:</span>
-      <ul>
+      <List>
         <li>
           Changes to minutes while the timer is running are now queued; the
           timer will not reset 🕗
@@ -22,7 +28,7 @@ const Updates = () => {
         <li>More ways to configure automatic start 🔁</li>
         <li>Option to disable notifications ⏹</li>
         <li>Bug fixes 🐞</li>
-      </ul>
+      </List>
     </Section>
   );
 };

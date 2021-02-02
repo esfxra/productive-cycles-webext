@@ -55,10 +55,6 @@ const GlobalStyle = createGlobalStyle`
   body {
     background-color: ${(props) => props.theme.background}
   }
-
-  h1 {
-    color: ${(props) => props.theme.foreground}
-  }
 `;
 
 const Popup = () => {

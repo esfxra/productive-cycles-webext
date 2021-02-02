@@ -13,11 +13,6 @@ const StyledOption = styled.div`
   margin-bottom: ${(props) => (props.margin ? '13px' : '0')};
 `;
 
-const Label = styled.div`
-  font-size: 13px;
-  color: ${(props) => props.theme.foreground};
-`;
-
 const Input = ({ type, storage }) => {
   if (type === 'checkbox') return <Checkbox storage={storage} />;
   else if (type === 'number') return <Number storage={storage} />;
@@ -27,7 +22,7 @@ const Input = ({ type, storage }) => {
 const Option = ({ name, type, storage, margin }) => {
   return (
     <StyledOption margin={margin}>
-      <Label>{name}</Label>
+      <span>{name}</span>
       <Input type={type} storage={storage} />
     </StyledOption>
   );
