@@ -24,3 +24,18 @@ MIT License; check out the LICENSE.md file in the repo
 
 ### Icons
 From the open source collection [Font Awesome](https://fontawesome.com/license/free)
+
+---
+
+### Manual Installation
+1. Clone the repository `git clone https://github.com/diegoserranor/productive-cycles-webext.git`
+
+2. Install the necessary modules `npm install` (assuming you have Node installed)
+
+3. Run a production build with `npm run build`
+
+4. Load the extension to the browser:
+
+    * Firefox - Visit `about:debugging` and load it as a temporary extension
+
+    * Chrome - Visit `chrome:extensions`, enable the developer mode, and load it as an unpacked extension
