@@ -1,10 +1,10 @@
 'use strict';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
-import Nav from './Nav';
-import Timer from './Timer';
-import Settings from './Settings';
+import Nav from './Common/Nav';
+import Timer from './Timer/Timer';
+import Settings from './Settings/Settings';
 import Updates from './Updates';
 import './Popup.css';
 

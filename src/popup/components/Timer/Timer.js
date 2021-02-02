@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import Section from './Common/Section';
-import Counter from './Timer/Counter';
-import Control from './Timer/Control';
-import Cycles from './Timer/Cycles';
+import Section from '../Common/Section';
+import Counter from './Counter';
+import Control from './Control';
+import Cycles from './Cycles';
 
 const CompleteMessage = styled.div`
   margin-bottom: 18px;

@@ -1,8 +1,8 @@
 'use strict';
 
 import React from 'react';
-import Appearance from './Settings/Appearance';
-import Group from './Settings/Group';
+import Appearance from './Appearance';
+import Group from './Group';
 
 const appearance = { storage: 'theme' };
 
