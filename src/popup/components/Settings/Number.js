@@ -19,7 +19,7 @@ const NumberInput = styled.input`
   border-style: solid;
   border-color: ${(props) => props.theme.elevation};
   color: ${(props) => props.theme.foreground};
-  background-color: ${(props) => props.theme.input};
+  background-color: ${(props) => props.theme.number};
   box-shadow: none;
 
   -moz-appearance: textfield;

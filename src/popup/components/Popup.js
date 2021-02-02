@@ -17,7 +17,9 @@ const light = {
   menu: '#b3b3b3',
   button: '#666666',
   button_alt: '#b3b3b3',
-  input: '#f2f2f2',
+  number: '#ededed',
+  checkbox: '#666666',
+  checkmark: '#ffffff',
 };
 
 const dark = {
@@ -29,19 +31,23 @@ const dark = {
   menu: '#3a3a3a',
   button: '#595959',
   button_alt: '#444444',
-  input: '#808080',
+  number: '#808080',
+  checkbox: '#808080',
+  checkmark: '#f5f5f5',
 };
 
 const dark_alt = {
   name: 'dark',
-  foreground: '#fffffe',
+  foreground: '#f5f5f5',
   background: '#1b1c22',
   accent: '#3c50fa',
   elevation: '#25262c',
   menu: '#434552',
   button: '#3c50fa',
   button_alt: '#434552',
-  input: '#787d8a',
+  number: '#787d8a',
+  checkbox: '#787d8a',
+  checkmark: '#f5f5f5',
 };
 
 const StyledPopup = styled.div`
