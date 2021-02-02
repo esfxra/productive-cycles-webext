@@ -59,11 +59,6 @@ const Number = ({ storage }) => {
     });
   }, []);
 
-  // Update stored value when the state is updated, and if the input is valid
-  useEffect(() => {
-    if (number.valid) chrome.storage.local.set({ [storage]: number.value });
-  }, [number]);
-
   // Match boundaries
   const min = boundaries[storage].min;
   const max = boundaries[storage].max;
@@ -71,6 +66,9 @@ const Number = ({ storage }) => {
   // Handle changes in input field
   const handleChange = (e) => {
     const result = validate(e.target.value, min, max);
+
+    if (result.valid) chrome.storage.local.set({ [storage]: result.value });
+
     setNumber(result);
   };
 
