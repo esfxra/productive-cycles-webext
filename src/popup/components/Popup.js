@@ -25,20 +25,6 @@ const light = {
 const dark = {
   name: 'dark',
   foreground: '#f5f5f5',
-  background: '#202124',
-  accent: '#8141f7',
-  elevation: '#282828',
-  menu: '#3a3a3a',
-  button: '#595959',
-  button_alt: '#444444',
-  number: '#808080',
-  checkbox: '#808080',
-  checkmark: '#f5f5f5',
-};
-
-const dark_alt = {
-  name: 'dark',
-  foreground: '#f5f5f5',
   background: '#1b1c22',
   accent: '#3c50fa',
   elevation: '#25262c',
@@ -47,6 +33,20 @@ const dark_alt = {
   button_alt: '#434552',
   number: '#787d8a',
   checkbox: '#787d8a',
+  checkmark: '#f5f5f5',
+};
+
+const dark_old = {
+  name: 'dark',
+  foreground: '#f5f5f5',
+  background: '#202124',
+  accent: '#8141f7',
+  elevation: '#282828',
+  menu: '#3a3a3a',
+  button: '#595959',
+  button_alt: '#444444',
+  number: '#808080',
+  checkbox: '#808080',
   checkmark: '#f5f5f5',
 };
 
