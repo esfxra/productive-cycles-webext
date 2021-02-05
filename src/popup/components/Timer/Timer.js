@@ -20,7 +20,7 @@ const NewTimerButton = styled.div`
   text-align: center;
   border-radius: 5px;
   color: #ffffff;
-  background-color: ${(props) => props.theme.button};
+  background-color: ${(props) => props.theme.button.main};
   cursor: pointer;
 `;
 

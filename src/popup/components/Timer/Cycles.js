@@ -21,25 +21,24 @@ const Dot = styled.div`
   width: 16px;
   height: 16px;
   border-radius: 50%;
-  background-color: ${(props) => props.theme.foreground};
+  background-color: ${(props) => props.theme.cycles.pending};
 `;
 
-const running = keyframes`
-  0% { opacity: 1; }
-  50% { opacity: 0.3; }
-  100% { opacity: 1; }
+const running = (props) => keyframes`
+  from { background-color: ${props.theme.cycles.pending}; }
+  to { background-color: ${props.theme.cycles.complete}; }
 `;
 
 const Running = styled(Dot)`
-  animation: ${running} 2s infinite;
+  animation: ${running} 1s infinite alternate;
 `;
 
 const Pending = styled(Dot)`
-  opacity: 0.3;
+  background-color: ${(props) => props.theme.cycles.pending};
 `;
 
 const Complete = styled(Dot)`
-  background-color: ${(props) => props.theme.foreground};
+  background-color: ${(props) => props.theme.cycles.complete};
 `;
 
 const Cycle = ({ status }) => {

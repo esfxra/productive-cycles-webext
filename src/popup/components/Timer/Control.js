@@ -28,7 +28,7 @@ const StyledControl = styled.div`
 const StyledButton = styled.div`
   border-radius: 5px;
   background-color: ${(props) =>
-    props.highlight ? props.theme.button : props.theme.button_alt};
+    props.highlight ? props.theme.button.main : props.theme.button.alt};
   cursor: pointer;
 `;
 

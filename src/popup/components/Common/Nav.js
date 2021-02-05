@@ -36,7 +36,7 @@ const MenuList = styled.ul`
   border-radius: 5px;
   font-size: 12px;
   color: #ffffff;
-  background-color: ${(props) => props.theme.menu};
+  background-color: ${(props) => props.theme.menu.main};
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
   cursor: pointer;
 `;
@@ -47,7 +47,7 @@ const MenuItem = styled.li`
 
   &:hover {
     border-radius: 5px;
-    background-color: ${(props) => props.theme.button};
+    background-color: ${(props) => props.theme.menu.alt};
   }
 `;
 
