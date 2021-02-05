@@ -10,43 +10,29 @@ import './Popup.css';
 
 const light = {
   name: 'light',
-  foreground: '#666666',
+  foreground: '#747980',
   background: '#eeeeee',
-  accent: '#8141f7',
+  accent: '#3c50fa',
   elevation: '#ffffff',
-  menu: '#b3b3b3',
-  button: '#666666',
-  button_alt: '#b3b3b3',
-  number: '#ededed',
-  checkbox: '#666666',
-  checkmark: '#ffffff',
+  menu: '#C2C5CB',
+  button: '#747980',
+  button_alt: '#C2C5CB',
+  number: '#e7e8ea',
+  checkbox: '#e7e8ea',
+  checkmark: '#747980',
 };
 
 const dark = {
   name: 'dark',
   foreground: '#f5f5f5',
-  background: '#1b1c22',
+  background: '#1e1f23',
   accent: '#3c50fa',
-  elevation: '#25262c',
+  elevation: '#27282D',
   menu: '#434552',
   button: '#3c50fa',
-  button_alt: '#434552',
+  button_alt: '#484B56',
   number: '#787d8a',
   checkbox: '#787d8a',
-  checkmark: '#f5f5f5',
-};
-
-const dark_old = {
-  name: 'dark',
-  foreground: '#f5f5f5',
-  background: '#202124',
-  accent: '#8141f7',
-  elevation: '#282828',
-  menu: '#3a3a3a',
-  button: '#595959',
-  button_alt: '#444444',
-  number: '#808080',
-  checkbox: '#808080',
   checkmark: '#f5f5f5',
 };
 
