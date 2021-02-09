@@ -69,31 +69,36 @@ class Utilities {
     };
 
     if (isCycle) setBadgeColor('#3c50fa');
-    else setBadgeColor('#747980');
+    else setBadgeColor('#484B56');
   }
 
-  static updateBadgeTime(isFirst, status, remaining) {
+  static updateBadgeTime(status, time) {
     const setBadgeText = (text) => {
       chrome.browserAction.setBadgeText({ text: text }, () => {});
     };
 
     switch (status) {
       case 'initial':
+      case 'complete':
         setBadgeText('...');
-        // if (!isFirst) setBadgeText('...');
-        // else setBadgeText(''); // Empty string clears the badge
         break;
       case 'running':
       case 'paused':
         let text;
 
-        if (remaining < 60000) text = `${Utilities.msToSec(remaining)}s`;
-        else text = `${Utilities.msToMin(remaining)}m`;
+        // Slice seconds if less than a minute, or slice minutes
+        // The format of the string 'time' is '00:00'
+        if (time.includes('00:')) {
+          text = `${time.slice(3)}s`;
+        } else {
+          text = `${time.slice(0, 2)}m`;
+        }
 
+        // Trim any 0s for single digit numbers
+        text = text.charAt(0) === '0' ? text.slice(1) : text;
+
+        // Update badge text
         setBadgeText(text);
-        break;
-      case 'complete':
-        setBadgeText('DONE'); // Empty string clears the badge
         break;
     }
   }

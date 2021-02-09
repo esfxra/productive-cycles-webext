@@ -138,23 +138,21 @@ class Timer {
   }
 
   postState() {
-    if (this.settings.badgeTimer) {
-      const isFirst = this.periods.isFirst;
-      const status = this.periods.current.status;
-      const remaining = this.periods.current.remaining;
+    const time = Utilities.parseMs(this.periods.current.remaining);
 
-      Utilities.updateBadgeTime(isFirst, status, remaining);
+    if (this.settings.badgeTimer) {
+      Utilities.updateBadgeTime(this.periods.current.status, time);
     }
 
     if (this.comms.open) {
-      this.comms.port.postMessage(this.formatState());
+      this.comms.port.postMessage(this.formatState(time));
     }
   }
 
-  formatState() {
+  formatState(time) {
     return {
       period: this.periods.current.id,
-      time: Utilities.parseMs(this.periods.current.remaining),
+      time: time,
       status: this.periods.current.status,
       totalPeriods: this.settings.totalPeriods,
     };

@@ -193,10 +193,10 @@ class Manager {
           this.operations.add(() => {
             this.timer.settings.badgeTimer = change;
 
-            if (!change) {
-              chrome.browserAction.setBadgeText({ text: '' }, () => {});
-            } else {
+            if (change) {
               chrome.browserAction.setBadgeText({ text: '...' }, () => {});
+            } else {
+              chrome.browserAction.setBadgeText({ text: '' }, () => {});
             }
           });
           break;
