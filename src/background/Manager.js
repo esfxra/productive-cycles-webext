@@ -14,6 +14,7 @@ const defaultSettings = {
   cycleMinutes: 25,
   breakMinutes: 5,
   totalCycles: 4,
+  badgeTimer: true,
 };
 
 const operations = {
@@ -187,6 +188,18 @@ class Manager {
           change = storageChange.newValue * 2 - 1;
           this.operations.add(() => this.timer.updateTotalPeriods(change));
           break;
+        case 'badgeTimer':
+          change = storageChange.newValue;
+          this.operations.add(() => {
+            this.timer.settings.badgeTimer = change;
+
+            if (!change) {
+              chrome.browserAction.setBadgeText({ text: '' }, () => {});
+            } else {
+              chrome.browserAction.setBadgeText({ text: '...' }, () => {});
+            }
+          });
+          break;
       }
     }
   }
@@ -200,6 +213,7 @@ class Manager {
     const status = this.timer.periods.current.status;
     if (status === 'running') {
       await Adjuster.adjust(this.timer, Date.now());
+      Utilities.updateBadgeColor(this.timer.periods.current.isCycle);
     }
 
     // Safe to:

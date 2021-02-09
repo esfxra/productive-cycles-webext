@@ -19,11 +19,11 @@ const Input = ({ type, storage }) => {
   else return null;
 };
 
-const Option = ({ name, type, storage, margin }) => {
+const Option = ({ option, last }) => {
   return (
-    <StyledOption margin={margin}>
-      <span>{name}</span>
-      <Input type={type} storage={storage} />
+    <StyledOption margin={!last}>
+      <span>{option.name}</span>
+      <Input type={option.type} storage={option.storage} />
     </StyledOption>
   );
 };

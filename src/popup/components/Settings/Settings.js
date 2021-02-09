@@ -24,6 +24,7 @@ const timer = [
   { name: 'Cycle minutes', type: 'number', storage: 'cycleMinutes' },
   { name: 'Break minutes', type: 'number', storage: 'breakMinutes' },
   { name: 'Total cycles', type: 'number', storage: 'totalCycles' },
+  { name: 'Show timer on icon', type: 'checkbox', storage: 'badgeTimer' },
 ];
 
 const Settings = ({ changeTheme }) => {

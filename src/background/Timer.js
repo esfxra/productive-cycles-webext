@@ -14,6 +14,7 @@ class Timer {
       cycleTime: 0,
       breakTime: 0,
       totalPeriods: 0,
+      badgeTimer: true,
     };
 
     this.comms = {
@@ -29,6 +30,7 @@ class Timer {
     this.settings = settings;
     this.periods.build(this.settings);
     Notifications.clearAll(this.settings.totalPeriods);
+    Utilities.updateBadgeColor(this.periods.current.isCycle);
   }
 
   updateAutoStart(autoStart) {
@@ -73,6 +75,8 @@ class Timer {
 
   next() {
     this.periods.index += 1;
+
+    Utilities.updateBadgeColor(this.periods.current.isCycle);
 
     if (this.periods.current.enabled) this.start();
     else this.postState();
@@ -134,6 +138,14 @@ class Timer {
   }
 
   postState() {
+    if (this.settings.badgeTimer) {
+      const isFirst = this.periods.isFirst;
+      const status = this.periods.current.status;
+      const remaining = this.periods.current.remaining;
+
+      Utilities.updateBadgeTime(isFirst, status, remaining);
+    }
+
     if (this.comms.open) {
       this.comms.port.postMessage(this.formatState());
     }

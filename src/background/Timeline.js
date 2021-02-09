@@ -13,6 +13,10 @@ class Timeline {
     return this.timeline[this.index];
   }
 
+  get isFirst() {
+    return this.index === 0;
+  }
+
   get isLast() {
     return this.index === this.timeline.length - 1;
   }
