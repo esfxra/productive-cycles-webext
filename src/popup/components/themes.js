@@ -7,15 +7,15 @@ const light = {
   elevation: '#ffffff',
   accent: '#3c50fa',
   menu: {
-    main: '#C2C5CB',
+    main: '#BEC1C5',
     alt: '#747980',
   },
   button: {
     main: '#747980',
-    alt: '#C2C5CB',
+    alt: '#BEC1C5',
   },
   cycles: {
-    pending: '#C2C5CB',
+    pending: '#BEC1C5',
     complete: '#747980',
   },
   settings: {
