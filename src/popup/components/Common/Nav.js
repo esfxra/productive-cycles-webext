@@ -1,98 +1,65 @@
 'use strict';
 
-import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import NavIcon from './NavIcon';
+import React, { useContext } from 'react';
+import styled, { ThemeContext } from 'styled-components';
+import settingsLight from '../../assets/settings-light.svg';
+import settingsDark from '../../assets/settings-dark.svg';
+import backLight from '../../assets/back-light.svg';
+import backDark from '../../assets/back-dark.svg';
 
+// Objects acting as dictionaries to trace image according to theme
+const settings = {
+  light: settingsLight,
+  dark: settingsDark,
+};
+const back = {
+  light: backLight,
+  dark: backDark,
+};
+
+// Styled wrappers
 const StyledNav = styled.nav`
   width: 100%;
-  min-height: 19px;
-  padding-top: 11px;
-  padding-bottom: 11px;
+  height: 21px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 `;
-
-const Menu = styled.div`
-  position: relative;
-  float: right;
-`;
-
 const IconWrapper = styled.div`
-  min-height: 19px;
+  float: right;
+  height: 21px;
   padding: 0 3px;
   cursor: pointer;
 `;
 
-const MenuList = styled.ul`
-  position: absolute;
-  right: 0;
-  z-index: 200;
-  margin-top: 2px;
-  margin-left: 0;
-  margin-right: -1px;
-  margin-bottom: 0;
-  padding: 0;
-  list-style: none;
-  text-transform: capitalize;
-  border-radius: 5px;
-  font-size: 12px;
-  color: #ffffff;
-  background-color: ${(props) => props.theme.menu.main};
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
-  cursor: pointer;
-`;
+// Settings icon
+const Settings = ({ theme }) => <img src={settings[theme.name]} />;
 
-const MenuItem = styled.li`
-  margin: 2px;
-  padding: 5px 10px;
+// Back icon
+const Back = ({ theme }) => <img src={back[theme.name]} />;
 
-  &:hover {
-    border-radius: 5px;
-    background-color: ${(props) => props.theme.menu.alt};
-  }
-`;
+// Main Nav component
+const Nav = ({ view, navigate }) => {
+  const theme = useContext(ThemeContext);
 
-const Nav = ({ navigate }) => {
-  const [open, setOpen] = useState(false);
-  const iconRef = useRef();
-  const listRef = useRef();
-
-  useEffect(() => {
-    if (open) document.addEventListener('mousedown', handleOutsideClick);
-    else document.removeEventListener('mousedown', handleOutsideClick);
-
-    return () => document.removeEventListener('mousedown', handleOutsideClick);
-  }, [open]);
-
-  const toggleMenu = () => setOpen((open) => !open);
-
-  const navigateTo = (input) => {
-    navigate(input);
-    setOpen(false);
-  };
-
-  const handleOutsideClick = (e) => {
-    const clickOnIcon = iconRef.current.contains(e.target);
-    const clickOnList = listRef.current.contains(e.target);
-
-    if (clickOnIcon || clickOnList) return;
-    else setOpen(false);
-  };
+  const target = determineTarget(view);
+  const icon = determineIcon(view, theme);
 
   return (
     <StyledNav>
-      <Menu>
-        <IconWrapper ref={iconRef} onClick={toggleMenu}>
-          <NavIcon />
-        </IconWrapper>
-        {open && (
-          <MenuList ref={listRef}>
-            <MenuItem onClick={() => navigateTo('timer')}>Timer</MenuItem>
-            <MenuItem onClick={() => navigateTo('settings')}>Settings</MenuItem>
-          </MenuList>
-        )}
-      </Menu>
+      <IconWrapper onClick={() => navigate(target)}>{icon}</IconWrapper>
     </StyledNav>
   );
 };
+
+// Helper functions
+function determineTarget(view) {
+  if (view === 'timer') return 'settings';
+  else return 'timer';
+}
+
+function determineIcon(view, theme) {
+  if (view === 'timer') return <Settings theme={theme} />;
+  else return <Back theme={theme} />;
+}
 
 export default Nav;
