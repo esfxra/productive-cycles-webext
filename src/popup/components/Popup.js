@@ -43,7 +43,7 @@ const Popup = () => {
     <StyledPopup>
       <ThemeProvider theme={theme ? themes[theme] : themes['light']}>
         <GlobalStyle />
-        <Nav navigate={setView} />
+        <Nav view={view} navigate={setView} />
         {view === 'timer' && <Timer />}
         {view === 'settings' && <Settings changeTheme={setTheme} />}
         {view === 'updates' && <Updates />}
