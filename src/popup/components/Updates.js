@@ -12,17 +12,15 @@ const List = styled.ul`
 
 const Updates = () => {
   return (
-    <Section width={350}>
+    <Section width={375}>
       <h1>Updates</h1>
-      <p>Welcome to version 0.5</p>
+      <p>Welcome to version 0.6</p>
 
       <span>Release notes:</span>
       <List>
-        <li>
-          Fixed a stability issue that made the timer count at an abnormal rate
-          🔧
-        </li>
-        <li>UI rewrite and tweaks 🎨</li>
+        <li>New option to show the timer on top of the icon ⏱</li>
+        <li>Adjusted colors in both the light and dark theme 🎨</li>
+        <li>Simplified navigation ⚙️</li>
       </List>
     </Section>
   );
