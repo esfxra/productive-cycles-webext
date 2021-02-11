@@ -47,8 +47,8 @@ const StyledSkip = styled.div`
   padding-bottom: 4px;
   font-size: 14px;
   opacity: 0.5;
-  color: #666666;
-  border-bottom: 1px dashed #666666;
+  color: ${(props) => props.theme.foreground};
+  border-bottom: 1px dashed ${(props) => props.theme.foreground};
   cursor: pointer;
 
   &:hover {
