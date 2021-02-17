@@ -7,11 +7,26 @@ import pauseIcon from '../../assets/control-pause.svg';
 import resetIcon from '../../assets/control-reset-cycle.svg';
 import resetAllIcon from '../../assets/control-reset-all.svg';
 
-const icons = {
-  start: startIcon,
-  pause: pauseIcon,
-  'reset-cycle': resetIcon,
-  'reset-all': resetAllIcon,
+const control = {
+  start: {
+    icon: startIcon,
+    text: chrome.i18n.getMessage('control_start'),
+  },
+  pause: {
+    icon: pauseIcon,
+    text: chrome.i18n.getMessage('control_pause'),
+  },
+  'reset-cycle': {
+    icon: resetIcon,
+    text: chrome.i18n.getMessage('control_resetCycle'),
+  },
+  'reset-all': {
+    icon: resetAllIcon,
+    text: chrome.i18n.getMessage('control_resetAll'),
+  },
+  skip: {
+    text: chrome.i18n.getMessage('control_skipBreak'),
+  },
 };
 
 const StyledControl = styled.div`
@@ -60,17 +75,18 @@ const Button = ({ name, onClick }) => {
   const highlight = name === 'start';
   return (
     <StyledButton
+      title={control[name].text}
       highlight={highlight}
       onClick={() => onClick({ command: name })}
     >
-      <Icon src={icons[name]} />
+      <Icon src={control[name].icon} />
     </StyledButton>
   );
 };
 
 const Skip = ({ onClick }) => (
   <StyledSkip onClick={() => onClick({ command: 'skip' })}>
-    Skip break
+    {control['skip'].text}
   </StyledSkip>
 );
 

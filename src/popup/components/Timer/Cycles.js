@@ -15,7 +15,9 @@ const StyledCycles = styled.div`
   min-height: 17px;
 `;
 
-const Dot = styled.div`
+const Dot = styled.div.attrs((props) => ({
+  title: `${chrome.i18n.getMessage('progress_dot')} ${props.id}`,
+}))`
   display: inline-block;
   justify-self: center;
   width: 16px;
@@ -41,11 +43,15 @@ const Complete = styled(Dot)`
   background-color: ${(props) => props.theme.cycles.complete};
 `;
 
-const Cycle = ({ status }) => {
+const Cycle = ({ status, id }) => {
   let cycle;
-  if (status === 'running' || status === 'paused') cycle = <Running />;
-  else if (status === 'initial') cycle = <Pending />;
-  else if (status === 'complete') cycle = <Complete />;
+  if (status === 'running' || status === 'paused') {
+    cycle = <Running id={id} />;
+  } else if (status === 'initial') {
+    cycle = <Pending id={id} />;
+  } else if (status === 'complete') {
+    cycle = <Complete id={id} />;
+  }
 
   return cycle;
 };
@@ -56,12 +62,13 @@ const Cycles = ({ period, status, total }) => {
   let i = 0;
   while (cycles.length < totalCycles) {
     if (i % 2 === 0) {
+      const id = i / 2 + 1;
       if (i === period) {
-        cycles.push(<Cycle key={i / 2} status={status} />);
+        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={status} />);
       } else if (i < period) {
-        cycles.push(<Cycle key={i / 2} status={'complete'} />);
+        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={'complete'} />);
       } else if (i > period) {
-        cycles.push(<Cycle key={i / 2} status={'initial'} />);
+        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={'initial'} />);
       }
     }
 

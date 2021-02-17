@@ -10,17 +10,26 @@ const List = styled.ul`
   margin-bottom: 0;
 `;
 
+const locale = {
+  title: chrome.i18n.getMessage('updates'),
+  greeting: chrome.i18n.getMessage('updates_greeting', '0.6'),
+  notes: chrome.i18n.getMessage('updates_notes'),
+  update_1: chrome.i18n.getMessage('updates_update_1'),
+  update_2: chrome.i18n.getMessage('updates_update_2'),
+  update_3: chrome.i18n.getMessage('updates_update_3'),
+};
+
 const Updates = () => {
   return (
     <Section width={375}>
-      <h1>Updates</h1>
-      <p>Welcome to version 0.6</p>
+      <h1>{locale.title}</h1>
+      <p>{locale.greeting}</p>
 
-      <span>Release notes:</span>
+      <span>{locale.notes}</span>
       <List>
-        <li>New option to show the timer on top of the icon ⏱</li>
-        <li>Adjusted colors in both the light and dark theme 🎨</li>
-        <li>Simplified navigation ⚙️</li>
+        <li>{locale.update_1}</li>
+        <li>{locale.update_2}</li>
+        <li>{locale.update_3}</li>
       </List>
     </Section>
   );

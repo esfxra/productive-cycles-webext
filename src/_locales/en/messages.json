@@ -8,103 +8,138 @@
     "description":"The description of the application, displayed in the web store."
   },
 
-  "start": {
+  "control_start": {
     "message": "Start"
   },
-  "pause": {
+  "control_pause": {
     "message": "Pause"
   },
-  "resetCycle": {
+  "control_resetCycle": {
     "message":"Reset cycle"
   },
-  "resetAll": {
+  "control_resetAll": {
     "message": "Reset all"
   },
-  "skipBreak": {
+  "control_skipBreak": {
     "message": "Skip break"
   },
-  "cycle": {
+
+  "progress_dot": {
     "message": "Cycle"
   },
 
-  "options": {
+  "complete": {
+    "message": "Timer complete&nbsp;&nbsp;🎉"
+  },
+  "complete_button": {
+    "message": "New timer"
+  },
+
+  "nav_settings": {
     "message": "Options"
   },
-  "statistics": {
-    "message": "Statistics"
-  },
-  "back": {
+  "nav_back": {
     "message": "Back"
   },
 
-  "themeTitle": {
+  "settings_appearance": {
     "message": "Theme"
   },
-  "themeLightTitle": {
+  "settings_appearance_light": {
     "message": "Light mode"
   },
-  "themeDarkTitle": {
+  "settings_appearance_dark": {
     "message": "Dark mode"
   },
 
-  "optionsTitle": {
+  "settings_notifications": {
+    "message": "Notifications"
+  },
+  "settings_notifications_enabled": {
+    "message": "Enable notifications"
+  },  
+  "settings_notifications_sound": {
+    "message": "Enable sound"
+  },  
+
+  "settings_autoStart": {
+    "message": "Automatic start"
+  },
+  "settings_autoStart_cycles": {
+    "message": "Auto-start cycles"
+  },  
+  "settings_autoStart_breaks": {
+    "message": "Auto-start breaks"
+  },  
+
+  "settings_timer": {
     "message": "Timer options"
   },
-  "optionsNote": {
-    "message": "Changes will reset the timer"
-  },
-  "optionsMinutes": {
+  "settings_timer_cycleMinutes": {
     "message": "Cycle minutes"
   },
-  "optionsBreak": {
+  "settings_timer_breakMinutes": {
     "message": "Break minutes"
   },
-  "optionsCycles": {
+  "settings_timer_totalCycles": {
     "message": "Total cycles"
   },
-  "optionsAutoStart": {
-    "message": "Auto-start"
+  "settings_timer_badgeTimer": {
+    "message": "Show timer on icon"
   },
 
-  "saveButton": {
-    "message": "Save"
-  },
-  "statusSaved": {
-    "message": "Saved"
-  },
-
-  "updatesTitle": {
+  "updates": {
     "message": "Updates"
   },
-  "upcomingTitle": {
-    "message": "Upcoming features"
+  "updates_greeting": {
+    "message": "Welcome to version $version$",
+    "placeholders": {
+      "version": {
+        "content": "$1"
+      }
+    }
+  },
+  "updates_update_1": {
+    "message": "New option to show the timer on top of the icon ⏱"
+  },
+  "updates_update_2": {
+    "message": "Adjusted colors in both the light and dark theme 🎨"
+  },
+  "updates_update_3": {
+    "message": "Simplified navigation ⚙️"
   },
 
-  "cycleCompleteTitle_Fragment_1": {
-    "message": "Cycle"
+  "notifications_cycle_title": {
+    "message": "Cycle $period$ complete!",
+    "placeholders": {
+      "period": {
+        "content": "$1"
+      }
+    }
   },
-  "cycleCompleteTitle_Fragment_2": {
-    "message": "complete"
+  "notifications_cycle_message": {
+    "message": "Great job. Take $time$.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
   },
-  "cycleCompleteMessage": {
-    "message": "Great job! Everyone, take"
+  "notifications_break_title": {
+    "message": "Break $period$ is over.",
+    "placeholders": {
+      "period": {
+        "content": "$1"
+      }
+    }
   },
-  "timerCompleteTitle": {
-    "message": "All cycles complete!"
+  "notifications_break_message": {
+    "message": "Time to grind!"
   },
-  "timerCompleteMessage": {
-    "message": "Take a long break :)"
+  "notifications_complete_title": {
+    "message": "You did it! All cycles are complete."
   },
-  "autoStartTitle": {
-    "message": "Starting cycle"
-  },
-  "autoStartMessage": {
-    "message": "Time to grind"
-  },
-  "breakCompleteTitle": {
-    "message": "Don't forget to start cycle"
-  },
-  "breakCompleteMessage": {
-    "message": "Time to grind"
+  "notifications_complete_message": {
+    "message": "Take a long break 🧘"
   }
 }

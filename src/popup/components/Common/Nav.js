@@ -9,12 +9,12 @@ import backDark from '../../assets/back-dark.svg';
 
 // Objects acting as dictionaries to trace image according to theme
 const settings = {
-  light: settingsLight,
-  dark: settingsDark,
+  icon: { light: settingsLight, dark: settingsDark },
+  text: chrome.i18n.getMessage('nav_settings'),
 };
 const back = {
-  light: backLight,
-  dark: backDark,
+  icon: { light: backLight, dark: backDark },
+  text: chrome.i18n.getMessage('nav_back'),
 };
 
 // Styled wrappers
@@ -32,10 +32,14 @@ const IconWrapper = styled.div`
 `;
 
 // Settings icon
-const Settings = ({ theme }) => <img src={settings[theme.name]} />;
+const Settings = ({ theme }) => (
+  <img src={settings.icon[theme.name]} title={settings.text} />
+);
 
 // Back icon
-const Back = ({ theme }) => <img src={back[theme.name]} />;
+const Back = ({ theme }) => (
+  <img src={back.icon[theme.name]} title={back.text} />
+);
 
 // Main Nav component
 const Nav = ({ view, navigate }) => {

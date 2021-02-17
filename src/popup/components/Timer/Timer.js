@@ -7,6 +7,11 @@ import Counter from './Counter';
 import Control from './Control';
 import Cycles from './Cycles';
 
+const locale = {
+  complete: chrome.i18n.getMessage('complete'),
+  complete_button: chrome.i18n.getMessage('complete_button'),
+};
+
 const CompleteMessage = styled.div`
   margin-bottom: 18px;
   font-size: 16px;
@@ -65,10 +70,10 @@ const Timer = () => {
 
   const complete = (
     <>
-      <CompleteMessage>Timer complete&nbsp;&nbsp;🎉</CompleteMessage>
+      <CompleteMessage>{locale.complete}</CompleteMessage>
       <Cycles period={period} status={status} total={total} />
       <NewTimerButton onClick={() => handleInput({ command: 'reset-all' })}>
-        New timer
+        {locale.complete_button}
       </NewTimerButton>
     </>
   );
