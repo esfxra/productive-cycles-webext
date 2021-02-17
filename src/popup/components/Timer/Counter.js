@@ -9,7 +9,7 @@ const StyledCounter = styled.div`
 `;
 
 const Time = styled.div`
-  min-height: 23px;
+  height: 30px;
   font-family: 'Roboto Mono', monospace;
   font-size: 23px;
   color: ${(props) => props.theme.foreground};

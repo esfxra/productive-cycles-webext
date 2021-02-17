@@ -28,8 +28,8 @@ const light = {
 const dark = {
   name: 'dark',
   foreground: '#f5f5f5',
-  background: '#1e1f23',
-  elevation: '#27282D',
+  background: '#202124',
+  elevation: '#28282B',
   accent: '#3c50fa',
   menu: {
     main: '#434552',
@@ -37,15 +37,15 @@ const dark = {
   },
   button: {
     main: '#3c50fa',
-    alt: '#484B56',
+    alt: '#454851',
   },
   cycles: {
-    pending: '#484B56',
+    pending: '#454851',
     complete: '#f5f5f5',
   },
   settings: {
-    number: '#787d8a',
-    checkbox: '#787d8a',
+    number: '#454851',
+    checkbox: '#454851',
     checkmark: '#f5f5f5',
   },
 };
