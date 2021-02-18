@@ -4,9 +4,13 @@ import React from 'react';
 import Appearance from './Appearance';
 import Group from './Group';
 
-console.time('jack');
-
+// Get localized strings
 const locale = {
+  appearance: {
+    title: chrome.i18n.getMessage('settings_appearance'),
+    light: chrome.i18n.getMessage('settings_appearance_light'),
+    dark: chrome.i18n.getMessage('settings_appearance_dark'),
+  },
   notifications: {
     title: chrome.i18n.getMessage('settings_notifications'),
     enabled: chrome.i18n.getMessage('settings_notifications_enabled'),
@@ -26,9 +30,11 @@ const locale = {
   },
 };
 
-console.timeEnd('jack');
-
-const appearance = { storage: 'theme' };
+// Build option objects: appearance, notifications, autoStart, timer
+const appearance = {
+  name: { light: locale.appearance.light, dark: locale.appearance.dark },
+  storage: 'theme',
+};
 
 const notifications = [
   {
@@ -67,7 +73,12 @@ const Settings = ({ changeTheme }) => {
   return (
     <>
       {/* Appearance settings */}
-      <Appearance options={appearance} margin={true} onChange={changeTheme} />
+      <Appearance
+        title={locale.appearance.title}
+        options={appearance}
+        margin={true}
+        onChange={changeTheme}
+      />
 
       {/* Notifications settings */}
       <Group

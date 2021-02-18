@@ -29,7 +29,7 @@
   },
 
   "complete": {
-    "message": "Timer complete&nbsp;&nbsp;🎉"
+    "message": "Timer complete  🎉"
   },
   "complete_button": {
     "message": "New timer"
@@ -43,7 +43,7 @@
   },
 
   "settings_appearance": {
-    "message": "Theme"
+    "message": "Appearance"
   },
   "settings_appearance_light": {
     "message": "Light mode"
@@ -98,6 +98,9 @@
         "content": "$1"
       }
     }
+  },
+  "updates_notes":{
+    "message": "Release notes:"
   },
   "updates_update_1": {
     "message": "New option to show the timer on top of the icon ⏱"
