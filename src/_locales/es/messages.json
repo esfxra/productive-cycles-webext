@@ -4,95 +4,95 @@
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Maximize your productivity with this simple-yet-complete Pomodoro timer. Track your effort and get reminded to take breaks.", 
+    "message": "Maximiza tu productividad con este simple temporizador de estilo Pomodoro. Mantente al tanto de tu esfuerzo y recibe recordatorios para tomar descansos.", 
     "description":"The description of the application, displayed in the web store."
   },
 
   "control_start": {
-    "message": "Start"
+    "message": "Comenzar"
   },
   "control_pause": {
-    "message": "Pause"
+    "message": "Pausa"
   },
   "control_resetCycle": {
-    "message":"Reset cycle"
+    "message":"Reiniciar ciclo"
   },
   "control_resetAll": {
-    "message": "Reset all"
+    "message": "Reiniciar todo"
   },
   "control_skipBreak": {
-    "message": "Skip break"
+    "message": "Omitir descanso"
   },
 
   "progress_dot": {
-    "message": "Cycle"
+    "message": "Ciclo"
   },
 
   "complete": {
-    "message": "Timer complete  🎉"
+    "message": "Buen trabajo!  🎉"
   },
   "complete_button": {
-    "message": "New timer"
+    "message": "Comenzar de nuevo"
   },
 
   "nav_settings": {
-    "message": "Settings"
+    "message": "Configuración"
   },
   "nav_back": {
-    "message": "Back"
+    "message": "Volver"
   },
 
   "settings_appearance": {
-    "message": "Appearance"
+    "message": "Apariencia"
   },
   "settings_appearance_light": {
-    "message": "Light mode"
+    "message": "Modo claro"
   },
   "settings_appearance_dark": {
-    "message": "Dark mode"
+    "message": "Modo oscuro"
   },
 
   "settings_notifications": {
-    "message": "Notifications"
+    "message": "Notificaciones"
   },
   "settings_notifications_enabled": {
-    "message": "Enable notifications"
+    "message": "Activar notificaciones"
   },  
   "settings_notifications_sound": {
-    "message": "Enable sound"
+    "message": "Activar sonido"
   },  
 
   "settings_autoStart": {
-    "message": "Automatic start"
+    "message": "Comienzo automático"
   },
   "settings_autoStart_cycles": {
-    "message": "Auto-start cycles"
+    "message": "Auto-comenzar ciclos"
   },  
   "settings_autoStart_breaks": {
-    "message": "Auto-start breaks"
+    "message": "Auto-comenzar descansos"
   },  
 
   "settings_timer": {
-    "message": "Timer options"
+    "message": "Temporizador"
   },
   "settings_timer_cycleMinutes": {
-    "message": "Cycle minutes"
+    "message": "Minutos por ciclo"
   },
   "settings_timer_breakMinutes": {
-    "message": "Break minutes"
+    "message": "Minutos por descanso"
   },
   "settings_timer_totalCycles": {
-    "message": "Total cycles"
+    "message": "Ciclos totales"
   },
   "settings_timer_badgeTimer": {
-    "message": "Show timer on icon"
+    "message": "Mostrar reloj sobre el ícono"
   },
 
   "updates": {
-    "message": "Updates"
+    "message": "Actualizaciones"
   },
   "updates_greeting": {
-    "message": "Welcome to version $version$",
+    "message": "Bienvenido a la versión $version$",
     "placeholders": {
       "version": {
         "content": "$1"
@@ -100,20 +100,20 @@
     }
   },
   "updates_notes":{
-    "message": "Release notes:"
+    "message": "Cambios:"
   },
   "updates_update_1": {
-    "message": "New option to show the timer on top of the icon ⏱"
+    "message": "Nueva opción para mostrar el temporizador encima del ícono ⏱"
   },
   "updates_update_2": {
-    "message": "Adjusted colors in both the light and dark theme 🎨"
+    "message": "Ajuste de los colores del modo claro y del modo oscuro 🎨"
   },
   "updates_update_3": {
-    "message": "Simplified navigation ⚙️"
+    "message": "Simplificación del menú ⚙️"
   },
 
   "notifications_cycle_title": {
-    "message": "Cycle $period$ complete!",
+    "message": "Ciclo $period$ completado!",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -121,7 +121,7 @@
     }
   },
   "notifications_cycle_message": {
-    "message": "Great job. Take $time$.",
+    "message": "Excelente trabajo. Toma $time$.",
     "placeholders": {
       "time": {
         "content": "$1"
@@ -129,7 +129,7 @@
     }
   },
   "notifications_break_title": {
-    "message": "Break $period$ is over.",
+    "message": "El descanso $period$ se acabó.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -137,12 +137,12 @@
     }
   },
   "notifications_break_message": {
-    "message": "Time to grind!"
+    "message": "Hora de trabajar!"
   },
   "notifications_complete_title": {
-    "message": "You did it! All cycles are complete."
+    "message": "Lo hiciste! Todos los ciclos han sido completados."
   },
   "notifications_complete_message": {
-    "message": "Take a long break 🧘"
+    "message": "Es hora de un buen descanso 🧘"
   }
 }
