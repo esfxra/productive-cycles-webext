@@ -1,16 +1,14 @@
-'use strict';
+"use strict";
 
-import React, { useState, useEffect, useRef } from 'react';
-import styled from 'styled-components';
-import Section from '../Common/Section';
-import Counter from './Counter';
-import Control from './Control';
-import Cycles from './Cycles';
+import React, { useState, useEffect, useRef } from "react";
+import styled from "styled-components";
+import Section from "../Common/Section";
+import Counter from "./Counter";
+import Control from "./Control";
+import Cycles from "./Cycles";
+import useLocale from "../../hooks/useLocale";
 
-const locale = {
-  complete: chrome.i18n.getMessage('complete'),
-  complete_button: chrome.i18n.getMessage('complete_button'),
-};
+const locale_set = ["complete", "complete_button"];
 
 const CompleteMessage = styled.div`
   margin-bottom: 18px;
@@ -31,15 +29,16 @@ const NewTimerButton = styled.div`
 
 const Timer = () => {
   const port = useRef();
-  const [time, setTime] = useState('25:00');
+  const [time, setTime] = useState("25:00");
   const [period, setPeriod] = useState(0);
-  const [status, setStatus] = useState('initial');
+  const [status, setStatus] = useState("initial");
   const [total, setTotal] = useState(7);
+  const locale = useLocale(locale_set);
 
   useEffect(() => {
-    port.current = chrome.runtime.connect({ name: 'port-from-popup' });
+    port.current = chrome.runtime.connect({ name: "port-from-popup" });
     port.current.onMessage.addListener(handleMessage);
-    port.current.postMessage({ command: 'preload' });
+    port.current.postMessage({ command: "preload" });
 
     return () => {
       port.current.onMessage.removeListener(handleMessage);
@@ -58,7 +57,7 @@ const Timer = () => {
     port.current.postMessage({ command: input.command });
   };
 
-  const isComplete = period === total - 1 && status === 'complete';
+  const isComplete = period === total - 1 && status === "complete";
 
   const normal = (
     <>
@@ -70,10 +69,10 @@ const Timer = () => {
 
   const complete = (
     <>
-      <CompleteMessage>{locale.complete}</CompleteMessage>
+      <CompleteMessage>{locale["complete"]}</CompleteMessage>
       <Cycles period={period} status={status} total={total} />
-      <NewTimerButton onClick={() => handleInput({ command: 'reset-all' })}>
-        {locale.complete_button}
+      <NewTimerButton onClick={() => handleInput({ command: "reset-all" })}>
+        {locale["complete_button"]}
       </NewTimerButton>
     </>
   );

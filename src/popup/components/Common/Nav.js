@@ -1,20 +1,23 @@
-'use strict';
+"use strict";
 
-import React, { useContext } from 'react';
-import styled, { ThemeContext } from 'styled-components';
-import settingsLight from '../../assets/settings-light.svg';
-import settingsDark from '../../assets/settings-dark.svg';
-import backLight from '../../assets/back-light.svg';
-import backDark from '../../assets/back-dark.svg';
+import React, { useContext } from "react";
+import styled, { ThemeContext } from "styled-components";
+
+import useLocale from "../../hooks/useLocale";
+
+import settingsLight from "../../assets/settings-light.svg";
+import settingsDark from "../../assets/settings-dark.svg";
+import backLight from "../../assets/back-light.svg";
+import backDark from "../../assets/back-dark.svg";
+
+const locale_set = ["nav_settings", "nav_back"];
 
 // Objects acting as dictionaries to trace image according to theme
 const settings = {
   icon: { light: settingsLight, dark: settingsDark },
-  text: chrome.i18n.getMessage('nav_settings'),
 };
 const back = {
   icon: { light: backLight, dark: backDark },
-  text: chrome.i18n.getMessage('nav_back'),
 };
 
 // Styled wrappers
@@ -32,21 +35,22 @@ const IconWrapper = styled.div`
 `;
 
 // Settings icon
-const Settings = ({ theme }) => (
-  <img src={settings.icon[theme.name]} title={settings.text} />
+const Settings = ({ theme, title }) => (
+  <img src={settings.icon[theme.name]} title={title} />
 );
 
 // Back icon
-const Back = ({ theme }) => (
-  <img src={back.icon[theme.name]} title={back.text} />
+const Back = ({ theme, title }) => (
+  <img src={back.icon[theme.name]} title={title} />
 );
 
 // Main Nav component
 const Nav = ({ view, navigate }) => {
   const theme = useContext(ThemeContext);
+  const locale = useLocale(locale_set);
 
   const target = determineTarget(view);
-  const icon = determineIcon(view, theme);
+  const icon = determineIcon(view, theme, locale);
 
   return (
     <StyledNav>
@@ -57,13 +61,14 @@ const Nav = ({ view, navigate }) => {
 
 // Helper functions
 function determineTarget(view) {
-  if (view === 'timer') return 'settings';
-  else return 'timer';
+  if (view === "timer") return "settings";
+  else return "timer";
 }
 
-function determineIcon(view, theme) {
-  if (view === 'timer') return <Settings theme={theme} />;
-  else return <Back theme={theme} />;
+function determineIcon(view, theme, locale) {
+  if (view === "timer")
+    return <Settings theme={theme} title={locale["nav_settings"]} />;
+  else return <Back theme={theme} title={locale["nav_back"]} />;
 }
 
 export default Nav;
