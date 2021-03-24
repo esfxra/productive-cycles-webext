@@ -1,9 +1,9 @@
-'use strict';
+"use strict";
 
-import React from 'react';
-import styled from 'styled-components';
-import Section from '../Common/Section';
-import Option from './Option';
+import React from "react";
+import styled from "styled-components";
+import Section from "../Common/Section";
+import Option from "./Option";
 
 const Separator = styled.div`
   width: 100%;
@@ -15,8 +15,8 @@ const Separator = styled.div`
 
 const Group = ({ title, options, margin }) => {
   // Separate options by type
-  let numbers = options.filter((option) => option.type === 'number');
-  let checkboxes = options.filter((option) => option.type === 'checkbox');
+  let numbers = options.filter((option) => option.type === "number");
+  let checkboxes = options.filter((option) => option.type === "checkbox");
 
   // Map number options to component
   numbers = mapOptions(numbers);
@@ -40,7 +40,7 @@ function mapOptions(options) {
 
   if (options.length > 0) {
     result = options.map((x, i) => (
-      <Option key={x.name} option={x} last={i === options.length - 1} />
+      <Option key={x.storage} option={x} last={i === options.length - 1} />
     ));
   }
 
