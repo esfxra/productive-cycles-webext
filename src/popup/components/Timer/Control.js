@@ -1,17 +1,36 @@
-'use strict';
+"use strict";
 
-import React from 'react';
-import styled from 'styled-components';
-import startIcon from '../../assets/control-start.svg';
-import pauseIcon from '../../assets/control-pause.svg';
-import resetIcon from '../../assets/control-reset-cycle.svg';
-import resetAllIcon from '../../assets/control-reset-all.svg';
+import React from "react";
+import styled from "styled-components";
 
-const icons = {
-  start: startIcon,
-  pause: pauseIcon,
-  'reset-cycle': resetIcon,
-  'reset-all': resetAllIcon,
+import useLocale from "../../hooks/useLocale";
+
+import startIcon from "../../assets/control-start.svg";
+import pauseIcon from "../../assets/control-pause.svg";
+import resetIcon from "../../assets/control-reset-cycle.svg";
+import resetAllIcon from "../../assets/control-reset-all.svg";
+
+const locale_set = [
+  "control_start",
+  "control_pause",
+  "control_resetCycle",
+  "control_resetAll",
+  "control_skipBreak",
+];
+
+const control = {
+  start: {
+    icon: startIcon,
+  },
+  pause: {
+    icon: pauseIcon,
+  },
+  "reset-cycle": {
+    icon: resetIcon,
+  },
+  "reset-all": {
+    icon: resetAllIcon,
+  },
 };
 
 const StyledControl = styled.div`
@@ -20,7 +39,7 @@ const StyledControl = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: ${(props) =>
-    props.period % 2 === 0 ? 'space-between' : 'center'};
+    props.period % 2 === 0 ? "space-between" : "center"};
   width: 100%;
   margin-bottom: 25px;
 `;
@@ -56,33 +75,60 @@ const StyledSkip = styled.div`
   }
 `;
 
-const Button = ({ name, onClick }) => {
-  const highlight = name === 'start';
+const Button = ({ name, title, onClick }) => {
+  const highlight = name === "start";
   return (
     <StyledButton
+      title={title}
       highlight={highlight}
       onClick={() => onClick({ command: name })}
     >
-      <Icon src={icons[name]} />
+      <Icon src={control[name].icon} />
     </StyledButton>
   );
 };
 
-const Skip = ({ onClick }) => (
-  <StyledSkip onClick={() => onClick({ command: 'skip' })}>
-    Skip break
-  </StyledSkip>
+const Skip = ({ title, onClick }) => (
+  <StyledSkip onClick={() => onClick({ command: "skip" })}>{title}</StyledSkip>
 );
 
 const Control = ({ period, status, handleInput }) => {
-  const isCycle = period % 2 === 0;
-  const isRunning = status === 'running';
+  const locale = useLocale(locale_set);
 
-  const start = <Button name="start" onClick={handleInput} />;
-  const pause = <Button name="pause" onClick={handleInput} />;
-  const reset = <Button name="reset-cycle" onClick={handleInput} />;
-  const resetAll = <Button name="reset-all" onClick={handleInput} />;
-  const skip = <Skip onClick={handleInput} />;
+  const isCycle = period % 2 === 0;
+  const isRunning = status === "running";
+
+  const start = (
+    <Button
+      name="start"
+      title={locale["control_start"]}
+      onClick={handleInput}
+    />
+  );
+  const pause = (
+    <Button
+      name="pause"
+      title={locale["control_pause"]}
+      onClick={handleInput}
+    />
+  );
+  const reset = (
+    <Button
+      name="reset-cycle"
+      title={locale["control_resetCycle"]}
+      onClick={handleInput}
+    />
+  );
+  const resetAll = (
+    <Button
+      name="reset-all"
+      title={locale["control_resetAll"]}
+      onClick={handleInput}
+    />
+  );
+  const skip = (
+    <Skip title={locale["control_skipBreak"]} onClick={handleInput} />
+  );
 
   let control;
   if (isCycle) {

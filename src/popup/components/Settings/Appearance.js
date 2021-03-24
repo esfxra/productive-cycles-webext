@@ -25,7 +25,7 @@ const Theme = styled.div`
   cursor: pointer;
 `;
 
-const Appearance = ({ options, margin, onChange }) => {
+const Appearance = ({ title, options, margin, onChange }) => {
   const storage = options.storage;
 
   const [theme, setTheme] = useState('light');
@@ -41,20 +41,18 @@ const Appearance = ({ options, margin, onChange }) => {
 
   return (
     <Section margin={margin}>
-      <h1>Appearance</h1>
+      <h1>{title}</h1>
 
       <Options>
         <Theme
           name="light"
-          alt="Light mode toggle"
-          title="Light mode"
+          title={options.name.light}
           selected={theme}
           onClick={() => setTheme('light')}
         />
         <Theme
           name="dark"
-          alt="Dark mode toggle"
-          title="Dark mode"
+          title={options.name.dark}
           selected={theme}
           onClick={() => setTheme('dark')}
         />
