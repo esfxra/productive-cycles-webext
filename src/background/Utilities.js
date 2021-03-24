@@ -1,16 +1,16 @@
-'use strict';
+"use strict";
 
 class Utilities {
   static getStoredSettings() {
     return new Promise((resolve) => {
       chrome.storage.local.get(
         [
-          'autoStartCycles',
-          'autoStartBreaks',
-          'cycleMinutes',
-          'breakMinutes',
-          'totalCycles',
-          'badgeTimer',
+          "autoStartCycles",
+          "autoStartBreaks",
+          "cycleMinutes",
+          "breakMinutes",
+          "totalCycles",
+          "badgeTimer",
         ],
         (storage) => {
           const settings = {
@@ -68,8 +68,8 @@ class Utilities {
       chrome.browserAction.setBadgeBackgroundColor({ color: color }, () => {});
     };
 
-    if (isCycle) setBadgeColor('#3c50fa');
-    else setBadgeColor('#484B56');
+    if (isCycle) setBadgeColor("#3c50fa");
+    else setBadgeColor("#484B56");
   }
 
   static updateBadgeTime(status, time) {
@@ -78,24 +78,24 @@ class Utilities {
     };
 
     switch (status) {
-      case 'initial':
-      case 'complete':
-        setBadgeText('...');
+      case "initial":
+      case "complete":
+        setBadgeText("...");
         break;
-      case 'running':
-      case 'paused':
+      case "running":
+      case "paused":
         let text;
 
         // Slice seconds if less than a minute, or slice minutes
         // The format of the string 'time' is '00:00'
-        if (time.includes('00:')) {
+        if (time.includes("00:")) {
           text = `${time.slice(3)}s`;
         } else {
           text = `${time.slice(0, 2)}m`;
         }
 
         // Trim any 0s for single digit numbers
-        text = text.charAt(0) === '0' ? text.slice(1) : text;
+        text = text.charAt(0) === "0" ? text.slice(1) : text;
 
         // Update badge text
         setBadgeText(text);

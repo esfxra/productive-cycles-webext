@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
 const Box = styled.div`
   position: relative;
@@ -21,7 +21,7 @@ const Box = styled.div`
 
 const Checkmark = styled.div`
   &:after {
-    content: '';
+    content: "";
     position: absolute;
     left: 3px;
     top: 0px;

@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-import { Adjuster } from '../../src/background/Adjuster.js';
+import { Adjuster } from "../../src/background/Adjuster.js";
 
-describe('Determine period', () => {
+describe("Determine period", () => {
   test.each([
     [2001, 1],
     [3000, 1],
@@ -11,7 +11,7 @@ describe('Determine period', () => {
     [6100, 3],
     [8100, 4],
     [11000, 4],
-  ])('When the whole timeline is enabled', (reference, expected) => {
+  ])("When the whole timeline is enabled", (reference, expected) => {
     const timeline = [
       { target: 2000, enabled: true },
       { target: 4000, enabled: true },
@@ -33,7 +33,7 @@ describe('Determine period', () => {
     [5000, 2],
     [6001, 2],
     [9000, 2],
-  ])('When the timeline is partially enabled', (reference, expected) => {
+  ])("When the timeline is partially enabled", (reference, expected) => {
     const timeline = [
       { target: 2000, enabled: false },
       { target: 4000, enabled: true },
@@ -56,7 +56,7 @@ describe('Determine period', () => {
     [10000, 4],
     [11000, 4],
   ])(
-    'When the timeline is partially enabled for the last 2 periods',
+    "When the timeline is partially enabled for the last 2 periods",
     (reference, expected) => {
       const timeline = [
         { target: 2000, enabled: false },

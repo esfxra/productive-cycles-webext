@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-import { Utilities } from './Utilities.js';
+import { Utilities } from "./Utilities.js";
 
-const idTemplate = 'notification-for-period';
+const idTemplate = "notification-for-period";
 
 class Notifications {
   static async send(period, breakTime, type) {
@@ -22,26 +22,26 @@ class Notifications {
     let message;
 
     switch (type) {
-      case 'cycle':
+      case "cycle":
         title = chrome.i18n.getMessage(
-          'notifications_cycle_title',
+          "notifications_cycle_title",
           Utilities.mapCycle(period).toString()
         );
         message = chrome.i18n.getMessage(
-          'notifications_cycle_message',
+          "notifications_cycle_message",
           Utilities.msToMin(breakTime).toString()
         );
         break;
-      case 'break':
+      case "break":
         title = chrome.i18n.getMessage(
-          'notifications_break_title',
+          "notifications_break_title",
           Utilities.mapBreak(period).toString()
         );
-        message = chrome.i18n.getMessage('notifications_break_message');
+        message = chrome.i18n.getMessage("notifications_break_message");
         break;
-      case 'complete':
-        title = chrome.i18n.getMessage('notifications_complete_title');
-        message = chrome.i18n.getMessage('notifications_complete_message');
+      case "complete":
+        title = chrome.i18n.getMessage("notifications_complete_title");
+        message = chrome.i18n.getMessage("notifications_complete_message");
         break;
     }
 
@@ -51,7 +51,7 @@ class Notifications {
   static checkSettings() {
     return new Promise((resolve) => {
       chrome.storage.local.get(
-        ['notificationsEnabled', 'notificationsSound'],
+        ["notificationsEnabled", "notificationsSound"],
         (storage) =>
           resolve({
             enabled: storage.notificationsEnabled,
@@ -62,7 +62,7 @@ class Notifications {
   }
 
   static playSound() {
-    const sound = document.querySelector('#notifications');
+    const sound = document.querySelector("#notifications");
 
     sound
       .play()
@@ -72,8 +72,8 @@ class Notifications {
 
   static publish(notification) {
     chrome.notifications.create(notification.id, {
-      type: 'basic',
-      iconUrl: chrome.runtime.getURL('../manifest-icons/icon-128.png'),
+      type: "basic",
+      iconUrl: chrome.runtime.getURL("../manifest-icons/icon-128.png"),
       title: notification.title,
       message: notification.message,
     });

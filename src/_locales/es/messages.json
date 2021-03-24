@@ -4,8 +4,8 @@
     "description": "The title of the application, displayed in the web store."
   },
   "appDesc": {
-    "message": "Maximiza tu productividad con este simple temporizador de estilo Pomodoro. Mantente al tanto de tu esfuerzo y recibe recordatorios para tomar descansos.", 
-    "description":"The description of the application, displayed in the web store."
+    "message": "Maximiza tu productividad con este simple temporizador de estilo Pomodoro. Mantente al tanto de tu esfuerzo y recibe recordatorios para tomar descansos.",
+    "description": "The description of the application, displayed in the web store."
   },
 
   "control_start": {
@@ -15,7 +15,7 @@
     "message": "Pausa"
   },
   "control_resetCycle": {
-    "message":"Reiniciar ciclo"
+    "message": "Reiniciar ciclo"
   },
   "control_resetAll": {
     "message": "Reiniciar todo"
@@ -57,20 +57,20 @@
   },
   "settings_notifications_enabled": {
     "message": "Activar notificaciones"
-  },  
+  },
   "settings_notifications_sound": {
     "message": "Activar sonido"
-  },  
+  },
 
   "settings_autoStart": {
     "message": "Comienzo automático"
   },
   "settings_autoStart_cycles": {
     "message": "Auto-comenzar ciclos"
-  },  
+  },
   "settings_autoStart_breaks": {
     "message": "Auto-comenzar descansos"
-  },  
+  },
 
   "settings_timer": {
     "message": "Temporizador"
@@ -94,7 +94,7 @@
   "updates_greeting": {
     "message": "Bienvenido a la versión 0.7"
   },
-  "updates_notes":{
+  "updates_notes": {
     "message": "Cambios:"
   },
   "updates_update_1": {

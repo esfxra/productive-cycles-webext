@@ -1,8 +1,8 @@
-'use strict';
+"use strict";
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
-import Section from '../Common/Section';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
+import Section from "../Common/Section";
 
 const Options = styled.div`
   display: flex;
@@ -20,7 +20,7 @@ const Theme = styled.div`
         ? props.theme.accent
         : props.theme.elevation};
   background-color: ${(props) =>
-    props.name === 'light' ? '#eeeeee' : '#202124'};
+    props.name === "light" ? "#eeeeee" : "#202124"};
   background-clip: padding-box;
   cursor: pointer;
 `;
@@ -28,7 +28,7 @@ const Theme = styled.div`
 const Appearance = ({ title, options, margin, onChange }) => {
   const storage = options.storage;
 
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState("light");
 
   useEffect(() => {
     chrome.storage.local.get([storage], (stored) => setTheme(stored[storage]));
@@ -48,13 +48,13 @@ const Appearance = ({ title, options, margin, onChange }) => {
           name="light"
           title={options.name.light}
           selected={theme}
-          onClick={() => setTheme('light')}
+          onClick={() => setTheme("light")}
         />
         <Theme
           name="dark"
           title={options.name.dark}
           selected={theme}
-          onClick={() => setTheme('dark')}
+          onClick={() => setTheme("dark")}
         />
       </Options>
     </Section>

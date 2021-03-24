@@ -1,3 +1,3 @@
-import 'regenerator-runtime/runtime';
+import "regenerator-runtime/runtime";
 
-Object.assign(global, require('jest-chrome'));
+Object.assign(global, require("jest-chrome"));

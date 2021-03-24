@@ -1,12 +1,12 @@
-'use strict';
+"use strict";
 
-import React from 'react';
-import styled from 'styled-components';
+import React from "react";
+import styled from "styled-components";
 
 const StyledSection = styled.div`
-  width: ${(props) => (props.width ? `${props.width}px` : 'auto')};
+  width: ${(props) => (props.width ? `${props.width}px` : "auto")};
   padding: 13px;
-  margin-bottom: ${(props) => (props.margin ? '13px' : '0')};
+  margin-bottom: ${(props) => (props.margin ? "13px" : "0")};
   border-radius: 5px;
   background-color: ${(props) => props.theme.elevation};
   box-sizing: border-box;

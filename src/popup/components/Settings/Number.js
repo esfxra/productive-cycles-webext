@@ -1,7 +1,7 @@
-'use strict';
+"use strict";
 
-import React, { useState, useEffect } from 'react';
-import styled from 'styled-components';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
 const boundaries = {
   cycleMinutes: { min: 1, max: 59 },
@@ -12,7 +12,7 @@ const boundaries = {
 const NumberInput = styled.input`
   padding: 3px;
   text-align: center;
-  font-family: 'Open Sans', sans-serif;
+  font-family: "Open Sans", sans-serif;
   font-size: 13px;
   border-radius: 4px;
   border-width: 1px;
@@ -33,12 +33,12 @@ const NumberInput = styled.input`
 
   &:focus {
     outline: none;
-    border-color: ${(props) => (props.valid ? props.theme.accent : 'red')};
+    border-color: ${(props) => (props.valid ? props.theme.accent : "red")};
   }
 `;
 
 const validate = (value, min, max) => {
-  if (value === '') return { valid: false, value: '' }; // Prevents a NaN not handled by 'number' type input
+  if (value === "") return { valid: false, value: "" }; // Prevents a NaN not handled by 'number' type input
 
   let parsed = parseInt(value);
 
