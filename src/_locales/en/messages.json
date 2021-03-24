@@ -92,12 +92,7 @@
     "message": "Updates"
   },
   "updates_greeting": {
-    "message": "Welcome to version $version$",
-    "placeholders": {
-      "version": {
-        "content": "$1"
-      }
-    }
+    "message": "Welcome to version 0.7"
   },
   "updates_notes":{
     "message": "Release notes:"
