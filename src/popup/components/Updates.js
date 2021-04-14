@@ -13,6 +13,10 @@ const List = styled.ul`
   margin-bottom: 0;
 `;
 
+const Item = styled.li`
+  white-space: nowrap;
+`;
+
 const locale_set = [
   "updates",
   "updates_greeting",
@@ -26,15 +30,15 @@ const Updates = () => {
   const locale = useLocale(locale_set);
 
   return (
-    <Section width={375}>
+    <Section>
       <h1>{locale["updates"]}</h1>
       <p>{locale["updates_greeting"]}</p>
 
       <span>{locale["updates_notes"]}</span>
       <List>
-        <li>{locale["updates_update_1"]}</li>
-        <li>{locale["updates_update_2"]}</li>
-        <li>{locale["updates_update_3"]}</li>
+        <Item>{locale["updates_update_1"]}</Item>
+        <Item>{locale["updates_update_2"]}</Item>
+        <Item>{locale["updates_update_3"]}</Item>
       </List>
     </Section>
   );

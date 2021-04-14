@@ -8,9 +8,10 @@ import Number from "./Number";
 const StyledOption = styled.div`
   display: grid;
   align-items: center;
-  grid-template-columns: 120px 40px;
+  grid-template-columns: 1fr 40px;
   column-gap: 15px;
   margin-bottom: ${(props) => (props.margin ? "13px" : "0")};
+  white-space: nowrap;
 `;
 
 const Input = ({ type, storage }) => {

@@ -68,7 +68,7 @@ const Settings = ({ changeTheme }) => {
       storage: "cycleMinutes",
     },
     {
-      name: locale["settings_timer_cycleMinutes"],
+      name: locale["settings_timer_breakMinutes"],
       type: "number",
       storage: "breakMinutes",
     },
