@@ -66,10 +66,10 @@
     "message": "Comienzo automático"
   },
   "settings_autoStart_cycles": {
-    "message": "Auto-comenzar ciclos"
+    "message": "Comenzar ciclos"
   },
   "settings_autoStart_breaks": {
-    "message": "Auto-comenzar descansos"
+    "message": "Comenzar descansos"
   },
 
   "settings_timer": {
@@ -82,10 +82,10 @@
     "message": "Minutos por descanso"
   },
   "settings_timer_totalCycles": {
-    "message": "Ciclos totales"
+    "message": "Número de ciclos"
   },
   "settings_timer_badgeTimer": {
-    "message": "Mostrar reloj sobre el ícono"
+    "message": "Temporizador en ícono"
   },
 
   "updates": {
