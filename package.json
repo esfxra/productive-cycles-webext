@@ -1,12 +1,12 @@
 {
   "name": "productive-cycles-webext",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "author": "Diego Serrano",
   "license": "MIT",
   "private": true,
   "scripts": {
     "test": "jest --watchAll",
-    "dev": "parcel watch ./src/manifest.json",
+    "dev": "parcel watch ./src/manifest.json --hmr-hostname localhost",
     "build": "parcel build ./src/manifest.json",
     "start:firefox": "web-ext run --source-dir ./dist",
     "start:chrome": "web-ext run --source-dir ./dist --target chromium"
