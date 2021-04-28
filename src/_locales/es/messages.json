@@ -29,10 +29,10 @@
   },
 
   "complete": {
-    "message": "Buen trabajo!  🎉"
+    "message": "Tiempo completo  🎉"
   },
   "complete_button": {
-    "message": "Comenzar de nuevo"
+    "message": "Recomenzar"
   },
 
   "nav_settings": {
@@ -98,17 +98,14 @@
     "message": "Cambios:"
   },
   "updates_update_1": {
-    "message": "Nueva opción para mostrar el temporizador encima del ícono ⏱"
+    "message": "Idioma español 🇪🇸"
   },
   "updates_update_2": {
-    "message": "Ajuste de los colores del modo claro y del modo oscuro 🎨"
-  },
-  "updates_update_3": {
-    "message": "Simplificación del menú ⚙️"
+    "message": "Trabajo preparatorio para más idiomas 🌐"
   },
 
   "notifications_cycle_title": {
-    "message": "Ciclo $period$ completado!",
+    "message": "Completaste el ciclo #$period$.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -116,7 +113,7 @@
     }
   },
   "notifications_cycle_message": {
-    "message": "Excelente trabajo. Toma $time$.",
+    "message": "Recuerda cumplir con tu descanso.",
     "placeholders": {
       "time": {
         "content": "$1"
@@ -124,7 +121,7 @@
     }
   },
   "notifications_break_title": {
-    "message": "El descanso $period$ se acabó.",
+    "message": "Se acabó el descanso #$period$.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -132,10 +129,10 @@
     }
   },
   "notifications_break_message": {
-    "message": "Hora de trabajar!"
+    "message": "¡A trabajar! Enfócate y da lo mejor de ti."
   },
   "notifications_complete_title": {
-    "message": "Lo hiciste! Todos los ciclos han sido completados."
+    "message": "¡Lo hiciste! Completaste todos los ciclos."
   },
   "notifications_complete_message": {
     "message": "Es hora de un buen descanso 🧘"

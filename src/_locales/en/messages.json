@@ -98,13 +98,10 @@
     "message": "Release notes:"
   },
   "updates_update_1": {
-    "message": "New option to show the timer on top of the icon ⏱"
+    "message": "Spanish language 🇪🇸"
   },
   "updates_update_2": {
-    "message": "Adjusted colors in both the light and dark theme 🎨"
-  },
-  "updates_update_3": {
-    "message": "Simplified navigation ⚙️"
+    "message": "Groundwork for additional language support 🌐"
   },
 
   "notifications_cycle_title": {
