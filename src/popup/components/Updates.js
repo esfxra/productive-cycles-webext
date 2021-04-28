@@ -23,7 +23,6 @@ const locale_set = [
   "updates_notes",
   "updates_update_1",
   "updates_update_2",
-  "updates_update_3",
 ];
 
 const Updates = () => {
@@ -38,7 +37,6 @@ const Updates = () => {
       <List>
         <Item>{locale["updates_update_1"]}</Item>
         <Item>{locale["updates_update_2"]}</Item>
-        <Item>{locale["updates_update_3"]}</Item>
       </List>
     </Section>
   );
