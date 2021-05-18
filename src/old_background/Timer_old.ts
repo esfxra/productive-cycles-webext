@@ -1,18 +1,42 @@
 "use strict";
 
-import { Timeline } from "./Timeline.js";
+import { DateTime, Duration } from "luxon";
+import { Timeline } from "./Timeline";
 import { Notifications } from "./Notifications.js";
 import { Utilities } from "./Utilities.js";
+import { Period } from "./Period";
+
+interface TimerSettings {
+  autoStart: {
+    cycles: boolean;
+    breaks: boolean;
+  };
+  cycleTime: Duration | null;
+  breakTime: Duration | null;
+  totalPeriods: number;
+  badgeTimer: boolean;
+}
+
+interface TimerComms {
+  port: chrome.runtime.Port | null;
+  open: boolean;
+}
 
 class Timer {
+  settings: TimerSettings;
+  comms: TimerComms;
+  periods: Period[];
+  current: number;
+  subtractor: any;
+
   constructor() {
     this.settings = {
       autoStart: {
         cycles: true,
         breaks: true,
       },
-      cycleTime: 0,
-      breakTime: 0,
+      cycleTime: null,
+      breakTime: null,
       totalPeriods: 0,
       badgeTimer: true,
     };
@@ -22,51 +46,62 @@ class Timer {
       open: false,
     };
 
-    this.periods = new Timeline();
-    this.subtractor = 0;
+    this.periods = null;
+    this.current = 0;
+    this.subtractor = null;
   }
 
-  init(settings) {
+  init(settings: TimerSettings) {
     this.settings = settings;
-    this.periods.build(this.settings);
+    this.periods = Timeline.build(this.settings);
     Notifications.clearAll(this.settings.totalPeriods);
-    Utilities.updateBadgeColor(this.periods.current.isCycle);
+    Utilities.updateBadgeColor(this.periods[this.current].isCycle);
   }
 
-  updateAutoStart(autoStart) {
-    this.settings.autoStart = { ...this.settings.autoStart, ...autoStart };
-    const updates = { time: false, targets: true, autoStart: true };
-    this.periods.update(updates, Date.now(), this.settings);
-  }
+  // updateAutoStart(autoStart) {
+  //   this.settings.autoStart = { ...this.settings.autoStart, ...autoStart };
+  //   const updates = { time: false, targets: true, autoStart: true };
+  //   this.periods.update(updates, Date.now(), this.settings);
+  // }
 
-  updateTime(time) {
-    this.settings = { ...this.settings, ...time };
-    const updates = { time: true, targets: true, autoStart: false };
-    this.periods.update(updates, Date.now(), this.settings);
-  }
+  // updateTime(time) {
+  //   this.settings = { ...this.settings, ...time };
+  //   const updates = { time: true, targets: true, autoStart: false };
+  //   this.periods.update(updates, Date.now(), this.settings);
+  // }
 
-  updateTotalPeriods(totalPeriods) {
-    this.settings.totalPeriods = totalPeriods;
+  // updateTotalPeriods(totalPeriods) {
+  //   this.settings.totalPeriods = totalPeriods;
 
-    if (totalPeriods < this.periods.timeline.length) {
-      this.periods.shorten(this.settings);
-    } else if (totalPeriods > this.periods.timeline.length) {
-      this.periods.lengthen(this.settings);
-    }
-  }
+  //   if (totalPeriods < this.periods.timeline.length) {
+  //     this.periods.shorten(this.settings);
+  //   } else if (totalPeriods > this.periods.timeline.length) {
+  //     this.periods.lengthen(this.settings);
+  //   }
+  // }
 
   start() {
     const updates = { time: false, targets: true, autoStart: true };
-    this.periods.update(updates, Date.now(), this.settings);
+    this.periods = Timeline.update(
+      this.periods,
+      this.current,
+      updates,
+      DateTime.now(),
+      {
+        cycleTime: this.settings.cycleTime,
+        breakTime: this.settings.breakTime,
+        autoStart: this.settings.autoStart,
+      }
+    );
 
-    this.periods.current.start();
+    this.periods[this.current].start();
     this.runSubtractor();
     this.postState();
   }
 
   end() {
     this.stopSubtractor();
-    this.periods.current.end();
+    this.periods[this.current].end();
     this.notify();
 
     if (this.periods.isLast) this.postState();
@@ -74,9 +109,9 @@ class Timer {
   }
 
   next() {
-    this.periods.index += 1;
+    this.current += 1;
 
-    Utilities.updateBadgeColor(this.periods.current.isCycle);
+    Utilities.updateBadgeColor(this.periods[this.current].isCycle);
 
     if (this.periods.current.enabled) this.start();
     else this.postState();

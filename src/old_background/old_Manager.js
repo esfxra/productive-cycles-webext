@@ -1,6 +1,6 @@
 "use strict";
 
-import { Timer } from "./Timer.js";
+import { Timer } from "./Timer";
 import { Adjuster } from "./Adjuster.js";
 import { Utilities } from "./Utilities.js";
 
