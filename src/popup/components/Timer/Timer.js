@@ -47,6 +47,9 @@ const Timer = () => {
   }, []);
 
   const handleMessage = (message) => {
+    console.log("Received new message");
+    console.log(message);
+
     setTime(message.time);
     setPeriod(message.period);
     setStatus(message.status);
