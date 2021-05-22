@@ -14,7 +14,7 @@ export interface ExtensionSettings extends TimerSettings {
   notificationsSound: boolean;
 }
 
-export interface Comms {
-  port: chrome.runtime.Port | null;
-  open: boolean;
+export enum Topics {
+  PUBLISH_MESSAGE = "PUBLISH_MESSAGE",
+  PRELOAD = "PRELOAD",
 }
