@@ -1,5 +1,6 @@
 import PubSub from "pubsub-js";
-import { Topics } from "./types";
+import { Topics } from "./utils/types";
+import { Publish } from "./utils/utils";
 
 class Bridge {
   open: boolean;
@@ -28,47 +29,21 @@ class Bridge {
   }
 
   handlePortMessages(message: { command: string }): void {
-    // Handle incoming messages
-    switch (message.command) {
-      case "start":
-        // Build timeline
-        // Start alarm / interval process
-        // Run UI timer until port is disconnected
-        console.log("Starts the timer");
-        break;
-      case "pause":
-        // Stop alarm / interval process
-        // Stop UI timer if running
-        console.log("Pauses the timer");
-        break;
-      case "skip":
-        console.log("Skips the current break");
-        break;
-      case "reset-cycle":
-        console.log("Resets the current cycle");
-        break;
-      case "reset-all":
-        console.log("Resets all the cycles");
-        break;
-      case "preload":
-        // Initial state post
-        PubSub.publish(Topics.PRELOAD);
-        // Run UI timer if needed ... should only run if state is 'running'
-        break;
-    }
+    // Forward incoming messages to subscribers
+    Publish.bridgeInput({ input: message.command });
   }
 
   registerSubscriptions(): void {
     // Subscribe to requests for posting messages
     this.requestSubscriptions.push(
       PubSub.subscribe(
-        Topics.PUBLISH_MESSAGE,
+        Topics.POST_MESSAGE,
         this.handlePublishRequests.bind(this)
       )
     );
   }
 
-  handlePublishRequests(msg, data): void {
+  handlePublishRequests(_msg: string, data: string): void {
     // Handle requests to post a message to the popup
     // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
     if (this.open) {

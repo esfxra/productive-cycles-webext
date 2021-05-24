@@ -27,14 +27,14 @@ const Popup = () => {
   const [theme, setTheme] = useState(); // Leave initial value empty on purpose to prevent flicker
 
   useEffect(() => {
-    chrome.storage.local.get(["theme", "updates"], (stored) => {
+    chrome.storage.local.get(["theme", "showUpdates"], (stored) => {
       // Set the theme
       setTheme(stored.theme);
 
       // Show updates if any have occurred, and disable flag afterwards
-      if (stored.updates) {
+      if (stored.showUpdates) {
         setView("updates");
-        chrome.storage.local.set({ updates: false });
+        chrome.storage.local.set({ showUpdates: false });
       }
     });
   }, []);

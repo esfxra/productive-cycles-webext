@@ -1,8 +1,11 @@
 {
   "compilerOptions": {
-    "esModuleInterop": true,
+    "target": "ES6",
     "jsx": "react",
-    "noEmit": true
+    "noEmit": true,
+    "esModuleInterop": true,
+    "alwaysStrict": true,
+    "skipLibCheck": true
   },
   "include": ["src/background/*"],
   "exclude": ["node_modules"]

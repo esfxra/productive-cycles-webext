@@ -1,34 +1,26 @@
-// import PubSub from "pubsub-js";
 import { Bridge } from "./Bridge";
 import { Manager } from "./Manager";
-import { ExtensionSettings } from "./types";
-
-const DEFAULT_SETTINGS: ExtensionSettings = {
-  showWelcome: false,
-  showUpdates: false,
-  showBadge: true,
-  notificationsEnabled: true,
-  notificationsSound: true,
-  cycleAutoStart: true,
-  breakAutoStart: true,
-  cycleMinutes: 25,
-  breakMinutes: 5,
-  totalPeriods: 7,
-};
+import { Timer } from "./Timer";
+import { DEFAULT_SETTINGS } from "./utils/constants";
+import { ExtensionSettings } from "./utils/types";
 
 runBackground();
 
 async function runBackground() {
-  // const settings = await initSettings();
+  const settings = await initSettings();
 
   const bridge = new Bridge();
-  const manager = new Manager();
+  const manager = new Manager(settings);
+  const timer = new Timer();
 
+  // Register browser-related listeners
   registerInstallListeners();
   bridge.registerPortListeners();
-  bridge.registerSubscriptions();
 
+  // Register publisher subscriptions
+  bridge.registerSubscriptions();
   manager.registerSubscriptions();
+  timer.registerSubscriptions();
 }
 
 function registerInstallListeners() {

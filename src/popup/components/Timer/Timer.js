@@ -50,8 +50,8 @@ const Timer = () => {
     console.log("Received new message");
     console.log(message);
 
-    setTime(message.time);
-    setPeriod(message.period);
+    setTime(message.remaining);
+    setPeriod(message.periodIndex);
     setStatus(message.status);
     setTotal(message.totalPeriods);
   };
