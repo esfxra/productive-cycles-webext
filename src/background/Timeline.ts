@@ -27,12 +27,15 @@ class Period {
 
 class Timeline {
   periods: Period[];
+  index: number;
 
   constructor({ totalPeriods, cycleMillis, breakMillis }: TimelineInit) {
     // Declare and assign empty array for periods
     this.periods = [];
     // Build periods array with default values
     this.build({ startAt: 0, totalPeriods, cycleMillis, breakMillis });
+    // Set starting period to 0
+    this.index = 0;
   }
 
   build({

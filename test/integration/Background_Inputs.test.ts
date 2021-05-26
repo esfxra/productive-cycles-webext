@@ -77,7 +77,7 @@ describe("On start", () => {
   test("Manager state is updated properly", () => {
     expect(manager.state.remaining).toBe("24:55");
     expect(manager.state.status).toBe(Status.Running);
-    expect(manager.state.periodIndex).toBe(0);
+    expect(manager.state.index).toBe(0);
   });
 });
 
@@ -97,7 +97,7 @@ describe("On pause", () => {
     jest.advanceTimersByTime(TIME_PASSED);
     // Save the current value of remaining
     remainingBefore = manager.current.remaining;
-    indexBefore = manager.periodIndex;
+    indexBefore = manager.timeline.index;
     // Publish 'stop' command through bridge
     bridge.handlePortMessages({ command: Input.Pause });
     jest.advanceTimersByTime(2000);
@@ -113,7 +113,7 @@ describe("On pause", () => {
   });
 
   test("Period index is not modified", () => {
-    expect(manager.periodIndex).toBe(indexBefore);
+    expect(manager.timeline.index).toBe(indexBefore);
   });
 
   test("Remaining time is not modified even if time passes", () => {

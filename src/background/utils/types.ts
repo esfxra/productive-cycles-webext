@@ -18,7 +18,7 @@ export interface ExtensionSettings extends TimerSettings {
 export interface State {
   remaining: string;
   status: string;
-  periodIndex: number;
+  index: number;
 }
 
 export interface StateMessage extends State {

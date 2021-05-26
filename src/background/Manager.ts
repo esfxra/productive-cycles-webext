@@ -5,7 +5,6 @@ import { TimerSettings, State, Status, Input } from "./utils/types";
 
 class Manager {
   timeline: Timeline;
-  periodIndex: number;
 
   settings: TimerSettings;
 
@@ -23,7 +22,7 @@ class Manager {
       breakMillis: minutesToMillis(settings.breakMinutes),
     });
     // Set the index for the current period at 0
-    this.periodIndex = 0;
+    this.timeline.index = 0;
     // Store the settings object
     this.settings = settings;
 
@@ -35,14 +34,14 @@ class Manager {
   }
 
   get current(): Period {
-    return this.timeline.periods[this.periodIndex];
+    return this.timeline.periods[this.timeline.index];
   }
 
   get state(): State {
     return {
       remaining: millisToFormattedString(this.current.remaining),
       status: this.current.status,
-      periodIndex: this.periodIndex,
+      index: this.timeline.index,
     };
   }
 
@@ -69,7 +68,7 @@ class Manager {
     this.timeline.setTargets();
     // Set updated autoStart based on settings
     this.timeline.setEnabled({
-      startAt: this.periodIndex,
+      startAt: this.timeline.index,
       cycleAutoStart: this.settings.cycleAutoStart,
       breakAutoStart: this.settings.breakAutoStart,
     });
@@ -136,7 +135,7 @@ class Manager {
 
   handleTimerEnd(): void {
     this.current.status = Status.Complete;
-    this.periodIndex += 1;
+    this.timeline.index += 1;
   }
 }
 
