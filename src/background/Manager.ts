@@ -107,8 +107,36 @@ class Manager {
   }
 
   resetCycle(): void {
+    const resetPeriod = () => {
+      // TODO: Consider converting this into a function of the period itself, or into a timeline function
+      const duration =
+        this.timeline.index === 0
+          ? this.settings.cycleMinutes
+          : this.settings.breakMinutes;
+
+      this.current.remaining = minutesToMillis(duration);
+      this.current.status = Status.Initial;
+      this.current.enabled = false; // TODO: Study if this is necessary
+    };
+
     // Stop the timer
     Publish.stopTimer();
+
+    if (this.current.status !== Status.Initial) {
+      // When the timer is running or is paused
+      resetPeriod();
+    } else if (this.timeline.index !== 0) {
+      // When the timer is in an initial state, and it is not the first period
+      // Go back to the previous break, and reset
+      this.timeline.index -= 1;
+      resetPeriod();
+      // Go back to the previous cycle, and reset
+      this.timeline.index -= 1;
+      resetPeriod();
+    }
+
+    // Post new state
+    this.postState();
   }
 
   resetAll(): void {
@@ -116,6 +144,7 @@ class Manager {
   }
 
   handleInput(input: Input): void {
+    console.log(input);
     // Handle incoming messages
     switch (input) {
       case Input.Start:

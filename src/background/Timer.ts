@@ -43,6 +43,7 @@ class Timer {
   }
 
   run(): void {
+    console.log("Run requested");
     // Start the timer
     this.subtractor = setInterval(() => {
       this.remaining = this.remaining - 1000;
@@ -59,6 +60,7 @@ class Timer {
   }
 
   stop(): void {
+    console.log("Stop requested");
     // Stop the timer
     clearInterval(this.subtractor);
   }
