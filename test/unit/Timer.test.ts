@@ -1,6 +1,6 @@
 import PubSub from "pubsub-js";
 import { Timer } from "../../src/background/Timer";
-import { Topics } from "../../src/background/utils/types";
+import { Topic } from "../../src/background/utils/types";
 
 const TIME = 5000;
 const TIME_PASSED = 1000;
@@ -20,7 +20,7 @@ describe("Timer commands", () => {
   test("Subtractor runs when command is published", async () => {
     jest.useFakeTimers();
 
-    PubSub.publish(Topics.TIMER_COMMAND, {
+    PubSub.publish(Topic.TimerCommand, {
       command: "run",
       time: TIME,
     });
@@ -34,7 +34,7 @@ describe("Timer commands", () => {
   test("Subtractor stops when command is published", () => {
     jest.useFakeTimers();
 
-    PubSub.publish(Topics.TIMER_COMMAND, {
+    PubSub.publish(Topic.TimerCommand, {
       command: "stop",
     });
 

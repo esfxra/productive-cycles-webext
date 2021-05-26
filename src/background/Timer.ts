@@ -1,5 +1,5 @@
 import PubSub from "pubsub-js";
-import { Topics } from "./utils/types";
+import { Topic } from "./utils/types";
 
 interface TimerCommand {
   command: "run" | "stop";
@@ -35,7 +35,7 @@ class Timer {
     };
 
     this.subscriptions.commands = PubSub.subscribe(
-      Topics.TIMER_COMMAND,
+      Topic.TimerCommand,
       (_msg: string, data: TimerCommand) => {
         handleCommands(data);
       }
@@ -50,10 +50,10 @@ class Timer {
       if (this.remaining < 0) {
         // Stop and publish to PERIOD_ENDED topic
         this.stop();
-        PubSub.publish(Topics.TIMER_END);
+        PubSub.publish(Topic.TimerEnd);
       } else {
         // Publish new time value
-        PubSub.publish(Topics.TIMER_TICK, { newTime: this.remaining });
+        PubSub.publish(Topic.TimerTick, { newTime: this.remaining });
       }
     }, 1000);
   }

@@ -15,8 +15,6 @@ export interface ExtensionSettings extends TimerSettings {
   notificationsSound: boolean;
 }
 
-export type setRemainingCallback = (time: number) => void;
-
 export interface State {
   remaining: string;
   status: string;
@@ -27,10 +25,26 @@ export interface StateMessage extends State {
   totalPeriods: number;
 }
 
-export enum Topics {
-  INPUT = "INPUT",
-  POST_MESSAGE = "POST_MESSAGE",
-  TIMER_COMMAND = "TIMER_COMMAND",
-  TIMER_TICK = "TICK",
-  TIMER_END = "PERIOD_ENDED",
+export enum Topic {
+  Input = "Input",
+  PostMessage = "PostMessage",
+  TimerCommand = "TimerCommand",
+  TimerTick = "Tick",
+  TimerEnd = "TimerEnd",
+}
+
+export enum Input {
+  Start = "Start",
+  Pause = "Pause",
+  Skip = "Skip",
+  ResetCycle = "ResetCycle",
+  ResetAll = "ResetAll",
+  Preload = "Preload",
+}
+
+export enum Status {
+  Initial = "Initial",
+  Running = "Running",
+  Paused = "Paused",
+  Complete = "Complete",
 }

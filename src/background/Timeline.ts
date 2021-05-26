@@ -1,3 +1,5 @@
+import { Status } from "./utils/types";
+
 interface TimelineInit {
   totalPeriods: number;
   cycleMillis: number;
@@ -9,7 +11,7 @@ interface TimelineBuild extends TimelineInit {
 }
 
 class Period {
-  status: string;
+  status: Status;
   target: number;
   remaining: number;
   enabled: boolean;
@@ -17,7 +19,7 @@ class Period {
   constructor(duration: number) {
     this.remaining = duration;
 
-    this.status = "initial";
+    this.status = Status.Initial;
     this.target = undefined;
     this.enabled = false;
   }

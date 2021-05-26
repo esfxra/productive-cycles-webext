@@ -1,7 +1,7 @@
 import { Duration } from "luxon";
 import { Publish, Subscribe } from "./utils/utils";
 import { Period, Timeline } from "./Timeline";
-import { TimerSettings, State } from "./utils/types";
+import { TimerSettings, State, Status, Input } from "./utils/types";
 
 class Manager {
   timeline: Timeline;
@@ -74,7 +74,7 @@ class Manager {
       breakAutoStart: this.settings.breakAutoStart,
     });
     // Update state, and publish
-    this.current.status = "running";
+    this.current.status = Status.Running;
     this.postState();
     // Start alarm / interval process
     Publish.runTimer({ time: this.current.remaining });
@@ -87,7 +87,7 @@ class Manager {
     // Stop alarm / interval process
     Publish.stopTimer();
     // Update state, and publish
-    this.current.status = "paused";
+    this.current.status = Status.Paused;
     this.postState();
   }
 
@@ -103,25 +103,25 @@ class Manager {
     console.log("Reset all");
   }
 
-  handleInput(input: string): void {
+  handleInput(input: Input): void {
     // Handle incoming messages
     switch (input) {
-      case "start":
+      case Input.Start:
         this.start();
         break;
-      case "pause":
+      case Input.Pause:
         this.pause();
         break;
-      case "skip":
+      case Input.Skip:
         this.skip();
         break;
-      case "reset-cycle":
+      case Input.ResetCycle:
         this.resetCycle();
         break;
-      case "reset-all":
+      case Input.ResetAll:
         this.resetAll();
         break;
-      case "preload":
+      case Input.Preload:
         // Initial state post
         // Run UI timer if needed ... should only run if state is 'running'
         this.postState();
@@ -135,7 +135,7 @@ class Manager {
   }
 
   handleTimerEnd(): void {
-    this.current.status = "complete";
+    this.current.status = Status.Complete;
     this.periodIndex += 1;
   }
 }

@@ -1,5 +1,5 @@
 import PubSub from "pubsub-js";
-import { Topics } from "./utils/types";
+import { Topic } from "./utils/types";
 import { Publish } from "./utils/utils";
 
 class Bridge {
@@ -36,10 +36,7 @@ class Bridge {
   registerSubscriptions(): void {
     // Subscribe to requests for posting messages
     this.requestSubscriptions.push(
-      PubSub.subscribe(
-        Topics.POST_MESSAGE,
-        this.handlePublishRequests.bind(this)
-      )
+      PubSub.subscribe(Topic.PostMessage, this.handlePublishRequests.bind(this))
     );
   }
 
