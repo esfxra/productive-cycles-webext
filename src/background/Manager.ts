@@ -92,11 +92,23 @@ class Manager {
   }
 
   skip(): void {
-    console.log("Skip");
+    // Stop the timer
+    Publish.stopTimer();
+    // Marks current period as complete
+    this.current.status = Status.Complete;
+
+    // TODO: Understand if this wants to be implemented as a 'this.next()' function
+    // Updates the timeline index to the next value
+    this.timeline.index += 1;
+    // // Starts the next period if it is enabled (i.e. autoStart on)
+    // if (this.current.enabled) {
+    //   this.start();
+    // }
   }
 
   resetCycle(): void {
-    console.log("Reset Cycle");
+    // Stop the timer
+    Publish.stopTimer();
   }
 
   resetAll(): void {

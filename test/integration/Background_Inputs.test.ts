@@ -9,7 +9,7 @@ let bridge: Bridge;
 let manager: Manager;
 let timer: Timer;
 
-describe("On start", () => {
+describe.skip("On start", () => {
   const TIME_PASSED = 5000;
 
   beforeAll(() => {
@@ -81,7 +81,7 @@ describe("On start", () => {
   });
 });
 
-describe("On pause", () => {
+describe.skip("On pause", () => {
   const TIME_PASSED = 5000;
   let remainingBefore = 0;
   let indexBefore = 0;
@@ -121,54 +121,70 @@ describe("On pause", () => {
   });
 });
 
-// describe("On skip (breaks only)", () => {
-//   let remainingBefore: number;
-//   let indexBefore: number;
-//   let statusBefore: string;
+describe("On skip (breaks only)", () => {
+  let indexBefore: number;
 
+  beforeAll(() => {
+    // Simulate the timer running on a break, and then skip it
+    const PERIOD_TIME_OFFSET = 10000;
+
+    jest.useFakeTimers();
+    [bridge, manager, timer] = _runBackground();
+    // Publish 'start' command through bridge
+    bridge.handlePortMessages({ command: Input.Start });
+    // Advance the timer by the whole duration of a cycle, plus an offset to make it to the next period
+    // This could be replaced by the current period's 'end' routine ... IF one is implemented
+    jest.advanceTimersByTime(
+      manager.settings.cycleMinutes * 60000 + PERIOD_TIME_OFFSET
+    );
+    // Assume autoStart is enabled, and that the break will start
+    indexBefore = manager.timeline.index;
+    // Skip the break
+    bridge.handlePortMessages({ command: Input.Skip });
+    jest.runOnlyPendingTimers();
+  });
+
+  test("Stops the timer", () => {
+    const TIME_PASSED = 5000;
+    const before = timer.remaining;
+    jest.advanceTimersByTime(TIME_PASSED);
+    expect(timer.remaining).toBe(before);
+  });
+
+  test("Ends the break that is supposed to be skipped", () => {
+    const period = manager.timeline.periods[indexBefore];
+    expect(period.status).toBe(Status.Complete);
+  });
+
+  test("Updates the current period index", () => {
+    expect(manager.timeline.index).toBe(indexBefore + 1);
+  });
+
+  // test("Induces a timer run per default settings since the next period is enabled", () => {
+  //   expect(manager.current.status).toBe(Status.Initial);
+  //   jest.advanceTimersByTime(1000);
+  //   expect(manager.current.status).toBe(Status.Running);
+  // });
+
+  afterAll(() => {
+    jest.clearAllTimers();
+    PubSub.clearAllSubscriptions();
+  });
+});
+
+// describe("On reset (cycle only)", () => {
 //   beforeAll(() => {
-//     // Simulate the timer running on a break, and then skip it
-//     const PERIOD_TIME_OFFSET = 10000;
-
-//     jest.useFakeTimers();
 //     [bridge, manager, timer] = _runBackground();
-//     // Publish 'start' command through bridge
-//     bridge.handlePortMessages({ command: "start" });
-//     // Advance the timer by the whole duration of a cycle, plus an offset to make it to the next period
-//     // This could be replaced by the current period's 'end' routine ... IF one is implemented
-//     jest.advanceTimersByTime(
-//       manager.settings.cycleMinutes * 60000 + PERIOD_TIME_OFFSET
-//     );
-//     // Assume autoStart is enabled, and that the break will start
-//     remainingBefore = manager.current.remaining;
-//     indexBefore = manager.periodIndex;
-//     statusBefore = manager.current.status;
-//     // Skip the break
-//     bridge.handlePortMessages({ command: "skip" });
 //   });
 
-//   test.skip("Stops the timer", () => {
-//     const TIME_PASSED = 5000;
-//     const before = timer.remaining;
-//     jest.advanceTimersByTime(TIME_PASSED);
-//     expect(timer.remaining).toBe(before);
-//   });
+//   test("", () => {});
 
-//   test("Ends the current period", () => {
-//     const period = manager.timeline.periods[indexBefore];
-//     expect(period.status).toBe("complete");
-//   });
+//   test("", () => {});
 
-//   test("Updates the current period index", () => {
-//     expect(manager.timeline.index).toBe(indexBefore + 1);
-//   });
+//   test("", () => {});
 
-//   test("Induces a timer run if the next period is enabled", () => {});
-
-//   afterAll(() => {});
+//   test("", () => {});
 // });
-
-// describe("On reset (cycle only)", () => {});
 
 // describe("On reset all", () => {});
 
