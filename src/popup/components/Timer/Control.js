@@ -19,16 +19,16 @@ const locale_set = [
 ];
 
 const control = {
-  start: {
+  Start: {
     icon: startIcon,
   },
-  pause: {
+  Pause: {
     icon: pauseIcon,
   },
-  "reset-cycle": {
+  ResetCycle: {
     icon: resetIcon,
   },
-  "reset-all": {
+  ResetAll: {
     icon: resetAllIcon,
   },
 };
@@ -76,7 +76,7 @@ const StyledSkip = styled.div`
 `;
 
 const Button = ({ name, title, onClick }) => {
-  const highlight = name === "start";
+  const highlight = name === "Start";
   return (
     <StyledButton
       title={title}
@@ -89,7 +89,7 @@ const Button = ({ name, title, onClick }) => {
 };
 
 const Skip = ({ title, onClick }) => (
-  <StyledSkip onClick={() => onClick({ command: "skip" })}>{title}</StyledSkip>
+  <StyledSkip onClick={() => onClick({ command: "Skip" })}>{title}</StyledSkip>
 );
 
 const Control = ({ period, status, handleInput }) => {
@@ -100,28 +100,28 @@ const Control = ({ period, status, handleInput }) => {
 
   const start = (
     <Button
-      name="start"
+      name="Start"
       title={locale["control_start"]}
       onClick={handleInput}
     />
   );
   const pause = (
     <Button
-      name="pause"
+      name="Pause"
       title={locale["control_pause"]}
       onClick={handleInput}
     />
   );
   const reset = (
     <Button
-      name="reset-cycle"
+      name="ResetCycle"
       title={locale["control_resetCycle"]}
       onClick={handleInput}
     />
   );
   const resetAll = (
     <Button
-      name="reset-all"
+      name="ResetAll"
       title={locale["control_resetAll"]}
       onClick={handleInput}
     />

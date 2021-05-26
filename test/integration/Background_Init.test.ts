@@ -1,7 +1,7 @@
 import { Bridge } from "../../src/background/Bridge";
 import { Manager } from "../../src/background/Manager";
 import { Timer } from "../../src/background/Timer";
-import { DEFAULT_SETTINGS } from "../../src/background/utils/constants";
+import { DEFAULT_SETTINGS } from "../../src/shared-constants";
 
 let bridge: Bridge;
 let manager: Manager;

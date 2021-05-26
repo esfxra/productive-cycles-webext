@@ -1,4 +1,4 @@
-import { ExtensionSettings } from "./types";
+import { ExtensionSettings } from "./shared-types";
 
 export const DEFAULT_SETTINGS: ExtensionSettings = {
   theme: "light",

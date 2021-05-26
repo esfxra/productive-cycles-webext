@@ -1,8 +1,8 @@
 import { Bridge } from "./Bridge";
 import { Manager } from "./Manager";
 import { Timer } from "./Timer";
-import { DEFAULT_SETTINGS } from "./utils/constants";
-import { ExtensionSettings } from "./utils/types";
+import { DEFAULT_SETTINGS } from "../shared-constants";
+import { ExtensionSettings } from "../shared-types";
 
 runBackground();
 

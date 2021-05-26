@@ -1,7 +1,8 @@
 import { Duration } from "luxon";
 import { Publish, Subscribe } from "./utils/utils";
 import { Period, Timeline } from "./Timeline";
-import { TimerSettings, State, Status, Input } from "./utils/types";
+import { State } from "./background-types";
+import { Status, Input, TimerSettings } from "../shared-types";
 
 class Manager {
   timeline: Timeline;

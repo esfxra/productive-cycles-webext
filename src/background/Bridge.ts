@@ -1,5 +1,5 @@
 import PubSub from "pubsub-js";
-import { Topic } from "./utils/types";
+import { Topic } from "./background-types";
 import { Publish } from "./utils/utils";
 
 class Bridge {

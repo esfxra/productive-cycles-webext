@@ -1,5 +1,5 @@
 import PubSub from "pubsub-js";
-import { Topic, StateMessage } from "./types";
+import { Topic, StateMessage } from "../background-types";
 
 // The purpose of the Publisher and Subscriber classes ...
 // .. is to build type-checked APIs

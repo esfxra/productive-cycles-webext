@@ -1,4 +1,4 @@
-import { Status } from "./utils/types";
+import { Status } from "../shared-types";
 
 interface TimelineInit {
   totalPeriods: number;

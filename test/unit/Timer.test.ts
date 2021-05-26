@@ -1,6 +1,6 @@
 import PubSub from "pubsub-js";
 import { Timer } from "../../src/background/Timer";
-import { Topic } from "../../src/background/utils/types";
+import { Topic } from "../../src/background/background-types";
 
 const TIME = 5000;
 const TIME_PASSED = 1000;

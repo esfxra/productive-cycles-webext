@@ -2,8 +2,8 @@ import PubSub from "pubsub-js";
 import { Bridge } from "../../src/background/Bridge";
 import { Manager } from "../../src/background/Manager";
 import { Timer } from "../../src/background/Timer";
-import { DEFAULT_SETTINGS } from "../../src/background/utils/constants";
-import { Input, Status } from "../../src/background/utils/types";
+import { DEFAULT_SETTINGS } from "../../src/shared-constants";
+import { Input, Status } from "../../src/shared-types";
 
 let bridge: Bridge;
 let manager: Manager;
