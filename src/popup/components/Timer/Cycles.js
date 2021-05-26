@@ -2,6 +2,7 @@
 
 import React from "react";
 import styled, { keyframes } from "styled-components";
+import { Status } from "../../../shared-types";
 
 const StyledCycles = styled.div`
   display: grid;
@@ -45,11 +46,11 @@ const Complete = styled(Dot)`
 
 const Cycle = ({ status, id }) => {
   let cycle;
-  if (status === "running" || status === "paused") {
+  if (status === Status.Running || status === Status.Paused) {
     cycle = <Running id={id} />;
-  } else if (status === "initial") {
+  } else if (status === Status.Initial) {
     cycle = <Pending id={id} />;
-  } else if (status === "complete") {
+  } else if (status === Status.Complete) {
     cycle = <Complete id={id} />;
   }
 
@@ -66,9 +67,13 @@ const Cycles = ({ period, status, total }) => {
       if (i === period) {
         cycles.push(<Cycle key={`cycle-${id}`} id={id} status={status} />);
       } else if (i < period) {
-        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={"complete"} />);
+        cycles.push(
+          <Cycle key={`cycle-${id}`} id={id} status={Status.Complete} />
+        );
       } else if (i > period) {
-        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={"initial"} />);
+        cycles.push(
+          <Cycle key={`cycle-${id}`} id={id} status={Status.Initial} />
+        );
       }
     }
 

@@ -7,6 +7,7 @@ import Counter from "./Counter";
 import Control from "./Control";
 import Cycles from "./Cycles";
 import useLocale from "../../hooks/useLocale";
+import { Input, Status } from "../../../shared-types";
 
 const locale_set = ["complete", "complete_button"];
 
@@ -31,14 +32,14 @@ const Timer = () => {
   const port = useRef();
   const [time, setTime] = useState("25:00");
   const [period, setPeriod] = useState(0);
-  const [status, setStatus] = useState("initial");
+  const [status, setStatus] = useState(Status.Initial);
   const [total, setTotal] = useState(7);
   const locale = useLocale(locale_set);
 
   useEffect(() => {
     port.current = chrome.runtime.connect({ name: "port-from-popup" });
     port.current.onMessage.addListener(handleMessage);
-    port.current.postMessage({ command: "preload" });
+    port.current.postMessage({ command: Input.Preload });
 
     return () => {
       port.current.onMessage.removeListener(handleMessage);
@@ -51,8 +52,8 @@ const Timer = () => {
     console.log(message);
 
     setTime(message.remaining);
-    setPeriod(message.periodIndex);
     setStatus(message.status);
+    setPeriod(message.index);
     setTotal(message.totalPeriods);
   };
 
@@ -60,7 +61,7 @@ const Timer = () => {
     port.current.postMessage({ command: input.command });
   };
 
-  const isComplete = period === total - 1 && status === "complete";
+  const isComplete = period === total - 1 && status === Status.Complete;
 
   const normal = (
     <>
@@ -74,7 +75,7 @@ const Timer = () => {
     <>
       <CompleteMessage>{locale["complete"]}</CompleteMessage>
       <Cycles period={period} status={status} total={total} />
-      <NewTimerButton onClick={() => handleInput({ command: "reset-all" })}>
+      <NewTimerButton onClick={() => handleInput({ command: Input.ResetAll })}>
         {locale["complete_button"]}
       </NewTimerButton>
     </>

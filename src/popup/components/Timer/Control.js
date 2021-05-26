@@ -2,8 +2,8 @@
 
 import React from "react";
 import styled from "styled-components";
-
 import useLocale from "../../hooks/useLocale";
+import { Input, Status } from "../../../shared-types";
 
 import startIcon from "../../assets/control-start.svg";
 import pauseIcon from "../../assets/control-pause.svg";
@@ -89,39 +89,41 @@ const Button = ({ name, title, onClick }) => {
 };
 
 const Skip = ({ title, onClick }) => (
-  <StyledSkip onClick={() => onClick({ command: "Skip" })}>{title}</StyledSkip>
+  <StyledSkip onClick={() => onClick({ command: Input.Skip })}>
+    {title}
+  </StyledSkip>
 );
 
 const Control = ({ period, status, handleInput }) => {
   const locale = useLocale(locale_set);
 
   const isCycle = period % 2 === 0;
-  const isRunning = status === "running";
+  const isRunning = status === Status.Running;
 
   const start = (
     <Button
-      name="Start"
+      name={Input.Start}
       title={locale["control_start"]}
       onClick={handleInput}
     />
   );
   const pause = (
     <Button
-      name="Pause"
+      name={Input.Pause}
       title={locale["control_pause"]}
       onClick={handleInput}
     />
   );
   const reset = (
     <Button
-      name="ResetCycle"
+      name={Input.ResetCycle}
       title={locale["control_resetCycle"]}
       onClick={handleInput}
     />
   );
   const resetAll = (
     <Button
-      name="ResetAll"
+      name={Input.ResetAll}
       title={locale["control_resetAll"]}
       onClick={handleInput}
     />
