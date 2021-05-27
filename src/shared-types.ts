@@ -14,7 +14,7 @@ export enum Status {
   Complete = "Complete",
 }
 
-export interface TimerSettings {
+export interface TimelineSettings {
   cycleAutoStart: boolean;
   breakAutoStart: boolean;
   cycleMinutes: number;
@@ -22,7 +22,7 @@ export interface TimerSettings {
   totalPeriods: number;
 }
 
-export interface ExtensionSettings extends TimerSettings {
+export interface ExtensionSettings extends TimelineSettings {
   theme: "light" | "dark";
   showWelcome: boolean;
   showUpdates: boolean;

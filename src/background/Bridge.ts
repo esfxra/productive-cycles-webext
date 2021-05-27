@@ -1,6 +1,5 @@
 import PubSub from "pubsub-js";
 import { Topic } from "./background-types";
-import { Publish } from "./utils/utils";
 
 class Bridge {
   open: boolean;
@@ -30,13 +29,13 @@ class Bridge {
 
   handlePortMessages(message: { command: string }): void {
     // Forward incoming messages to subscribers
-    Publish.bridgeInput({ input: message.command });
+    PubSub.publish(Topic[message.command]);
   }
 
   registerSubscriptions(): void {
     // Subscribe to requests for posting messages
     this.requestSubscriptions.push(
-      PubSub.subscribe(Topic.PostMessage, this.handlePublishRequests.bind(this))
+      PubSub.subscribe(Topic.State, this.handlePublishRequests.bind(this))
     );
   }
 

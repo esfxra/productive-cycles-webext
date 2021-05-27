@@ -9,9 +9,9 @@ export interface StateMessage extends State {
 }
 
 export enum Topic {
-  Input = "Input",
+  Start = "Start",
+  Pause = "Pause",
   PostMessage = "PostMessage",
-  TimerCommand = "TimerCommand",
-  TimerTick = "Tick",
-  TimerEnd = "TimerEnd",
+  State = "State",
+  Index = "Index",
 }

@@ -3,7 +3,7 @@ import { DEFAULT_SETTINGS } from "../../src/shared-constants";
 import { Status } from "../../src/shared-types";
 import { runBackground, simulateStart } from "./test-utils";
 
-const [bridge, manager, timer] = runBackground(DEFAULT_SETTINGS);
+const [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
 
 describe("On start", () => {
   const TIME_PASSED = 5000;
@@ -23,8 +23,7 @@ describe("On start", () => {
 
   test("Remaining time in Timer matches current period", () => {
     const expected = DEFAULT_SETTINGS.cycleMinutes * 60000 - TIME_PASSED;
-    expect(timer.remaining).toBe(expected);
-    expect(manager.current.remaining).toBe(expected);
+    expect(timeline.current.remaining).toBe(expected);
   });
 
   test("Timeline targets are properly calculated", () => {
@@ -52,7 +51,7 @@ describe("On start", () => {
       target7,
     ];
 
-    manager.timeline.periods.forEach((period, idx) => {
+    timeline.periods.forEach((period, idx) => {
       const lowerLimit = expected[idx] - TARGET_THRESHOLD;
       const upperLimit = expected[idx] + TARGET_THRESHOLD;
 
@@ -62,15 +61,15 @@ describe("On start", () => {
   });
 
   test("Timeline periods are updated per default settings", () => {
-    manager.timeline.periods.forEach((period) => {
+    timeline.periods.forEach((period) => {
       expect(period.enabled).toBe(true);
     });
   });
 
-  test("Manager state is updated properly", () => {
-    expect(manager.state.remaining).toBe("24:55");
-    expect(manager.state.status).toBe(Status.Running);
-    expect(manager.state.index).toBe(0);
+  test("Timeline state is updated properly", () => {
+    expect(timeline.current.state.remaining).toBe("24:55");
+    expect(timeline.current.state.status).toBe(Status.Running);
+    expect(timeline.current.state.index).toBe(0);
   });
 
   test.skip("Start command is not allowed to be called twice (mutex behavior)", () => {

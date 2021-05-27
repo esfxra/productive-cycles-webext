@@ -1,21 +1,16 @@
 import { Bridge } from "../../src/background/Bridge";
-import { Manager } from "../../src/background/Manager";
-import { Timer } from "../../src/background/Timer";
+import { Timeline } from "../../src/background/Timeline";
 import { ExtensionSettings, Input } from "../../src/shared-types";
 
-export function runBackground(
-  settings: ExtensionSettings
-): [Bridge, Manager, Timer] {
+export function runBackground(settings: ExtensionSettings): [Bridge, Timeline] {
   // Simulate the main runBackground function without the browser listeners
   const bridge = new Bridge();
-  const manager = new Manager(settings);
-  const timer = new Timer();
+  const timeline = new Timeline(settings);
 
   bridge.registerSubscriptions();
-  manager.registerSubscriptions();
-  timer.registerSubscriptions();
+  timeline.registerSubscriptions();
 
-  return [bridge, manager, timer];
+  return [bridge, timeline];
 }
 
 export function simulateStart(bridge: Bridge): void {

@@ -1,53 +1,42 @@
-import { Status } from "../shared-types";
-
-interface TimelineInit {
-  totalPeriods: number;
-  cycleMillis: number;
-  breakMillis: number;
-}
-
-interface TimelineBuild extends TimelineInit {
-  startAt: number;
-}
-
-class Period {
-  status: Status;
-  target: number;
-  remaining: number;
-  enabled: boolean;
-
-  constructor(duration: number) {
-    this.remaining = duration;
-
-    this.status = Status.Initial;
-    this.target = undefined;
-    this.enabled = false;
-  }
-}
+import PubSub from "pubsub-js";
+import { Period } from "./Period";
+import { minutesToMillis } from "./utils/utils";
+import { Topic } from "./background-types";
+import { TimelineSettings } from "../shared-types";
 
 class Timeline {
   periods: Period[];
   index: number;
 
-  constructor({ totalPeriods, cycleMillis, breakMillis }: TimelineInit) {
+  settings: TimelineSettings;
+
+  constructor(settings: TimelineSettings) {
     // Declare and assign empty array for periods
     this.periods = [];
-    // Build periods array with default values
-    this.build({ startAt: 0, totalPeriods, cycleMillis, breakMillis });
+    // Assign timeline settings
+    this.settings = settings;
     // Set starting period to 0
     this.index = 0;
+    // Build periods array with default settings
+    this.build();
   }
 
-  build({
-    startAt,
-    totalPeriods,
-    cycleMillis,
-    breakMillis,
-  }: TimelineBuild): void {
+  get current(): Period {
+    return this.periods[this.index];
+  }
+
+  build(): void {
+    // Assign aliases
+    const startAt = this.index;
+    const totalPeriods = this.settings.totalPeriods;
+    const cycleMillis = minutesToMillis(this.settings.cycleMinutes);
+    const breakMillis = minutesToMillis(this.settings.breakMinutes);
+
+    // Instantiate new periods
     const timeline: Period[] = [];
     for (let i = startAt; i < totalPeriods; i += 1) {
       const duration = i % 2 === 0 ? cycleMillis : breakMillis;
-      timeline[i] = new Period(duration);
+      timeline[i] = new Period(i, duration);
     }
 
     this.periods = timeline;
@@ -64,17 +53,15 @@ class Timeline {
     });
   }
 
-  setEnabled({
-    startAt,
-    cycleAutoStart,
-    breakAutoStart,
-  }: {
-    startAt: number;
-    cycleAutoStart: boolean;
-    breakAutoStart: boolean;
-  }): void {
+  setEnabled(): void {
+    // Assign aliases
+    const startAt = this.index;
+    const length = this.periods.length;
+    const cycleAutoStart = this.settings.cycleAutoStart;
+    const breakAutoStart = this.settings.breakAutoStart;
+
     // Enable or disable periods per autoStart settings
-    for (let i = startAt; i < this.periods.length; i += 1) {
+    for (let i = startAt; i < length; i += 1) {
       const previous = i === 0 ? null : this.periods[i - 1];
 
       if (i === startAt) {
@@ -88,6 +75,26 @@ class Timeline {
       }
     }
   }
+
+  registerSubscriptions(): void {
+    PubSub.subscribe(Topic.Start, () => {
+      // Set targets
+      this.setTargets();
+      // Set updated autoStart based on settings
+      this.setEnabled();
+      // Update state and publish
+      this.current.start();
+    });
+
+    PubSub.subscribe(Topic.Pause, () => {
+      // Update state and publish
+      this.current.pause();
+    });
+
+    PubSub.subscribe(Topic.Index, (index) => {
+      this.index = index;
+    });
+  }
 }
 
-export { Period, Timeline };
+export { Timeline };

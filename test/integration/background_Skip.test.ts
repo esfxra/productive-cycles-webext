@@ -5,7 +5,7 @@ import { runBackground, simulateStart, simulateSkip } from "./test-utils";
 
 const [bridge, manager, timer] = runBackground(DEFAULT_SETTINGS);
 
-describe("On skip (breaks only)", () => {
+describe.skip("On skip (breaks only)", () => {
   const PERIOD_TIME_OFFSET = 10000;
   let previousIndex: number;
 
