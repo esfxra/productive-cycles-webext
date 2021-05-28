@@ -15,7 +15,5 @@ export enum Topic {
   ResetCycle = "ResetCycle",
   ResetAll = "ResetAll",
   Preload = "Preload",
-  PostMessage = "PostMessage",
   State = "State",
-  Index = "Index",
 }

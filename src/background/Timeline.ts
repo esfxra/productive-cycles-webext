@@ -22,6 +22,7 @@ class Timeline {
   }
 
   get current(): Period {
+    // Get the current period
     return this.periods[this.index];
   }
 
@@ -35,8 +36,14 @@ class Timeline {
     // Instantiate new periods
     const timeline: Period[] = [];
     for (let i = startAt; i < totalPeriods; i += 1) {
-      const duration = i % 2 === 0 ? cycleMillis : breakMillis;
-      timeline[i] = new Period(i, duration);
+      const props = {
+        id: i,
+        duration: i % 2 === 0 ? cycleMillis : breakMillis,
+        incrementIndex: this.incrementIndex.bind(this),
+        publishState: this.publishState.bind(this),
+      };
+
+      timeline[i] = new Period(props);
     }
 
     this.periods = timeline;
@@ -131,10 +138,22 @@ class Timeline {
     PubSub.subscribe(Topic.Preload, () => {
       this.current.publishState();
     });
+  }
 
-    PubSub.subscribe(Topic.Index, (_msg: string, data: { index: number }) => {
-      this.index = data.index;
-    });
+  incrementIndex(): void {
+    // Increment the index to set the next period as current
+    // TODO: Examine whether to add handling for what to do with the last period
+    this.index += 1;
+  }
+
+  publishState(): void {
+    // Prepare state + totalPeriods (UI currently receives totalPeriods from the port messages)
+    const data = {
+      ...this.current.state,
+      totalPeriods: this.settings.totalPeriods,
+    };
+    // Publish request to post the state through the port
+    PubSub.publishSync(Topic.State, data);
   }
 }
 

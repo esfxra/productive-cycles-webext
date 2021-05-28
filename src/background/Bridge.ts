@@ -1,5 +1,9 @@
 import PubSub from "pubsub-js";
-import { Topic } from "./background-types";
+import { State, Topic } from "./background-types";
+
+interface Message extends State {
+  totalPeriods: number;
+}
 
 class Bridge {
   open: boolean;
@@ -39,10 +43,11 @@ class Bridge {
     );
   }
 
-  handlePublishRequests(_msg: string, data: string): void {
+  handlePublishRequests(_msg: string, data: Message): void {
     // Handle requests to post a message to the popup
     // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
     if (this.open) {
+      console.log(data);
       this.port.postMessage(data);
     }
   }

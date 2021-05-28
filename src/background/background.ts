@@ -1,6 +1,5 @@
 import { Bridge } from "./Bridge";
-import { Manager } from "./Manager";
-import { Timer } from "./Timer";
+import { Timeline } from "./Timeline";
 import { DEFAULT_SETTINGS } from "../shared-constants";
 import { ExtensionSettings } from "../shared-types";
 
@@ -10,8 +9,7 @@ async function runBackground() {
   const settings = await initSettings();
 
   const bridge = new Bridge();
-  const manager = new Manager(settings);
-  const timer = new Timer();
+  const timeline = new Timeline(settings);
 
   // Register browser-related listeners
   registerInstallListeners();
@@ -19,8 +17,7 @@ async function runBackground() {
 
   // Register publisher subscriptions
   bridge.registerSubscriptions();
-  manager.registerSubscriptions();
-  timer.registerSubscriptions();
+  timeline.registerSubscriptions();
 }
 
 function registerInstallListeners() {

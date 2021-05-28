@@ -1,8 +1,7 @@
-import PubSub from "pubsub-js";
 import { Timer } from "./Timer";
 import { millisToFormattedString } from "./utils/utils";
 import { Status } from "../shared-types";
-import { State, Topic } from "./background-types";
+import { State } from "./background-types";
 
 interface PeriodWithTimer {
   id: number;
@@ -18,6 +17,15 @@ interface PeriodWithTimer {
   stop: () => void;
   tick: () => void;
   end: () => void;
+  incrementIndex: () => void;
+  publishState: () => void;
+}
+
+interface PeriodConstructor {
+  id: number;
+  duration: number;
+  incrementIndex: () => void;
+  publishState: () => void;
 }
 
 class Period extends Timer implements PeriodWithTimer {
@@ -25,11 +33,22 @@ class Period extends Timer implements PeriodWithTimer {
   status: Status;
   target: number;
   enabled: boolean;
+  incrementIndex: () => void;
+  publishState: () => void;
 
-  constructor(id: number, duration: number) {
+  constructor({
+    id,
+    duration,
+    incrementIndex,
+    publishState,
+  }: PeriodConstructor) {
+    // Assignments
     super(duration);
-
     this.id = id;
+    this.incrementIndex = incrementIndex;
+    this.publishState = publishState;
+
+    // Default values
     this.status = Status.Initial;
     this.target = undefined;
     this.enabled = false;
@@ -58,7 +77,7 @@ class Period extends Timer implements PeriodWithTimer {
   skip(): void {
     this.stop();
     this.status = Status.Complete;
-    this.publishIndex();
+    this.incrementIndex();
   }
 
   reset(duration: number): void {
@@ -77,17 +96,9 @@ class Period extends Timer implements PeriodWithTimer {
   end(): void {
     // Mark period as complete, publish state, perform timeline index update
     this.status = Status.Complete;
+    // TODO: Understand if a next() function is appropriate for proper transitions
     this.publishState();
-    this.publishIndex();
-  }
-
-  publishIndex(): void {
-    // TODO: This could be better implemented by a method passed down from the Timeline class
-    PubSub.publishSync(Topic.Index, { index: this.id + 1 });
-  }
-
-  publishState(): void {
-    PubSub.publish(Topic.State, this.state);
+    this.incrementIndex();
   }
 }
 
