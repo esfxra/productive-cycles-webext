@@ -3,9 +3,9 @@ import { DEFAULT_SETTINGS } from "../../src/shared-constants";
 import { Status } from "../../src/shared-types";
 import { runBackground, simulateStart, simulateSkip } from "./test-utils";
 
-const [bridge, manager, timer] = runBackground(DEFAULT_SETTINGS);
+const [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
 
-describe.skip("On skip (breaks only)", () => {
+describe("On skip (breaks only)", () => {
   const PERIOD_TIME_OFFSET = 10000;
   let previousIndex: number;
 
@@ -16,10 +16,10 @@ describe.skip("On skip (breaks only)", () => {
     simulateStart(bridge);
     // Advance the timer by the whole duration of a cycle, plus an offset to make it to the next period
     jest.advanceTimersByTime(
-      manager.settings.cycleMinutes * 60000 + PERIOD_TIME_OFFSET
+      timeline.settings.cycleMinutes * 60000 + PERIOD_TIME_OFFSET
     );
     // Assume autoStart is enabled, and that the break will start
-    previousIndex = manager.timeline.index;
+    previousIndex = timeline.index;
     // Skip the break
     simulateSkip(bridge);
   });
@@ -33,20 +33,20 @@ describe.skip("On skip (breaks only)", () => {
     // Arbitrary value to advance time by
     const TIME_PASSED = 5000;
     // Save the value of remaining time before advancing timer
-    const previous = timer.remaining;
+    const previousState = timeline.current.remaining;
 
     jest.advanceTimersByTime(TIME_PASSED);
 
-    expect(timer.remaining).toBe(previous);
+    expect(timeline.current.remaining).toBe(previousState);
   });
 
   test("Ends the break that was skipped", () => {
-    const previousPeriod = manager.timeline.periods[previousIndex];
-    expect(previousPeriod.status).toBe(Status.Complete);
+    const previousPeriod = timeline.periods[previousIndex];
+    expect(previousPeriod.state.status).toBe(Status.Complete);
   });
 
   test("The current period index was advanced by 1", () => {
-    expect(manager.timeline.index).toBe(previousIndex + 1);
+    expect(timeline.index).toBe(previousIndex + 1);
   });
 
   test.skip("Induces a timer run per default settings since the next period is enabled", () => {

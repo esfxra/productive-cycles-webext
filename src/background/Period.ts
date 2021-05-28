@@ -13,7 +13,7 @@ interface PeriodWithTimer {
 
   start: () => void;
   pause: () => void;
-  reset: () => void;
+  reset: (duration: number) => void;
   run: () => void;
   stop: () => void;
   tick: () => void;
@@ -50,12 +50,23 @@ class Period extends Timer implements PeriodWithTimer {
   }
 
   pause(): void {
+    this.stop();
     this.status = Status.Paused;
     this.publishState();
   }
 
-  reset(): void {
+  skip(): void {
+    this.stop();
+    this.status = Status.Complete;
+    this.publishIndex();
+  }
+
+  reset(duration: number): void {
+    this.stop();
     this.status = Status.Initial;
+    this.remaining = duration;
+    // TODO: Understand if target should be reset to null or undefined
+    // TODO: Understand if enabled should be reset to false
   }
 
   tick(): void {
@@ -72,7 +83,7 @@ class Period extends Timer implements PeriodWithTimer {
 
   publishIndex(): void {
     // TODO: This could be better implemented by a method passed down from the Timeline class
-    PubSub.publishSync(Topic.Index, this.id + 1);
+    PubSub.publishSync(Topic.Index, { index: this.id + 1 });
   }
 
   publishState(): void {

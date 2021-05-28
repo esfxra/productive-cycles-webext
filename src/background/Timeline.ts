@@ -2,7 +2,7 @@ import PubSub from "pubsub-js";
 import { Period } from "./Period";
 import { minutesToMillis } from "./utils/utils";
 import { Topic } from "./background-types";
-import { TimelineSettings } from "../shared-types";
+import { Status, TimelineSettings } from "../shared-types";
 
 class Timeline {
   periods: Period[];
@@ -82,17 +82,58 @@ class Timeline {
       this.setTargets();
       // Set updated autoStart based on settings
       this.setEnabled();
-      // Update state and publish
+      // Run period start tasks
       this.current.start();
     });
 
     PubSub.subscribe(Topic.Pause, () => {
-      // Update state and publish
+      // Run period pause tasks
       this.current.pause();
     });
 
-    PubSub.subscribe(Topic.Index, (index) => {
-      this.index = index;
+    PubSub.subscribe(Topic.Skip, () => {
+      // Run period skip tasks
+      this.current.skip();
+    });
+
+    PubSub.subscribe(Topic.ResetCycle, () => {
+      const breakMillis = minutesToMillis(this.settings.breakMinutes);
+      const cycleMillis = minutesToMillis(this.settings.cycleMinutes);
+
+      if (this.current.status === Status.Initial) {
+        if (this.index === 0) {
+          // Do nothing
+        } else {
+          // Reset previous break, and then previous cycle
+          this.index -= 1;
+          this.current.reset(breakMillis);
+          this.index -= 1;
+          this.current.reset(cycleMillis);
+        }
+      } else {
+        // Reset current cycle back to Initial state
+        this.current.reset(cycleMillis);
+      }
+    });
+
+    PubSub.subscribe(Topic.ResetAll, () => {
+      const breakMillis = minutesToMillis(this.settings.breakMinutes);
+      const cycleMillis = minutesToMillis(this.settings.cycleMinutes);
+
+      // Iterate through the periods array
+      this.periods.forEach((period) => {
+        period.reset(period.id % 2 === 0 ? cycleMillis : breakMillis);
+      });
+      // Reset the timeline index
+      this.index = 0;
+    });
+
+    PubSub.subscribe(Topic.Preload, () => {
+      this.current.publishState();
+    });
+
+    PubSub.subscribe(Topic.Index, (_msg: string, data: { index: number }) => {
+      this.index = data.index;
     });
   }
 }

@@ -35,3 +35,8 @@ export function simulateResetCycle(bridge: Bridge): void {
   bridge.handlePortMessages({ command: Input.ResetCycle });
   jest.runOnlyPendingTimers();
 }
+
+export function simulateResetAll(bridge: Bridge): void {
+  bridge.handlePortMessages({ command: Input.ResetAll });
+  jest.runOnlyPendingTimers();
+}

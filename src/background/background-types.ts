@@ -11,6 +11,10 @@ export interface StateMessage extends State {
 export enum Topic {
   Start = "Start",
   Pause = "Pause",
+  Skip = "Skip",
+  ResetCycle = "ResetCycle",
+  ResetAll = "ResetAll",
+  Preload = "Preload",
   PostMessage = "PostMessage",
   State = "State",
   Index = "Index",

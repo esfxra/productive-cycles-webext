@@ -15,6 +15,7 @@ class Timer {
       if (this.remaining < 0) {
         // Stop subtracting
         this.stop();
+        this.end();
       } else {
         // Post new time to period
         this.tick();
@@ -25,7 +26,6 @@ class Timer {
   stop(): void {
     // Stop the timer
     clearInterval(this.subtractor);
-    this.end();
   }
 
   tick(): void {
