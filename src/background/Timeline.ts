@@ -39,7 +39,7 @@ class Timeline {
       const props = {
         id: i,
         duration: i % 2 === 0 ? cycleMillis : breakMillis,
-        incrementIndex: this.incrementIndex.bind(this),
+        nextPeriod: this.nextPeriod.bind(this),
         publishState: this.publishState.bind(this),
       };
 
@@ -140,10 +140,24 @@ class Timeline {
     });
   }
 
-  incrementIndex(): void {
-    // Increment the index to set the next period as current
-    // TODO: Examine whether to add handling for what to do with the last period
-    this.index += 1;
+  nextPeriod(): void {
+    if (this.index === this.settings.totalPeriods - 1) {
+      // Last period
+      // Marked as complete before calling this method
+      this.publishState();
+    } else {
+      // Increment the index
+      this.index += 1;
+      // Check autoStart settings and act accordingly
+      if (this.current.enabled) {
+        // ?? - Set targets
+        this.setTargets();
+        // ?? - Set updated autoStart based on settings
+        this.setEnabled();
+        // Start the period
+        this.current.start();
+      }
+    }
   }
 
   publishState(): void {

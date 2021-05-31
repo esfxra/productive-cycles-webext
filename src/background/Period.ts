@@ -3,49 +3,26 @@ import { millisToFormattedString } from "./utils/utils";
 import { Status } from "../shared-types";
 import { State } from "./background-types";
 
-interface PeriodWithTimer {
-  id: number;
-  remaining: number;
-  status: Status;
-  target: number;
-  enabled: boolean;
-
-  start: () => void;
-  pause: () => void;
-  reset: (duration: number) => void;
-  run: () => void;
-  stop: () => void;
-  tick: () => void;
-  end: () => void;
-  incrementIndex: () => void;
-  publishState: () => void;
-}
-
 interface PeriodConstructor {
   id: number;
   duration: number;
-  incrementIndex: () => void;
+  nextPeriod: () => void;
   publishState: () => void;
 }
 
-class Period extends Timer implements PeriodWithTimer {
+class Period extends Timer {
   id: number;
   status: Status;
   target: number;
   enabled: boolean;
-  incrementIndex: () => void;
+  nextPeriod: () => void;
   publishState: () => void;
 
-  constructor({
-    id,
-    duration,
-    incrementIndex,
-    publishState,
-  }: PeriodConstructor) {
+  constructor({ id, duration, nextPeriod, publishState }: PeriodConstructor) {
     // Assignments
     super(duration);
     this.id = id;
-    this.incrementIndex = incrementIndex;
+    this.nextPeriod = nextPeriod;
     this.publishState = publishState;
 
     // Default values
@@ -77,7 +54,9 @@ class Period extends Timer implements PeriodWithTimer {
   skip(): void {
     this.stop();
     this.status = Status.Complete;
-    this.incrementIndex();
+    this.nextPeriod();
+    // TODO: Implement code to start tasks for the next period
+    // - I.E. ... autoStart on or off checks
   }
 
   reset(duration: number): void {
@@ -96,9 +75,10 @@ class Period extends Timer implements PeriodWithTimer {
   end(): void {
     // Mark period as complete, publish state, perform timeline index update
     this.status = Status.Complete;
-    // TODO: Understand if a next() function is appropriate for proper transitions
-    this.publishState();
-    this.incrementIndex();
+
+    this.nextPeriod();
+    // this.publishState();
+    // this.incrementIndex();
   }
 }
 

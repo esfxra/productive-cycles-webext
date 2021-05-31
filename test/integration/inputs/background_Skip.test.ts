@@ -1,7 +1,7 @@
 import PubSub from "pubsub-js";
-import { DEFAULT_SETTINGS } from "../../src/shared-constants";
-import { Status } from "../../src/shared-types";
-import { runBackground, simulateStart, simulateSkip } from "./test-utils";
+import { DEFAULT_SETTINGS } from "../../../src/shared-constants";
+import { Status } from "../../../src/shared-types";
+import { runBackground, simulateStart, simulateSkip } from "../test-utils";
 
 const [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
 

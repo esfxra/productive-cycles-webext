@@ -1,7 +1,11 @@
 import PubSub from "pubsub-js";
-import { DEFAULT_SETTINGS } from "../../src/shared-constants";
-import { Status } from "../../src/shared-types";
-import { runBackground, simulateResetCycle, simulateStart } from "./test-utils";
+import { DEFAULT_SETTINGS } from "../../../src/shared-constants";
+import { Status } from "../../../src/shared-types";
+import {
+  runBackground,
+  simulateResetCycle,
+  simulateStart,
+} from "../test-utils";
 
 describe("On reset (cycle only)", () => {
   describe("When the cycle is the first period, and it has not started", () => {

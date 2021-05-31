@@ -1,16 +1,21 @@
 import PubSub from "pubsub-js";
-import { DEFAULT_SETTINGS } from "../../src/shared-constants";
-import { Status } from "../../src/shared-types";
-import { runBackground, simulateStart, simulatePause } from "./test-utils";
+import { Bridge } from "../../../src/background/Bridge";
+import { Timeline } from "../../../src/background/Timeline";
+import { DEFAULT_SETTINGS } from "../../../src/shared-constants";
+import { Status } from "../../../src/shared-types";
+import { runBackground, simulateStart, simulatePause } from "../test-utils";
 
-const [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
+let bridge: Bridge;
+let timeline: Timeline;
 
-describe.skip("On pause", () => {
+describe("On pause", () => {
   const TIME_PASSED = 5000;
   let previousRemaining = 0;
   let previousIndex = 0;
 
   beforeAll(() => {
+    [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
+
     // Simulate the timer running, and then a 'pause' command to stop it
     jest.useFakeTimers();
     // Publish 'start' command, and advance the timer
@@ -37,6 +42,6 @@ describe.skip("On pause", () => {
   });
 
   test("Remaining time is not modified even if time passes", () => {
-    expect(timeline.current.state.remaining).toBe(previousRemaining);
+    expect(timeline.current.remaining).toBe(previousRemaining);
   });
 });

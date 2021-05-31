@@ -1,14 +1,14 @@
 import PubSub from "pubsub-js";
-import { Bridge } from "../../src/background/Bridge";
-import { Timeline } from "../../src/background/Timeline";
-import { DEFAULT_SETTINGS } from "../../src/shared-constants";
-import { Status } from "../../src/shared-types";
+import { Bridge } from "../../../src/background/Bridge";
+import { Timeline } from "../../../src/background/Timeline";
+import { DEFAULT_SETTINGS } from "../../../src/shared-constants";
+import { Status } from "../../../src/shared-types";
 import {
   runBackground,
   simulatePause,
   simulateResetAll,
   simulateStart,
-} from "./test-utils";
+} from "../test-utils";
 
 let bridge: Bridge;
 let timeline: Timeline;
