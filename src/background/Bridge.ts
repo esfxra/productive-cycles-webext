@@ -1,5 +1,5 @@
-import PubSub from "pubsub-js";
-import { State, Topic } from "./background-types";
+import PubSub from 'pubsub-js';
+import { State, Topic } from './background-types';
 
 interface Message extends State {
   totalPeriods: number;
@@ -53,4 +53,4 @@ class Bridge {
   }
 }
 
-export { Bridge };
+export default Bridge;

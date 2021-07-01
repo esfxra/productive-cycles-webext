@@ -1,7 +1,7 @@
-import { Bridge } from "./Bridge";
-import { Timeline } from "./Timeline";
-import { DEFAULT_SETTINGS } from "../shared-constants";
-import { ExtensionSettings } from "../shared-types";
+import Bridge from './Bridge';
+import Timeline from './Timeline';
+import { DEFAULT_SETTINGS } from '../shared-constants';
+import { ExtensionSettings } from '../shared-types';
 
 runBackground();
 
@@ -24,11 +24,11 @@ function registerInstallListeners() {
   // Register install and update listeners
   chrome.runtime.onInstalled.addListener((details: { reason: string }) => {
     switch (details.reason) {
-      case "install":
+      case 'install':
         chrome.storage.local.set({ showWelcome: true });
         chrome.storage.local.set({ showUpdates: false });
         break;
-      case "update":
+      case 'update':
         chrome.storage.local.set({ showWelcome: false });
         chrome.storage.local.set({ showUpdates: true });
         break;
@@ -45,7 +45,7 @@ function initSettings(): Promise<ExtensionSettings> {
       const expected = Object.keys(DEFAULT_SETTINGS);
 
       expected.forEach((setting) => {
-        if (typeof stored[setting] === "undefined") {
+        if (typeof stored[setting] === 'undefined') {
           // If undefined (i.e. new settings introduced in an update), use default settign
           settings[setting] = DEFAULT_SETTINGS[setting];
         } else {

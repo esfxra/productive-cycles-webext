@@ -1,7 +1,7 @@
-import { Timer } from "./Timer";
-import { millisToFormattedString } from "./utils/utils";
-import { Status } from "../shared-types";
-import { State } from "./background-types";
+import Timer from './Timer';
+import { millisToFormattedString } from './utils/utils';
+import { Status } from '../shared-types';
+import { State } from './background-types';
 
 interface PeriodConstructor {
   id: number;
@@ -82,4 +82,4 @@ class Period extends Timer {
   }
 }
 
-export { Period };
+export default Period;

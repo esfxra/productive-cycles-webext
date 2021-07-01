@@ -1,13 +1,13 @@
-import PubSub from "pubsub-js";
-import { Timer } from "../../src/background/Timer";
-import { Topic } from "../../src/background/background-types";
+import PubSub from 'pubsub-js';
+import Timer from '../../src/background/Timer';
+import { Topic } from '../../src/background/background-types';
 
 const TIME = 5000;
 const TIME_PASSED = 1000;
 
 let timer: Timer;
 
-describe.skip("Timer commands", () => {
+describe.skip('Timer commands', () => {
   beforeAll(() => {
     timer = new Timer();
     timer.registerSubscriptions();
@@ -17,11 +17,11 @@ describe.skip("Timer commands", () => {
     PubSub.clearAllSubscriptions();
   });
 
-  test("Subtractor runs when command is published", async () => {
+  test('Subtractor runs when command is published', async () => {
     jest.useFakeTimers();
 
     PubSub.publish(Topic.TimerCommand, {
-      command: "run",
+      command: 'run',
       time: TIME,
     });
 
@@ -31,11 +31,11 @@ describe.skip("Timer commands", () => {
     expect(timer.remaining).toBe(TIME - TIME_PASSED);
   });
 
-  test("Subtractor stops when command is published", () => {
+  test('Subtractor stops when command is published', () => {
     jest.useFakeTimers();
 
     PubSub.publish(Topic.TimerCommand, {
-      command: "stop",
+      command: 'stop',
     });
 
     jest.advanceTimersByTime(2000);

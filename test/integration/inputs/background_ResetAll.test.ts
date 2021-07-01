@@ -1,22 +1,22 @@
-import PubSub from "pubsub-js";
-import { Bridge } from "../../../src/background/Bridge";
-import { Timeline } from "../../../src/background/Timeline";
-import { DEFAULT_SETTINGS } from "../../../src/shared-constants";
-import { Status } from "../../../src/shared-types";
+import PubSub from 'pubsub-js';
+import Bridge from '../../../src/background/Bridge';
+import Timeline from '../../../src/background/Timeline';
+import { DEFAULT_SETTINGS } from '../../../src/shared-constants';
+import { Status } from '../../../src/shared-types';
 import {
   runBackground,
   simulatePause,
   simulateResetAll,
   simulateStart,
-} from "../test-utils";
+} from '../test-utils';
 
 let bridge: Bridge;
 let timeline: Timeline;
 
-describe("Reset all", () => {
-  describe("When the period is in its initial state", () => {
+describe('Reset all', () => {
+  describe('When the period is in its initial state', () => {
     // Tests
-    describe("First period", () => {
+    describe('First period', () => {
       beforeAll(() => {
         jest.useFakeTimers();
         [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
@@ -28,14 +28,14 @@ describe("Reset all", () => {
         jest.clearAllTimers();
       });
 
-      test("The status remains as initial", () => {
+      test('The status remains as initial', () => {
         expect(timeline.current.status).toBe(Status.Initial);
       });
-      test("The index does not change", () => {
+      test('The index does not change', () => {
         expect(timeline.current.id).toBe(0);
       });
     });
-    describe("All other periods", () => {
+    describe('All other periods', () => {
       beforeAll(() => {
         jest.useFakeTimers();
         [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
@@ -52,16 +52,16 @@ describe("Reset all", () => {
         jest.clearAllTimers();
       });
 
-      test("The status remains as initial", () => {
+      test('The status remains as initial', () => {
         expect(timeline.current.status).toBe(Status.Initial);
       });
-      test("The index points to the first period", () => {
+      test('The index points to the first period', () => {
         expect(timeline.current.id).toBe(0);
       });
     });
   });
 
-  describe("When the period is running", () => {
+  describe('When the period is running', () => {
     beforeAll(() => {
       jest.useFakeTimers();
       [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
@@ -79,7 +79,7 @@ describe("Reset all", () => {
       jest.clearAllTimers();
     });
 
-    test("The status is set to initial", () => {
+    test('The status is set to initial', () => {
       expect(timeline.current.status).toBe(Status.Initial);
     });
 
@@ -94,12 +94,12 @@ describe("Reset all", () => {
       });
     });
 
-    test("The index is set to the first period", () => {
+    test('The index is set to the first period', () => {
       expect(timeline.current.id).toBe(0);
     });
   });
 
-  describe("When the period is paused", () => {
+  describe('When the period is paused', () => {
     beforeAll(() => {
       jest.useFakeTimers();
       [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
@@ -119,7 +119,7 @@ describe("Reset all", () => {
       jest.clearAllTimers();
     });
 
-    test("The status is set to initial", () => {
+    test('The status is set to initial', () => {
       expect(timeline.current.status).toBe(Status.Initial);
     });
 
@@ -134,12 +134,12 @@ describe("Reset all", () => {
       });
     });
 
-    test("The index is set to the first period", () => {
+    test('The index is set to the first period', () => {
       expect(timeline.current.id).toBe(0);
     });
   });
 
-  describe("When the period is a break", () => {
+  describe('When the period is a break', () => {
     beforeAll(() => {
       jest.useFakeTimers();
       [bridge, timeline] = runBackground(DEFAULT_SETTINGS);
@@ -159,7 +159,7 @@ describe("Reset all", () => {
       jest.clearAllTimers();
     });
 
-    test("The status is set to initial", () => {
+    test('The status is set to initial', () => {
       expect(timeline.current.status).toBe(Status.Initial);
     });
 
@@ -174,7 +174,7 @@ describe("Reset all", () => {
       });
     });
 
-    test("The index is set to the first period", () => {
+    test('The index is set to the first period', () => {
       expect(timeline.current.id).toBe(0);
     });
   });

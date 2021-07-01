@@ -1,14 +1,14 @@
-import PubSub from "pubsub-js";
-import { Bridge } from "../../../src/background/Bridge";
-import { Timeline } from "../../../src/background/Timeline";
-import { DEFAULT_SETTINGS } from "../../../src/shared-constants";
-import { Status } from "../../../src/shared-types";
-import { runBackground, simulateStart, simulatePause } from "../test-utils";
+import PubSub from 'pubsub-js';
+import Bridge from '../../../src/background/Bridge';
+import Timeline from '../../../src/background/Timeline';
+import { DEFAULT_SETTINGS } from '../../../src/shared-constants';
+import { Status } from '../../../src/shared-types';
+import { runBackground, simulateStart, simulatePause } from '../test-utils';
 
 let bridge: Bridge;
 let timeline: Timeline;
 
-describe("On pause", () => {
+describe('On pause', () => {
   const TIME_PASSED = 5000;
   let previousRemaining = 0;
   let previousIndex = 0;
@@ -33,15 +33,15 @@ describe("On pause", () => {
     PubSub.clearAllSubscriptions();
   });
 
-  test("Status is updated properly", () => {
+  test('Status is updated properly', () => {
     expect(timeline.current.state.status).toBe(Status.Paused);
   });
 
-  test("Period index is not modified", () => {
+  test('Period index is not modified', () => {
     expect(timeline.current.state.index).toBe(previousIndex);
   });
 
-  test("Remaining time is not modified even if time passes", () => {
+  test('Remaining time is not modified even if time passes', () => {
     expect(timeline.current.remaining).toBe(previousRemaining);
   });
 });

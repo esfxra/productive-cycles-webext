@@ -1,6 +1,6 @@
-import { Bridge } from "../../src/background/Bridge";
-import { Timeline } from "../../src/background/Timeline";
-import { ExtensionSettings, Input } from "../../src/shared-types";
+import Bridge from '../../src/background/Bridge';
+import Timeline from '../../src/background/Timeline';
+import { ExtensionSettings, Input } from '../../src/shared-types';
 
 export function runBackground(settings: ExtensionSettings): [Bridge, Timeline] {
   // Simulate the main runBackground function without the browser listeners

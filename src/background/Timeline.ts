@@ -1,8 +1,8 @@
-import PubSub from "pubsub-js";
-import { Period } from "./Period";
-import { minutesToMillis } from "./utils/utils";
-import { Topic } from "./background-types";
-import { Status, TimelineSettings } from "../shared-types";
+import PubSub from 'pubsub-js';
+import Period from './Period';
+import { minutesToMillis } from './utils/utils';
+import { Topic } from './background-types';
+import { Status, TimelineSettings } from '../shared-types';
 
 class Timeline {
   periods: Period[];
@@ -53,6 +53,8 @@ class Timeline {
     // TODO: Implement this from the period index sent as a parameter
     // - This considers that completed periods do not need to be updated
 
+    // TODO: Consider using map() to replace the existing array
+
     // Calculate targets using period duration and either: current time or previous period target
     this.periods.forEach((period, idx) => {
       const reference = idx === 0 ? Date.now() : this.periods[idx - 1].target;
@@ -61,6 +63,8 @@ class Timeline {
   }
 
   setEnabled(): void {
+    // TODO: Consider using map() to replace the existing array
+
     // Assign aliases
     const startAt = this.index;
     const length = this.periods.length;
@@ -171,4 +175,4 @@ class Timeline {
   }
 }
 
-export { Timeline };
+export default Timeline;
