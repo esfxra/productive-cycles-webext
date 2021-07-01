@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ES6",
+    "target": "ESNext",
     "jsx": "react",
     "noEmit": true,
+    "noImplicitAny": true,
     "esModuleInterop": true,
     "alwaysStrict": true,
     "skipLibCheck": true
