@@ -5,171 +5,232 @@ import { Topic } from './background-types';
 import { Status, TimelineSettings } from '../shared-types';
 
 class Timeline {
+  settings: TimelineSettings;
   periods: Period[];
   index: number;
 
-  settings: TimelineSettings;
-
   constructor(settings: TimelineSettings) {
-    // Declare and assign empty array for periods
-    this.periods = [];
-    // Assign timeline settings
     this.settings = settings;
-    // Set starting period to 0
+    this.periods = [];
     this.index = 0;
-    // Build periods array with default settings
+
     this.build();
   }
 
+  /**
+   * Gets the current period in an easy-to-chain format to invoke {@link Period#Period} methods.
+   */
   get current(): Period {
     // Get the current period
     return this.periods[this.index];
   }
 
+  /**
+   * Builds an array of new instances of the class Period.
+   *
+   * It uses timeline {@link Timeline#settings} to
+   * initialize each period as either a cycle or a break.
+   */
   build(): void {
-    // Assign aliases
-    const startAt = this.index;
-    const totalPeriods = this.settings.totalPeriods;
-    const cycleMillis = minutesToMillis(this.settings.cycleMinutes);
-    const breakMillis = minutesToMillis(this.settings.breakMinutes);
+    // Get settings
+    const { totalPeriods, cycleMinutes, breakMinutes } = this.settings;
 
-    // Instantiate new periods
-    const timeline: Period[] = [];
-    for (let i = startAt; i < totalPeriods; i += 1) {
-      const props = {
-        id: i,
-        duration: i % 2 === 0 ? cycleMillis : breakMillis,
+    // Instantiate new periods, and populate this.periods array
+    this.periods = Array.from(Array(totalPeriods)).map((_, idx) => {
+      const duration = idx % 2 === 0 ? cycleMinutes : breakMinutes;
+
+      return new Period({
+        id: idx,
+        duration: minutesToMillis(duration),
         nextPeriod: this.nextPeriod.bind(this),
         publishState: this.publishState.bind(this),
-      };
-
-      timeline[i] = new Period(props);
-    }
-
-    this.periods = timeline;
+      });
+    });
   }
 
+  /**
+   * Sets new targets to all periods that have not yet been completed.
+   *
+   * It sums the previous period's target plus the duration of the current period.
+   * Note: The first period (idx === 0) uses the current time as initial reference.
+   */
   setTargets(): void {
-    // TODO: Implement this from the period index sent as a parameter
-    // - This considers that completed periods do not need to be updated
+    this.periods.forEach((period, idx, arr) => {
+      if (period.status === Status.Complete) {
+        return;
+      }
 
-    // TODO: Consider using map() to replace the existing array
-
-    // Calculate targets using period duration and either: current time or previous period target
-    this.periods.forEach((period, idx) => {
-      const reference = idx === 0 ? Date.now() : this.periods[idx - 1].target;
+      const reference = idx === 0 ? Date.now() : arr[idx - 1].target;
       period.target = period.remaining + reference;
     });
   }
 
+  /**
+   * Sets new autoStart settings to timeline periods.
+   *
+   * Note: Always enables current period by default.
+   */
   setEnabled(): void {
-    // TODO: Consider using map() to replace the existing array
+    const { cycleAutoStart, breakAutoStart } = this.settings;
 
-    // Assign aliases
-    const startAt = this.index;
-    const length = this.periods.length;
-    const cycleAutoStart = this.settings.cycleAutoStart;
-    const breakAutoStart = this.settings.breakAutoStart;
+    this.periods.forEach((period, idx, arr) => {
+      // Always enable current period; consider adding this as part of the start() behavior, not here
+      if (idx === this.index) {
+        period.enabled = true;
 
-    // Enable or disable periods per autoStart settings
-    for (let i = startAt; i < length; i += 1) {
-      const previous = i === 0 ? null : this.periods[i - 1];
-
-      if (i === startAt) {
-        // Always enable current period
-        // - This assumes setEnabled is only called when running the timer
-        this.periods[i].enabled = true;
-      } else if (previous.enabled) {
-        // Use settings to enable or disable consecutive periods
-        // - NOTE: In case one of the consecutive periods is disabled, all the remaining ones also get disabled
-        this.periods[i].enabled = i % 2 === 0 ? cycleAutoStart : breakAutoStart;
+        return;
       }
+
+      // NOTE: If previous period is disabled, all the consecutive ones also get disabled
+      const previous = idx === 0 ? null : arr[idx - 1];
+      if (previous.enabled) {
+        period.enabled = idx % 2 === 0 ? cycleAutoStart : breakAutoStart;
+      }
+    });
+  }
+
+  handleStart(): void {
+    this.setTargets();
+    this.setEnabled();
+    this.current.start();
+  }
+
+  handlePause(): void {
+    this.current.pause();
+  }
+
+  handleSkip(): void {
+    this.current.skip();
+  }
+
+  handleResetCycle(): void {
+    /**
+     * ResetCycle is currently only handled for cycles, not breaks
+     * The UI does not show the ResetCycle button for breaks, but this check is here just in case
+     */
+    if (this.index % 2 !== 0) {
+      return;
+    }
+
+    const { cycleMinutes, breakMinutes } = this.settings;
+
+    if (this.current.status === Status.Initial) {
+      /**
+       * If a cycle's status is Initial, allow the user to go back to the initial state of the previous cycle
+       * Note: The first cycle does not have any previous period to go back to, so we skip it
+       *
+       * TODO: Consider eliminating the ResetCycle button from the UI
+       */
+      if (this.index === 0) {
+        return;
+      }
+
+      // Go back to previous break, and reset it
+      this.index -= 1;
+      this.current.reset(minutesToMillis(breakMinutes));
+
+      // Go back to previous cycle, and reset it
+      this.index -= 1;
+      this.current.reset(minutesToMillis(cycleMinutes));
+
+      return;
+    }
+
+    // TODO: Eliminate the redundant conditions once all possible Status values are locked in
+    if (
+      this.current.status === Status.Running ||
+      this.current.status === Status.Paused ||
+      this.current.status === Status.Complete
+    ) {
+      // Reset current cycle back to Initial state
+      this.current.reset(minutesToMillis(cycleMinutes));
+
+      return;
     }
   }
 
+  handleResetAll(): void {
+    const { cycleMinutes, breakMinutes } = this.settings;
+
+    // Iterate all periods, and reset these
+    this.periods.forEach((period, idx) => {
+      const duration = idx % 2 === 0 ? cycleMinutes : breakMinutes;
+      period.reset(minutesToMillis(duration));
+    });
+
+    // Reset the timeline index back to 0
+    this.index = 0;
+  }
+
+  handlePreload(): void {
+    this.current.publishState();
+  }
+
+  /**
+   * Subscribe to published messages from Bridge.
+   * Handlers for user input and PreLoad are registered here.
+   */
   registerSubscriptions(): void {
     PubSub.subscribe(Topic.Start, () => {
-      // Set targets
-      this.setTargets();
-      // Set updated autoStart based on settings
-      this.setEnabled();
-      // Run period start tasks
-      this.current.start();
+      this.handleStart();
     });
 
     PubSub.subscribe(Topic.Pause, () => {
-      // Run period pause tasks
-      this.current.pause();
+      this.handlePause();
     });
 
     PubSub.subscribe(Topic.Skip, () => {
-      // Run period skip tasks
-      this.current.skip();
+      this.handleSkip();
     });
 
     PubSub.subscribe(Topic.ResetCycle, () => {
-      const breakMillis = minutesToMillis(this.settings.breakMinutes);
-      const cycleMillis = minutesToMillis(this.settings.cycleMinutes);
-
-      if (this.current.status === Status.Initial) {
-        if (this.index === 0) {
-          // Do nothing
-        } else {
-          // Reset previous break, and then previous cycle
-          this.index -= 1;
-          this.current.reset(breakMillis);
-          this.index -= 1;
-          this.current.reset(cycleMillis);
-        }
-      } else {
-        // Reset current cycle back to Initial state
-        this.current.reset(cycleMillis);
-      }
+      this.handleResetCycle();
     });
 
     PubSub.subscribe(Topic.ResetAll, () => {
-      const breakMillis = minutesToMillis(this.settings.breakMinutes);
-      const cycleMillis = minutesToMillis(this.settings.cycleMinutes);
-
-      // Iterate through the periods array
-      this.periods.forEach((period) => {
-        period.reset(period.id % 2 === 0 ? cycleMillis : breakMillis);
-      });
-      // Reset the timeline index
-      this.index = 0;
+      this.handleResetAll();
     });
 
     PubSub.subscribe(Topic.Preload, () => {
-      this.current.publishState();
+      this.handlePreload();
     });
   }
 
+  /**
+   * Increments the Timeline's index to point to the next period.
+   * This function is also an interface passed down to each {@link Period#Period}
+   * to be invoked once the timer has finished.
+   *
+   * Note: The increment does not occur if this is called for the last period.
+   */
   nextPeriod(): void {
-    if (this.index === this.settings.totalPeriods - 1) {
-      // Last period
-      // Marked as complete before calling this method
+    const isLast = this.index === this.settings.totalPeriods - 1;
+    if (isLast) {
       this.publishState();
-    } else {
-      // Increment the index
-      this.index += 1;
-      // Check autoStart settings and act accordingly
-      if (this.current.enabled) {
-        // ?? - Set targets
-        this.setTargets();
-        // ?? - Set updated autoStart based on settings
-        this.setEnabled();
-        // Start the period
-        this.current.start();
-      }
+      return;
+    }
+
+    this.index += 1;
+    if (this.current.enabled) {
+      // this.setTargets();
+      // this.setEnabled();
+      // this.current.start();
+      this.handleStart();
     }
   }
 
+  /**
+   * Publishes the state to the Bridge.
+   * This function is also an interface passed down to each {@link Period#Period}
+   * to be invoked on every tick.
+   */
   publishState(): void {
     // Prepare state + totalPeriods (UI currently receives totalPeriods from the port messages)
     const data = {
       ...this.current.state,
       totalPeriods: this.settings.totalPeriods,
     };
+
     // Publish request to post the state through the port
     PubSub.publishSync(Topic.State, data);
   }
