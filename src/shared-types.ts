@@ -1,17 +1,8 @@
-export enum Input {
-  Start = "Start",
-  Pause = "Pause",
-  Skip = "Skip",
-  ResetCycle = "ResetCycle",
-  ResetAll = "ResetAll",
-  Preload = "Preload",
-}
-
 export enum Status {
-  Initial = "Initial",
-  Running = "Running",
-  Paused = "Paused",
-  Complete = "Complete",
+  Initial = 'Initial',
+  Running = 'Running',
+  Paused = 'Paused',
+  Complete = 'Complete',
 }
 
 export interface TimelineSettings {
@@ -23,7 +14,7 @@ export interface TimelineSettings {
 }
 
 export interface ExtensionSettings extends TimelineSettings {
-  theme: "light" | "dark";
+  theme: 'light' | 'dark';
   showWelcome: boolean;
   showUpdates: boolean;
   showBadge: boolean;

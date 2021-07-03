@@ -1,21 +1,22 @@
-"use strict";
+'use strict';
 
-import React from "react";
-import styled from "styled-components";
-import useLocale from "../../hooks/useLocale";
-import { Input, Status } from "../../../shared-types";
+import React from 'react';
+import styled from 'styled-components';
+import useLocale from '../../hooks/useLocale';
+import { INPUT } from '../../../shared-constants';
+import { Status } from '../../../shared-types';
 
-import startIcon from "../../assets/control-start.svg";
-import pauseIcon from "../../assets/control-pause.svg";
-import resetIcon from "../../assets/control-reset-cycle.svg";
-import resetAllIcon from "../../assets/control-reset-all.svg";
+import startIcon from '../../assets/control-start.svg';
+import pauseIcon from '../../assets/control-pause.svg';
+import resetIcon from '../../assets/control-reset-cycle.svg';
+import resetAllIcon from '../../assets/control-reset-all.svg';
 
 const locale_set = [
-  "control_start",
-  "control_pause",
-  "control_resetCycle",
-  "control_resetAll",
-  "control_skipBreak",
+  'control_start',
+  'control_pause',
+  'control_resetCycle',
+  'control_resetAll',
+  'control_skipBreak',
 ];
 
 const control = {
@@ -39,7 +40,7 @@ const StyledControl = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: ${(props) =>
-    props.period % 2 === 0 ? "space-between" : "center"};
+    props.period % 2 === 0 ? 'space-between' : 'center'};
   width: 100%;
   margin-bottom: 25px;
 `;
@@ -76,7 +77,7 @@ const StyledSkip = styled.div`
 `;
 
 const Button = ({ name, title, onClick }) => {
-  const highlight = name === "Start";
+  const highlight = name === 'Start';
   return (
     <StyledButton
       title={title}
@@ -89,7 +90,7 @@ const Button = ({ name, title, onClick }) => {
 };
 
 const Skip = ({ title, onClick }) => (
-  <StyledSkip onClick={() => onClick({ command: Input.Skip })}>
+  <StyledSkip onClick={() => onClick({ command: INPUT.Skip })}>
     {title}
   </StyledSkip>
 );
@@ -102,34 +103,34 @@ const Control = ({ period, status, handleInput }) => {
 
   const start = (
     <Button
-      name={Input.Start}
-      title={locale["control_start"]}
+      name={INPUT.Start}
+      title={locale['control_start']}
       onClick={handleInput}
     />
   );
   const pause = (
     <Button
-      name={Input.Pause}
-      title={locale["control_pause"]}
+      name={INPUT.Pause}
+      title={locale['control_pause']}
       onClick={handleInput}
     />
   );
   const reset = (
     <Button
-      name={Input.ResetCycle}
-      title={locale["control_resetCycle"]}
+      name={INPUT.ResetCycle}
+      title={locale['control_resetCycle']}
       onClick={handleInput}
     />
   );
   const resetAll = (
     <Button
-      name={Input.ResetAll}
-      title={locale["control_resetAll"]}
+      name={INPUT.ResetAll}
+      title={locale['control_resetAll']}
       onClick={handleInput}
     />
   );
   const skip = (
-    <Skip title={locale["control_skipBreak"]} onClick={handleInput} />
+    <Skip title={locale['control_skipBreak']} onClick={handleInput} />
   );
 
   let control;

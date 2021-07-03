@@ -1,29 +1,20 @@
 import Timer from './Timer';
+import Alarms from './Alarms';
 import { millisToFormattedString } from './utils/utils';
+import { TOPICS } from './background-constants';
 import { Status } from '../shared-types';
 import { State } from './background-types';
-
-interface PeriodConstructor {
-  id: number;
-  duration: number;
-  nextPeriod: () => void;
-  publishState: () => void;
-}
 
 class Period extends Timer {
   id: number;
   status: Status;
   target: number;
   enabled: boolean;
-  nextPeriod: () => void;
-  publishState: () => void;
 
-  constructor({ id, duration, nextPeriod, publishState }: PeriodConstructor) {
+  constructor({ id, duration }: { id: number; duration: number }) {
     // Assignments
     super(duration);
     this.id = id;
-    this.nextPeriod = nextPeriod;
-    this.publishState = publishState;
 
     // Default values
     this.status = Status.Initial;
@@ -41,20 +32,24 @@ class Period extends Timer {
 
   start(): void {
     this.status = Status.Running;
-    this.publishState();
+    PubSub.publishSync(TOPICS.Period.PeriodState);
+
+    // Set alarm
+    Alarms.schedule(`alarm-period-${this.id}`, Date.now() + this.remaining);
+
+    // Run bridge timer
     this.run();
   }
 
   pause(): void {
     this.stop();
     this.status = Status.Paused;
-    this.publishState();
+    PubSub.publishSync(TOPICS.Period.PeriodState);
   }
 
   skip(): void {
     this.stop();
-    this.status = Status.Complete;
-    this.nextPeriod();
+    PubSub.publishSync(TOPICS.Period.PeriodState);
     // TODO: Implement code to start tasks for the next period
     // - I.E. ... autoStart on or off checks
   }
@@ -63,22 +58,22 @@ class Period extends Timer {
     this.stop();
     this.status = Status.Initial;
     this.remaining = duration;
+    PubSub.publishSync(TOPICS.Period.PeriodState);
     // TODO: Understand if target should be reset to null or undefined
     // TODO: Understand if enabled should be reset to false
   }
 
   tick(): void {
     // Publish state
-    this.publishState();
+    PubSub.publishSync(TOPICS.Period.PeriodState);
   }
 
-  end(): void {
-    // Mark period as complete, publish state, perform timeline index update
+  /**
+   * Queue end tasks to be checked by _____.
+   * This is to prevent conflicts with the alarm set in parallel when the period was started.
+   */
+  complete(): void {
     this.status = Status.Complete;
-
-    this.nextPeriod();
-    // this.publishState();
-    // this.incrementIndex();
   }
 }
 

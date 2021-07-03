@@ -1,3 +1,5 @@
+import { TOPICS } from './background-constants';
+
 class Timer {
   remaining: number;
   subtractor: ReturnType<typeof setInterval>;
@@ -28,11 +30,12 @@ class Timer {
     clearInterval(this.subtractor);
   }
 
-  tick(): void {
-    // To be overriden
+  end(): void {
+    // Publish timer end message
+    PubSub.publishSync(TOPICS.Period.PeriodEnd);
   }
 
-  end(): void {
+  tick(): void {
     // To be overriden
   }
 }

@@ -1,7 +1,7 @@
 import PubSub from 'pubsub-js';
 import Period from './Period';
 import { minutesToMillis } from './utils/utils';
-import { Topic } from './background-types';
+import { TOPICS } from './background-constants';
 import { Status, TimelineSettings } from '../shared-types';
 
 class Timeline {
@@ -13,7 +13,6 @@ class Timeline {
     this.settings = settings;
     this.periods = [];
     this.index = 0;
-
     this.build();
   }
 
@@ -21,7 +20,6 @@ class Timeline {
    * Gets the current period in an easy-to-chain format to invoke {@link Period#Period} methods.
    */
   get current(): Period {
-    // Get the current period
     return this.periods[this.index];
   }
 
@@ -32,7 +30,6 @@ class Timeline {
    * initialize each period as either a cycle or a break.
    */
   build(): void {
-    // Get settings
     const { totalPeriods, cycleMinutes, breakMinutes } = this.settings;
 
     // Instantiate new periods, and populate this.periods array
@@ -42,8 +39,6 @@ class Timeline {
       return new Period({
         id: idx,
         duration: minutesToMillis(duration),
-        nextPeriod: this.nextPeriod.bind(this),
-        publishState: this.publishState.bind(this),
       });
     });
   }
@@ -66,6 +61,41 @@ class Timeline {
   }
 
   /**
+   * Increments the Timeline's index to point to the next period.
+   *
+   * Note: The increment does not occur if this is called for the last period.
+   */
+  nextPeriod(): void {
+    const isLast = this.index === this.settings.totalPeriods - 1;
+    if (isLast) {
+      this.publishState();
+      return;
+    }
+
+    this.index += 1;
+    if (this.current.enabled) {
+      // this.setTargets();
+      // this.setEnabled();
+      // this.current.start();
+      this.handleStart();
+    }
+  }
+
+  /**
+   * Publishes the state to the Bridge.
+   */
+  publishState(): void {
+    // Prepare state + totalPeriods (UI currently receives totalPeriods from the port messages)
+    const data = {
+      ...this.current.state,
+      totalPeriods: this.settings.totalPeriods,
+    };
+
+    // Publish request to post the state through the port
+    PubSub.publishSync(TOPICS.Timeline.TimelineState, data);
+  }
+
+  /**
    * Sets new autoStart settings to timeline periods.
    *
    * Note: Always enables current period by default.
@@ -77,7 +107,6 @@ class Timeline {
       // Always enable current period; consider adding this as part of the start() behavior, not here
       if (idx === this.index) {
         period.enabled = true;
-
         return;
       }
 
@@ -132,7 +161,6 @@ class Timeline {
       // Go back to previous cycle, and reset it
       this.index -= 1;
       this.current.reset(minutesToMillis(cycleMinutes));
-
       return;
     }
 
@@ -144,7 +172,6 @@ class Timeline {
     ) {
       // Reset current cycle back to Initial state
       this.current.reset(minutesToMillis(cycleMinutes));
-
       return;
     }
   }
@@ -163,7 +190,7 @@ class Timeline {
   }
 
   handlePreload(): void {
-    this.current.publishState();
+    this.publishState();
   }
 
   /**
@@ -171,68 +198,58 @@ class Timeline {
    * Handlers for user input and PreLoad are registered here.
    */
   registerSubscriptions(): void {
-    PubSub.subscribe(Topic.Start, () => {
+    /**
+     * Input subscriptions.
+     */
+    PubSub.subscribe(TOPICS.Bridge.Start, () => {
       this.handleStart();
     });
 
-    PubSub.subscribe(Topic.Pause, () => {
+    PubSub.subscribe(TOPICS.Bridge.Pause, () => {
       this.handlePause();
     });
 
-    PubSub.subscribe(Topic.Skip, () => {
+    PubSub.subscribe(TOPICS.Bridge.Skip, () => {
       this.handleSkip();
     });
 
-    PubSub.subscribe(Topic.ResetCycle, () => {
+    PubSub.subscribe(TOPICS.Bridge.ResetCycle, () => {
       this.handleResetCycle();
     });
 
-    PubSub.subscribe(Topic.ResetAll, () => {
+    PubSub.subscribe(TOPICS.Bridge.ResetAll, () => {
       this.handleResetAll();
     });
 
-    PubSub.subscribe(Topic.Preload, () => {
+    PubSub.subscribe(TOPICS.Bridge.Preload, () => {
       this.handlePreload();
     });
-  }
 
-  /**
-   * Increments the Timeline's index to point to the next period.
-   * This function is also an interface passed down to each {@link Period#Period}
-   * to be invoked once the timer has finished.
-   *
-   * Note: The increment does not occur if this is called for the last period.
-   */
-  nextPeriod(): void {
-    const isLast = this.index === this.settings.totalPeriods - 1;
-    if (isLast) {
+    /**
+     * Period-related subscriptions.
+     */
+    PubSub.subscribe(TOPICS.Period.PeriodState, () => {
       this.publishState();
-      return;
-    }
+    });
 
-    this.index += 1;
-    if (this.current.enabled) {
-      // this.setTargets();
-      // this.setEnabled();
-      // this.current.start();
-      this.handleStart();
-    }
-  }
+    PubSub.subscribe(TOPICS.Period.PeriodEnd, () => {
+      /**
+       * Actions to take once a period has ended.
+       *
+       * Note: Both the period's timer and the alarms are setup to publish
+       * through this topic's channel.
+       *
+       * TODO: Handle parallel requests. Reconcile messages from both Timer and Alarms.
+       * - Consider making sure that remaining is zero if timer is running.
+       */
+      if (Date.now() > this.current.remaining) {
+        this.current.complete();
+        this.nextPeriod();
+      }
 
-  /**
-   * Publishes the state to the Bridge.
-   * This function is also an interface passed down to each {@link Period#Period}
-   * to be invoked on every tick.
-   */
-  publishState(): void {
-    // Prepare state + totalPeriods (UI currently receives totalPeriods from the port messages)
-    const data = {
-      ...this.current.state,
-      totalPeriods: this.settings.totalPeriods,
-    };
-
-    // Publish request to post the state through the port
-    PubSub.publishSync(Topic.State, data);
+      // this.current.complete();
+      // this.nextPeriod();
+    });
   }
 }
 

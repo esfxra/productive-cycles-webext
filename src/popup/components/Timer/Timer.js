@@ -1,15 +1,16 @@
-"use strict";
+'use strict';
 
-import React, { useState, useEffect, useRef } from "react";
-import styled from "styled-components";
-import Section from "../Common/Section";
-import Counter from "./Counter";
-import Control from "./Control";
-import Cycles from "./Cycles";
-import useLocale from "../../hooks/useLocale";
-import { Input, Status } from "../../../shared-types";
+import React, { useState, useEffect, useRef } from 'react';
+import styled from 'styled-components';
+import Section from '../Common/Section';
+import Counter from './Counter';
+import Control from './Control';
+import Cycles from './Cycles';
+import useLocale from '../../hooks/useLocale';
+import { INPUT } from '../../../shared-constants';
+import { Status } from '../../../shared-types';
 
-const locale_set = ["complete", "complete_button"];
+const locale_set = ['complete', 'complete_button'];
 
 const CompleteMessage = styled.div`
   margin-bottom: 18px;
@@ -30,16 +31,16 @@ const NewTimerButton = styled.div`
 
 const Timer = () => {
   const port = useRef();
-  const [time, setTime] = useState("25:00");
+  const [time, setTime] = useState('25:00');
   const [period, setPeriod] = useState(0);
   const [status, setStatus] = useState(Status.Initial);
   const [total, setTotal] = useState(7);
   const locale = useLocale(locale_set);
 
   useEffect(() => {
-    port.current = chrome.runtime.connect({ name: "port-from-popup" });
+    port.current = chrome.runtime.connect({ name: 'port-from-popup' });
     port.current.onMessage.addListener(handleMessage);
-    port.current.postMessage({ command: Input.Preload });
+    port.current.postMessage({ command: INPUT.Preload });
 
     return () => {
       port.current.onMessage.removeListener(handleMessage);
@@ -48,7 +49,7 @@ const Timer = () => {
   }, []);
 
   const handleMessage = (message) => {
-    console.log("Received new message");
+    console.log('Received new message');
     console.log(message);
 
     setTime(message.remaining);
@@ -73,10 +74,10 @@ const Timer = () => {
 
   const complete = (
     <>
-      <CompleteMessage>{locale["complete"]}</CompleteMessage>
+      <CompleteMessage>{locale['complete']}</CompleteMessage>
       <Cycles period={period} status={status} total={total} />
-      <NewTimerButton onClick={() => handleInput({ command: Input.ResetAll })}>
-        {locale["complete_button"]}
+      <NewTimerButton onClick={() => handleInput({ command: INPUT.ResetAll })}>
+        {locale['complete_button']}
       </NewTimerButton>
     </>
   );

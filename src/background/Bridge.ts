@@ -1,5 +1,6 @@
 import PubSub from 'pubsub-js';
-import { State, Topic } from './background-types';
+import { TOPICS } from './background-constants';
+import { State } from './background-types';
 
 interface Message extends State {
   totalPeriods: number;
@@ -31,15 +32,24 @@ class Bridge {
     this.open = false;
   }
 
-  handlePortMessages(message: { command: string }): void {
-    // Forward incoming messages to subscribers
-    PubSub.publish(Topic[message.command]);
+  /**
+   * Forward incoming messages to subscriber Timeline
+   *
+   * TODO: Examine better typing for 'command', which should represent one of the enums inside Topics.Input.
+   * Do note, however, that this is already guaranteed because input commands are sent using the Input enum.
+   * See /popup/components/Timer/Control.js
+   */
+  handlePortMessages(message: { command: any }): void {
+    PubSub.publish(message.command);
   }
 
   registerSubscriptions(): void {
     // Subscribe to requests for posting messages
     this.requestSubscriptions.push(
-      PubSub.subscribe(Topic.State, this.handlePublishRequests.bind(this))
+      PubSub.subscribe(
+        TOPICS.Timeline.TimelineState,
+        this.handlePublishRequests.bind(this)
+      )
     );
   }
 
