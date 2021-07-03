@@ -74,9 +74,7 @@ class Timeline {
 
     this.index += 1;
     if (this.current.enabled) {
-      // this.setTargets();
-      // this.setEnabled();
-      // this.current.start();
+      // TODO: Consider holding start() login in a different place since it is used in at least 2 places.
       this.handleStart();
     }
   }
@@ -91,7 +89,7 @@ class Timeline {
       totalPeriods: this.settings.totalPeriods,
     };
 
-    // Publish request to post the state through the port
+    // Publish request to post the state through the port.
     PubSub.publishSync(TOPICS.Timeline.TimelineState, data);
   }
 
@@ -104,17 +102,29 @@ class Timeline {
     const { cycleAutoStart, breakAutoStart } = this.settings;
 
     this.periods.forEach((period, idx, arr) => {
-      // Always enable current period; consider adding this as part of the start() behavior, not here
+      // Always enable current period; consider adding this as part of the start() behavior, not here.
       if (idx === this.index) {
         period.enabled = true;
         return;
       }
 
-      // NOTE: If previous period is disabled, all the consecutive ones also get disabled
-      const previous = idx === 0 ? null : arr[idx - 1];
-      if (previous.enabled) {
-        period.enabled = idx % 2 === 0 ? cycleAutoStart : breakAutoStart;
+      // Only use previous period if this is not the first one.
+      if (idx === 0) {
+        return;
       }
+
+      /**
+       * Disable period if previous is also disabled.
+       * Note: All the consecutive periods in the iteration will also be disabled.
+       */
+      const previous = arr[idx - 1];
+      if (!previous.enabled) {
+        period.enabled = false;
+        return;
+      }
+
+      // Apply autoStart settings.
+      period.enabled = idx % 2 === 0 ? cycleAutoStart : breakAutoStart;
     });
   }
 
@@ -134,8 +144,8 @@ class Timeline {
 
   handleResetCycle(): void {
     /**
-     * ResetCycle is currently only handled for cycles, not breaks
-     * The UI does not show the ResetCycle button for breaks, but this check is here just in case
+     * ResetCycle is currently only handled for cycles, not breaks.
+     * The UI does not show the ResetCycle button for breaks, but this check is here just in case.
      */
     if (this.index % 2 !== 0) {
       return;
@@ -145,10 +155,10 @@ class Timeline {
 
     if (this.current.status === Status.Initial) {
       /**
-       * If a cycle's status is Initial, allow the user to go back to the initial state of the previous cycle
-       * Note: The first cycle does not have any previous period to go back to, so we skip it
+       * If a cycle's status is Initial, allow the user to go back to the initial state of the previous cycle.
+       * Note: The first cycle does not have any previous period to go back to, so we skip it.
        *
-       * TODO: Consider eliminating the ResetCycle button from the UI
+       * TODO: Consider eliminating the ResetCycle button from the UI.
        */
       if (this.index === 0) {
         return;
@@ -164,7 +174,7 @@ class Timeline {
       return;
     }
 
-    // TODO: Eliminate the redundant conditions once all possible Status values are locked in
+    // TODO: Eliminate the redundant conditions once all possible Status values are locked in.
     if (
       this.current.status === Status.Running ||
       this.current.status === Status.Paused ||
