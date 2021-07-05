@@ -1,5 +1,4 @@
 import Timer from './Timer';
-import Alarms from './Alarms';
 import { millisToFormattedString } from './utils/utils';
 import { TOPICS } from './background-constants';
 import { Status } from '../shared-types';
@@ -34,10 +33,6 @@ class Period extends Timer {
     this.status = Status.Running;
     PubSub.publishSync(TOPICS.Period.PeriodState);
 
-    // Set alarm
-    Alarms.schedule(`alarm-period-${this.id}`, Date.now() + this.remaining);
-
-    // Run bridge timer
     this.run();
   }
 

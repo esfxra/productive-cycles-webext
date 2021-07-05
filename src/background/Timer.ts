@@ -31,7 +31,6 @@ class Timer {
   }
 
   end(): void {
-    // Publish timer end message
     PubSub.publishSync(TOPICS.Period.PeriodEnd);
   }
 

@@ -209,7 +209,7 @@ class Timeline {
    */
   registerSubscriptions(): void {
     /**
-     * Input subscriptions.
+     * Bridge subscriptions.
      */
     PubSub.subscribe(TOPICS.Bridge.Start, () => {
       this.handleStart();
@@ -245,20 +245,12 @@ class Timeline {
     PubSub.subscribe(TOPICS.Period.PeriodEnd, () => {
       /**
        * Actions to take once a period has ended.
-       *
-       * Note: Both the period's timer and the alarms are setup to publish
-       * through this topic's channel.
-       *
-       * TODO: Handle parallel requests. Reconcile messages from both Timer and Alarms.
-       * - Consider making sure that remaining is zero if timer is running.
+       * TODO: Examine whether checking if it is too early or too late is necessary.
        */
-      if (Date.now() > this.current.remaining) {
-        this.current.complete();
-        this.nextPeriod();
-      }
-
-      // this.current.complete();
-      // this.nextPeriod();
+      this.current.complete();
+      this.nextPeriod();
+      // if (Date.now() > this.current.remaining) {
+      // }
     });
   }
 }
