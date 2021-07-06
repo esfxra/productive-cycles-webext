@@ -9,103 +9,133 @@
   },
 
   "control_start": {
-    "message": "Comenzar"
+    "message": "Comenzar",
+    "description": "Tooltip text for when the user hovers over the Start button."
   },
   "control_pause": {
-    "message": "Pausa"
+    "message": "Pausa",
+    "description": "Tooltip text for when the user hovers over the Pause button."
   },
   "control_resetCycle": {
-    "message": "Reiniciar ciclo"
+    "message": "Reiniciar ciclo",
+    "description": "Tooltip text for when the user hovers over the ResetCycle button."
   },
   "control_resetAll": {
-    "message": "Reiniciar todo"
+    "message": "Reiniciar todo",
+    "description": "Tooltip text for when the user hovers over the ResetAll button."
   },
   "control_skipBreak": {
-    "message": "Omitir descanso"
+    "message": "Omitir descanso",
+    "description": "Text shown when a break is active. It triggers a skip when pressed."
   },
 
   "progress_dot": {
-    "message": "Ciclo"
+    "message": "Ciclo",
+    "description": "Tooltip text for when the user hovers over the progress dots."
   },
 
   "complete": {
-    "message": "Tiempo completo  🎉"
+    "message": "Tiempo completo  🎉",
+    "description": "Congratulatory message that appears once all cycles have been completed."
   },
   "complete_button": {
-    "message": "Recomenzar"
+    "message": "Recomenzar",
+    "description": "Text shown on the button that creates a new timer once all cycles have been completed."
   },
 
   "nav_settings": {
-    "message": "Configuración"
+    "message": "Configuración",
+    "description": "Tooltip text for when the user hovers over the settings icon."
   },
   "nav_back": {
-    "message": "Volver"
+    "message": "Volver",
+    "description": "Tooltip text for when the user hovers over the back icon."
   },
 
   "settings_appearance": {
-    "message": "Apariencia"
+    "message": "Apariencia",
+    "description": "Title of the appearance settings section."
   },
   "settings_appearance_light": {
-    "message": "Modo claro"
+    "message": "Modo claro",
+    "description": "Tooltip text for when the user hovers over the light theme icon."
   },
   "settings_appearance_dark": {
-    "message": "Modo oscuro"
+    "message": "Modo oscuro",
+    "description": "Tooltip text for when the user hovers over the dark theme icon."
   },
 
   "settings_notifications": {
-    "message": "Notificaciones"
+    "message": "Notificaciones",
+    "description": "Title of the notification settings section."
   },
   "settings_notifications_enabled": {
-    "message": "Activar notificaciones"
+    "message": "Activar notificaciones",
+    "description": "Setting name for enabling notifications."
   },
   "settings_notifications_sound": {
-    "message": "Activar sonido"
+    "message": "Activar sonido",
+    "description": "Setting name for enabling notification sounds."
   },
 
   "settings_autoStart": {
-    "message": "Comienzo automático"
+    "message": "Comienzo automático",
+    "description": "Title of the automatic start settings section."
   },
   "settings_autoStart_cycles": {
-    "message": "Comenzar ciclos"
+    "message": "Comenzar ciclos",
+    "description": "Setting name for automatically starting cycles."
   },
   "settings_autoStart_breaks": {
-    "message": "Comenzar descansos"
+    "message": "Comenzar descansos",
+    "description": "Setting name for automatically starting breaks."
   },
 
   "settings_timer": {
-    "message": "Temporizador"
+    "message": "Temporizador",
+    "description": "Title of the timer settings section."
   },
   "settings_timer_cycleMinutes": {
-    "message": "Minutos por ciclo"
+    "message": "Minutos por ciclo",
+    "description": "Setting name for changing cycle minutes."
   },
   "settings_timer_breakMinutes": {
-    "message": "Minutos por descanso"
+    "message": "Minutos por descanso",
+    "description": "Setting name for changing break minutes."
   },
   "settings_timer_totalCycles": {
-    "message": "Número de ciclos"
+    "message": "Número de ciclos",
+    "description": "Setting name for changing total cycles."
   },
   "settings_timer_badgeTimer": {
-    "message": "Temporizador en ícono"
+    "message": "Temporizador en ícono",
+    "description": "Setting name for enabling timer on icon."
   },
 
   "updates": {
-    "message": "Actualizaciones"
+    "message": "Actualizaciones",
+    "description": "Title for updates screen."
   },
   "updates_greeting": {
-    "message": "Bienvenido a la versión 0.7"
+    "message": "Bienvenido a la versión 0.7",
+    "description": "Greeting for updates screen."
   },
   "updates_notes": {
-    "message": "Cambios:"
+    "message": "Cambios:",
+    "description": "Subtitle for release notes section."
   },
   "updates_update_1": {
-    "message": "Idioma español 🇪🇸"
+    "message": "Idioma español 🇪🇸",
+    "description": "Update item 1."
   },
   "updates_update_2": {
-    "message": "Trabajo preparatorio para más idiomas 🌐"
+    "message": "Trabajo preparatorio para más idiomas 🌐",
+    "description": "Update item 2."
   },
 
   "notifications_cycle_title": {
     "message": "Completaste el ciclo #$period$.",
+    "description": "Notification title for when a cycle is complete.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -114,6 +144,7 @@
   },
   "notifications_cycle_message": {
     "message": "Recuerda cumplir con tu descanso.",
+    "description": "Notification text for when a cycle is complete.",
     "placeholders": {
       "time": {
         "content": "$1"
@@ -122,6 +153,7 @@
   },
   "notifications_break_title": {
     "message": "Se acabó el descanso #$period$.",
+    "description": "Notification title for when a break is complete.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -129,12 +161,15 @@
     }
   },
   "notifications_break_message": {
-    "message": "¡A trabajar! Enfócate y da lo mejor de ti."
+    "message": "¡A trabajar! Enfócate y da lo mejor de ti.",
+    "description": "Notification text for when a break is complete."
   },
   "notifications_complete_title": {
-    "message": "¡Lo hiciste! Completaste todos los ciclos."
+    "message": "¡Lo hiciste! Completaste todos los ciclos.",
+    "description": "Notification title for when all cycles are complete."
   },
   "notifications_complete_message": {
-    "message": "Es hora de un buen descanso 🧘"
+    "message": "Es hora de un buen descanso 🧘",
+    "description": "Notification text for when all cycles are complete."
   }
 }

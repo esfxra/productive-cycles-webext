@@ -9,103 +9,133 @@
   },
 
   "control_start": {
-    "message": "Start"
+    "message": "Start",
+    "description": "Tooltip text for when the user hovers over the Start button."
   },
   "control_pause": {
-    "message": "Pause"
+    "message": "Pause",
+    "description": "Tooltip text for when the user hovers over the Pause button."
   },
   "control_resetCycle": {
-    "message": "Reset cycle"
+    "message": "Reset cycle",
+    "description": "Tooltip text for when the user hovers over the ResetCycle button."
   },
   "control_resetAll": {
-    "message": "Reset all"
+    "message": "Reset all",
+    "description": "Tooltip text for when the user hovers over the ResetAll button."
   },
   "control_skipBreak": {
-    "message": "Skip break"
+    "message": "Skip break",
+    "description": "Text shown when a break is active. It triggers a skip when pressed."
   },
 
   "progress_dot": {
-    "message": "Cycle"
+    "message": "Cycle",
+    "description": "Tooltip text for when the user hovers over the progress dots."
   },
 
   "complete": {
-    "message": "Timer complete  🎉"
+    "message": "Timer complete  🎉",
+    "description": "Congratulatory message that appears once all cycles have been completed."
   },
   "complete_button": {
-    "message": "New timer"
+    "message": "New timer",
+    "description": "Text shown on the button that creates a new timer once all cycles have been completed."
   },
 
   "nav_settings": {
-    "message": "Settings"
+    "message": "Settings",
+    "description": "Tooltip text for when the user hovers over the settings icon."
   },
   "nav_back": {
-    "message": "Back"
+    "message": "Back",
+    "description": "Tooltip text for when the user hovers over the back icon."
   },
 
   "settings_appearance": {
-    "message": "Appearance"
+    "message": "Appearance",
+    "description": "Title of the appearance settings section."
   },
   "settings_appearance_light": {
-    "message": "Light mode"
+    "message": "Light mode",
+    "description": "Tooltip text for when the user hovers over the light theme icon."
   },
   "settings_appearance_dark": {
-    "message": "Dark mode"
+    "message": "Dark mode",
+    "description": "Tooltip text for when the user hovers over the dark theme icon."
   },
 
   "settings_notifications": {
-    "message": "Notifications"
+    "message": "Notifications",
+    "description": "Title of the notification settings section."
   },
   "settings_notifications_enabled": {
-    "message": "Enable notifications"
+    "message": "Enable notifications",
+    "description": "Setting name for enabling notifications."
   },
   "settings_notifications_sound": {
-    "message": "Enable sound"
+    "message": "Enable sound",
+    "description": "Setting name for enabling notification sounds."
   },
 
   "settings_autoStart": {
-    "message": "Automatic start"
+    "message": "Automatic start",
+    "description": "Title of the automatic start settings section."
   },
   "settings_autoStart_cycles": {
-    "message": "Auto-start cycles"
+    "message": "Auto-start cycles",
+    "description": "Setting name for automatically starting cycles."
   },
   "settings_autoStart_breaks": {
-    "message": "Auto-start breaks"
+    "message": "Auto-start breaks",
+    "description": "Setting name for automatically starting breaks."
   },
 
   "settings_timer": {
-    "message": "Timer options"
+    "message": "Timer options",
+    "description": "Title of the timer settings section."
   },
   "settings_timer_cycleMinutes": {
-    "message": "Cycle minutes"
+    "message": "Cycle minutes",
+    "description": "Setting name for changing cycle minutes."
   },
   "settings_timer_breakMinutes": {
-    "message": "Break minutes"
+    "message": "Break minutes",
+    "description": "Setting name for changing break minutes."
   },
   "settings_timer_totalCycles": {
-    "message": "Total cycles"
+    "message": "Total cycles",
+    "description": "Setting name for changing total cycles."
   },
   "settings_timer_badgeTimer": {
-    "message": "Show timer on icon"
+    "message": "Show timer on icon",
+    "description": "Setting name for enabling timer on icon."
   },
 
   "updates": {
-    "message": "Updates"
+    "message": "Updates",
+    "description": "Title for updates screen."
   },
   "updates_greeting": {
-    "message": "Welcome to version 0.7"
+    "message": "Welcome to version 0.7",
+    "description": "Greeting for updates screen."
   },
   "updates_notes": {
-    "message": "Release notes:"
+    "message": "Release notes:",
+    "description": "Subtitle for release notes section."
   },
   "updates_update_1": {
-    "message": "Spanish language 🇪🇸"
+    "message": "Spanish language 🇪🇸",
+    "description": "Update item 1."
   },
   "updates_update_2": {
-    "message": "Groundwork for additional language support 🌐"
+    "message": "Groundwork for additional language support 🌐",
+    "description": "Update item 2."
   },
 
   "notifications_cycle_title": {
     "message": "Cycle $period$ complete!",
+    "description": "Notification title for when a cycle is complete.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -114,6 +144,7 @@
   },
   "notifications_cycle_message": {
     "message": "Great job. Take $time$.",
+    "description": "Notification text for when a cycle is complete.",
     "placeholders": {
       "time": {
         "content": "$1"
@@ -122,6 +153,7 @@
   },
   "notifications_break_title": {
     "message": "Break $period$ is over.",
+    "description": "Notification title for when a break is complete.",
     "placeholders": {
       "period": {
         "content": "$1"
@@ -129,12 +161,15 @@
     }
   },
   "notifications_break_message": {
-    "message": "Time to grind!"
+    "message": "Time to grind!",
+    "description": "Notification text for when a break is complete."
   },
   "notifications_complete_title": {
-    "message": "You did it! All cycles are complete."
+    "message": "You did it! All cycles are complete.",
+    "description": "Notification title for when all cycles are complete."
   },
   "notifications_complete_message": {
-    "message": "Take a long break 🧘"
+    "message": "Take a long break 🧘",
+    "description": "Notification text for when all cycles are complete."
   }
 }
