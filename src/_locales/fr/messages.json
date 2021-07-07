@@ -117,7 +117,7 @@
     "description": "Title for updates screen."
   },
   "updates_greeting": {
-    "message": "Bienvenue à la version 0.7",
+    "message": "Bienvenue à la version 0.7.1",
     "description": "Greeting for updates screen."
   },
   "updates_notes": {
@@ -125,13 +125,10 @@
     "description": "Subtitle for release notes section."
   },
   "updates_update_1": {
-    "message": "Langue espagnole 🇪🇸",
+    "message": "Langue française. Merci Nick W. 🇫🇷",
     "description": "Update item 1."
   },
-  "updates_update_2": {
-    "message": "Les bases de la prise en charge linguistique supplémentaire 🌐",
-    "description": "Update item 2."
-  },
+
 
   "notifications_cycle_title": {
     "message": "Cycle $period$ terminé !",

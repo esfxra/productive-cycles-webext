@@ -92,16 +92,13 @@
     "message": "Updates"
   },
   "updates_greeting": {
-    "message": "Welcome to version 0.7"
+    "message": "Welcome to version 0.7.1"
   },
   "updates_notes": {
     "message": "Release notes:"
   },
   "updates_update_1": {
-    "message": "Spanish language 🇪🇸"
-  },
-  "updates_update_2": {
-    "message": "Groundwork for additional language support 🌐"
+    "message": "French language. Thank you, Nick W. 🇫🇷"
   },
 
   "notifications_cycle_title": {
