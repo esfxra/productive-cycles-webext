@@ -1,0 +1,175 @@
+{
+  "appName": {
+    "message": "Productive Cycles",
+    "description": "The title of the application, displayed in the web store."
+  },
+  "appDesc": {
+    "message": "Maximisez votre productivité avec cette minuterie Pomodoro simple mais complète. Suivez vos efforts et recevez des rappels pour faire des pauses.",
+    "description": "The description of the application, displayed in the web store."
+  },
+
+  "control_start": {
+    "message": "Démarrer",
+    "description": "Tooltip text for when the user hovers over the Start button."
+  },
+  "control_pause": {
+    "message": "Pause",
+    "description": "Tooltip text for when the user hovers over the Pause button."
+  },
+  "control_resetCycle": {
+    "message": "Réinitialiser le cycle",
+    "description": "Tooltip text for when the user hovers over the ResetCycle button."
+  },
+  "control_resetAll": {
+    "message": "Réinitialiser tout",
+    "description": "Tooltip text for when the user hovers over the ResetAll button."
+  },
+  "control_skipBreak": {
+    "message": "Sauter la pause",
+    "description": "Text shown when a break is active. It triggers a skip when pressed."
+  },
+
+  "progress_dot": {
+    "message": "Cycle",
+    "description": "Tooltip text for when the user hovers over the progress dots."
+  },
+
+  "complete": {
+    "message": "Minuterie terminée  🎉",
+    "description": "Congratulatory message that appears once all cycles have been completed."
+  },
+  "complete_button": {
+    "message": "Recommencer",
+    "description": "Text shown on the button that creates a new timer once all cycles have been completed."
+  },
+
+  "nav_settings": {
+    "message": "Paramètres",
+    "description": "Tooltip text for when the user hovers over the settings icon."
+  },
+  "nav_back": {
+    "message": "Retour",
+    "description": "Tooltip text for when the user hovers over the back icon."
+  },
+
+  "settings_appearance": {
+    "message": "Apparence",
+    "description": "Title of the appearance settings section."
+  },
+  "settings_appearance_light": {
+    "message": "Mode clair",
+    "description": "Tooltip text for when the user hovers over the light theme icon."
+  },
+  "settings_appearance_dark": {
+    "message": "Mode sombre",
+    "description": "Tooltip text for when the user hovers over the dark theme icon."
+  },
+
+  "settings_notifications": {
+    "message": "Notifications",
+    "description": "Title of the notification settings section."
+  },
+  "settings_notifications_enabled": {
+    "message": "Activer les notifications",
+    "description": "Setting name for enabling notifications."
+  },
+  "settings_notifications_sound": {
+    "message": "Activer le son",
+    "description": "Setting name for enabling notification sounds."
+  },
+
+  "settings_autoStart": {
+    "message": "Démarrage automatique",
+    "description": "Title of the automatic start settings section."
+  },
+  "settings_autoStart_cycles": {
+    "message": "Démarrer les cycles",
+    "description": "Setting name for automatically starting cycles."
+  },
+  "settings_autoStart_breaks": {
+    "message": "Démarrer les pauses",
+    "description": "Setting name for automatically starting breaks."
+  },
+
+  "settings_timer": {
+    "message": "Minuterie",
+    "description": "Title of the timer settings section."
+  },
+  "settings_timer_cycleMinutes": {
+    "message": "Minutes de cycle",
+    "description": "Setting name for changing cycle minutes."
+  },
+  "settings_timer_breakMinutes": {
+    "message": "Minutes de pause",
+    "description": "Setting name for changing break minutes."
+  },
+  "settings_timer_totalCycles": {
+    "message": "Nombre total de cycles",
+    "description": "Setting name for changing total cycles."
+  },
+  "settings_timer_badgeTimer": {
+    "message": "Afficher le minuteur sur l'icône",
+    "description": "Setting name for enabling timer on icon."
+  },
+
+  "updates": {
+    "message": "Mises à jour",
+    "description": "Title for updates screen."
+  },
+  "updates_greeting": {
+    "message": "Bienvenue à la version 0.7",
+    "description": "Greeting for updates screen."
+  },
+  "updates_notes": {
+    "message": "Modifications:",
+    "description": "Subtitle for release notes section."
+  },
+  "updates_update_1": {
+    "message": "Langue espagnole 🇪🇸",
+    "description": "Update item 1."
+  },
+  "updates_update_2": {
+    "message": "Les bases de la prise en charge linguistique supplémentaire 🌐",
+    "description": "Update item 2."
+  },
+
+  "notifications_cycle_title": {
+    "message": "Cycle $period$ terminé !",
+    "description": "Notification title for when a cycle is complete.",
+    "placeholders": {
+      "period": {
+        "content": "$1"
+      }
+    }
+  },
+  "notifications_cycle_message": {
+    "message": "Bon travail. Faites une pause.",
+    "description": "Notification text for when a cycle is complete.",
+    "placeholders": {
+      "time": {
+        "content": "$1"
+      }
+    }
+  },
+  "notifications_break_title": {
+    "message": "Ainsi se termine la pause $period$.",
+    "description": "Notification title for when a break is complete.",
+    "placeholders": {
+      "period": {
+        "content": "$1"
+      }
+    }
+  },
+  "notifications_break_message": {
+    "message": "Il est temps de grind !",
+    "description": "Notification text for when a break is complete."
+  },
+  "notifications_complete_title": {
+    "message": "Tu l'as fait ! Tous les cycles sont terminés.",
+    "description": "Notification title for when all cycles are complete."
+  },
+  "notifications_complete_message": {
+    "message": "Faites une longue pause 🧘",
+    "description": "Notification text for when all cycles are complete."
+  }
+}
