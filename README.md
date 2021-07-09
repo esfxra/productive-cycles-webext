@@ -1,3 +1,5 @@
+>❗️ Note: Please refer to the [pre-typescript](https://github.com/diegoserranor/productive-cycles-webext/tree/pre-typescript) branch if you want to build or test a fully working release. The main branch is in active development, and there are still broken features, failing tests and other nuances to consider.
+
 # Productive Cycles
 
 Pomodoro-inspired timer extension for [Firefox](https://addons.mozilla.org/en-US/firefox/addon/productive-cycles/) and [Google Chrome](https://chrome.google.com/webstore/detail/productive-cycles/lhcaggipefcoefbijhmdehhloonnlobh)
