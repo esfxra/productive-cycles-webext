@@ -1,12 +1,13 @@
+import PubSub from 'pubsub-js';
 import { TOPICS } from './background-constants';
 
 class Timer {
   remaining: number;
-  subtractor: ReturnType<typeof setInterval>;
+  subtractor: ReturnType<typeof setInterval> | null;
 
-  constructor(duration: number) {
+  constructor({ duration }: { duration: number }) {
     this.remaining = duration;
-    this.subtractor = undefined;
+    this.subtractor = null;
   }
 
   run(): void {
@@ -18,10 +19,12 @@ class Timer {
         // Stop subtracting
         this.stop();
         this.end();
-      } else {
-        // Post new time to period
-        this.tick();
+        return;
       }
+
+      // Post new time to period
+      this.tick();
+      return;
     }, 1000);
   }
 
@@ -35,7 +38,7 @@ class Timer {
   }
 
   tick(): void {
-    // To be overriden
+    PubSub.publishSync(TOPICS.Period.PeriodState);
   }
 }
 

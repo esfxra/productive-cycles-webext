@@ -1,4 +1,5 @@
 import Timer from './Timer';
+import PubSub from 'pubsub-js';
 import { millisToFormattedString } from './utils/utils';
 import { TOPICS } from './background-constants';
 import { Status } from '../shared-types';
@@ -7,17 +8,17 @@ import { State } from './background-types';
 class Period extends Timer {
   id: number;
   status: Status;
-  target: number;
+  target: number | null;
   enabled: boolean;
 
   constructor({ id, duration }: { id: number; duration: number }) {
     // Assignments
-    super(duration);
+    super({ duration });
     this.id = id;
 
     // Default values
     this.status = Status.Initial;
-    this.target = undefined;
+    this.target = null;
     this.enabled = false;
   }
 
@@ -44,22 +45,16 @@ class Period extends Timer {
 
   skip(): void {
     this.stop();
+    this.complete();
     PubSub.publishSync(TOPICS.Period.PeriodState);
-    // TODO: Implement code to start tasks for the next period
-    // - I.E. ... autoStart on or off checks
   }
 
-  reset(duration: number): void {
+  reset({ duration }: { duration: number }): void {
     this.stop();
-    this.status = Status.Initial;
     this.remaining = duration;
-    PubSub.publishSync(TOPICS.Period.PeriodState);
-    // TODO: Understand if target should be reset to null or undefined
-    // TODO: Understand if enabled should be reset to false
-  }
-
-  tick(): void {
-    // Publish state
+    this.status = Status.Initial;
+    this.target = null;
+    this.enabled = false;
     PubSub.publishSync(TOPICS.Period.PeriodState);
   }
 

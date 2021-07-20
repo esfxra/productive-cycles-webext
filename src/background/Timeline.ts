@@ -46,17 +46,63 @@ class Timeline {
   /**
    * Sets new targets to all periods that have not yet been completed.
    *
-   * It sums the previous period's target plus the duration of the current period.
-   * Note: The first period (idx === 0) uses the current time as initial reference.
+   * The first period (idx === 0) and the current period use Date.now() to serve
+   * as initial reference. All consequent periods use the previous period's target plus
+   * the duration of the current period.
    */
-  setTargets(): void {
-    this.periods.forEach((period, idx, arr) => {
+  updateTargets(): void {
+    this.periods = this.periods.map((period, idx, arr) => {
       if (period.status === Status.Complete) {
-        return;
+        return period;
       }
 
-      const reference = idx === 0 ? Date.now() : arr[idx - 1].target;
-      period.target = period.remaining + reference;
+      if (idx === 0 || idx === this.index) {
+        period.target = period.remaining + Date.now();
+        return period;
+      }
+
+      period.target = period.remaining + arr[idx - 1].target;
+      return period;
+    });
+  }
+
+  /**
+   * Sets enabled or disabled status with autoStart settings to timeline periods.
+   * Considerations:
+   * - Period is skipped if already completed
+   * - Current period is enabled by default .. @todo Consider moving this to start()
+   * - Consequent periods are disabled if previous period is disabled
+   */
+  updateEnabled(): void {
+    const { cycleAutoStart, breakAutoStart } = this.settings;
+
+    this.periods = this.periods.map((period, idx, arr) => {
+      // Skip completed periods
+      if (period.status === Status.Complete) {
+        return period;
+      }
+
+      // Always enable current period; consider adding this as part of the start() behavior, not here.
+      if (idx === this.index) {
+        period.enabled = true;
+        return period;
+      }
+
+      // Only use previous period if this is not the first one.
+      if (idx === 0) {
+        return period;
+      }
+
+      // Disable period if previous is also disabled.
+      const previous = arr[idx - 1];
+      if (!previous.enabled) {
+        period.enabled = false;
+        return period;
+      }
+
+      // Apply autoStart settings.
+      period.enabled = idx % 2 === 0 ? cycleAutoStart : breakAutoStart;
+      return period;
     });
   }
 
@@ -93,44 +139,9 @@ class Timeline {
     PubSub.publishSync(TOPICS.Timeline.TimelineState, data);
   }
 
-  /**
-   * Sets new autoStart settings to timeline periods.
-   *
-   * Note: Always enables current period by default.
-   */
-  setEnabled(): void {
-    const { cycleAutoStart, breakAutoStart } = this.settings;
-
-    this.periods.forEach((period, idx, arr) => {
-      // Always enable current period; consider adding this as part of the start() behavior, not here.
-      if (idx === this.index) {
-        period.enabled = true;
-        return;
-      }
-
-      // Only use previous period if this is not the first one.
-      if (idx === 0) {
-        return;
-      }
-
-      /**
-       * Disable period if previous is also disabled.
-       * Note: All the consecutive periods in the iteration will also be disabled.
-       */
-      const previous = arr[idx - 1];
-      if (!previous.enabled) {
-        period.enabled = false;
-        return;
-      }
-
-      // Apply autoStart settings.
-      period.enabled = idx % 2 === 0 ? cycleAutoStart : breakAutoStart;
-    });
-  }
-
   handleStart(): void {
-    this.setTargets();
-    this.setEnabled();
+    this.updateTargets();
+    this.updateEnabled();
     this.current.start();
   }
 
@@ -166,11 +177,11 @@ class Timeline {
 
       // Go back to previous break, and reset it
       this.index -= 1;
-      this.current.reset(minutesToMillis(breakMinutes));
+      this.current.reset({ duration: minutesToMillis(breakMinutes) });
 
       // Go back to previous cycle, and reset it
       this.index -= 1;
-      this.current.reset(minutesToMillis(cycleMinutes));
+      this.current.reset({ duration: minutesToMillis(cycleMinutes) });
       return;
     }
 
@@ -181,7 +192,7 @@ class Timeline {
       this.current.status === Status.Complete
     ) {
       // Reset current cycle back to Initial state
-      this.current.reset(minutesToMillis(cycleMinutes));
+      this.current.reset({ duration: minutesToMillis(cycleMinutes) });
       return;
     }
   }
@@ -192,7 +203,7 @@ class Timeline {
     // Iterate all periods, and reset these
     this.periods.forEach((period, idx) => {
       const duration = idx % 2 === 0 ? cycleMinutes : breakMinutes;
-      period.reset(minutesToMillis(duration));
+      period.reset({ duration: minutesToMillis(duration) });
     });
 
     // Reset the timeline index back to 0
