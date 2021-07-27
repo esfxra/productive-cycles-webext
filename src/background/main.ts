@@ -1,23 +1,40 @@
+import Mediator from './Mediator';
 import Bridge from './Bridge';
 import Timeline from './Timeline';
 import { DEFAULT_SETTINGS } from '../shared-constants';
 import { ExtensionSettings } from '../shared-types';
 
-runBackground();
+main();
 
-async function runBackground() {
+async function main() {
   const settings = await initSettings();
 
-  const bridge = new Bridge();
-  const timeline = new Timeline(settings);
+  const mediator = new Mediator();
+  const bridge = new Bridge(mediator);
+  const timeline = new Timeline(mediator, settings);
 
-  // Register browser-related listeners
+  // Register browser-related listeners for install and storage
   registerInstallListeners();
+
+  // Register browser-related listeners for bridge
   bridge.registerPortListeners();
 
-  // Register publisher subscriptions
-  bridge.registerSubscriptions();
-  timeline.registerSubscriptions();
+  // Output state to UI
+  bridge.mediator.subscribe('MessageRequest', bridge.handleBridgeOutput);
+
+  // Handle input from UI
+  timeline.mediator.subscribe('Start', timeline.handleStart);
+  timeline.mediator.subscribe('Pause', timeline.handlePause);
+  timeline.mediator.subscribe('Skip', timeline.handleSkip);
+  timeline.mediator.subscribe('ResetCycle', timeline.handleResetCycle);
+  timeline.mediator.subscribe('ResetAll', timeline.handleResetAll);
+  timeline.mediator.subscribe('Preload', timeline.handlePreload);
+
+  // Listen to period updates for new state publications
+  timeline.mediator.subscribe('PeriodTick', timeline.handlePeriodUpdate);
+
+  // Listen to period end
+  timeline.mediator.subscribe('PeriodEnd', timeline.handlePeriodEnd);
 }
 
 function registerInstallListeners() {

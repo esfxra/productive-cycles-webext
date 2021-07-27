@@ -1,66 +1,88 @@
-import PubSub from 'pubsub-js';
-import { TOPICS } from './background-constants';
-import { State } from './background-types';
+import Mediator from './Mediator';
+import { Participant } from './background-types';
+import { INPUT } from '../shared-constants';
 
-interface Message extends State {
-  totalPeriods: number;
-}
-
-class Bridge {
+export default class Bridge implements Participant {
+  mediator: Mediator;
   open: boolean;
   port: chrome.runtime.Port;
 
-  requestSubscriptions: string[];
-
-  constructor() {
-    this.requestSubscriptions = [];
-  }
-
-  registerPortListeners(): void {
-    chrome.runtime.onConnect.addListener((port) => {
-      port.onDisconnect.addListener(this.handlePortDisconnect.bind(this));
-      port.onMessage.addListener(this.handlePortMessages.bind(this));
-
-      this.port = port;
-      this.open = true;
-    });
-  }
-
-  handlePortDisconnect(): void {
-    // Update port open flag if a disconnect occurs
-    // TODO: Check if an event that signals observers to not attempt to post messages is needed
+  constructor(mediator: Mediator) {
+    this.mediator = mediator;
     this.open = false;
+    this.port = null;
   }
+
+  registerPortListeners = (): void => {
+    chrome.runtime.onConnect.addListener(this.handlePortConnect);
+  };
+
+  handlePortConnect = (port: chrome.runtime.Port): void => {
+    port.onDisconnect.addListener(this.handlePortDisconnect);
+    port.onMessage.addListener(this.handlePortMessages);
+
+    this.port = port;
+    this.open = true;
+
+    /**
+     * @todo Consider publishing port open event.
+     * @todo Consider removing port connect listener, and adding it back on disconnect.
+     */
+    // this.mediator.publish('port_open');
+    // chrome.runtime.onConnect.removeListener(this.handlePortConnect.bind(this));
+  };
+
+  handlePortDisconnect = (): void => {
+    // Update port open flag if a disconnect occurs
+    this.open = false;
+
+    /**
+     * @todo Consider publishing port closed event.
+     * @todo Add onConnect listener now that the port is closed.
+     * @todo Consider removing port disconnect listener, and adding it back on connect.
+     * @todo Consider removing onMessage listener, and adding it back on connect.
+     */
+    // this.mediator.publish('port_closed');
+    // chrome.runtime.onConnect.addListener(this.handlePortConnect.bind(this));
+    // this.port.onDisconnect.removeListener(this.handlePortDisconnect.bind(this));
+    // this.port.onMessage.removeListener(this.handlePortMessages.bind(this));
+  };
 
   /**
-   * Forward incoming messages to subscriber Timeline
-   *
-   * TODO: Examine better typing for 'command', which should represent one of the enums inside Topics.Input.
-   * Do note, however, that this is already guaranteed because input commands are sent using the Input enum.
-   * See /popup/components/Timer/Control.js
+   * Forward incoming messages to mediator.
    */
-  handlePortMessages(message: { command: any }): void {
-    PubSub.publish(message.command);
-  }
+  handlePortMessages = (message: { command: string }): void => {
+    switch (message.command) {
+      case INPUT.Start:
+        this.mediator.publish(INPUT.Start);
+        break;
+      case INPUT.Pause:
+        this.mediator.publish(INPUT.Pause);
+        break;
+      case INPUT.Skip:
+        this.mediator.publish(INPUT.Skip);
+        break;
+      case INPUT.ResetCycle:
+        this.mediator.publish(INPUT.ResetCycle);
+        break;
+      case INPUT.ResetAll:
+        this.mediator.publish(INPUT.ResetAll);
+        break;
+      case INPUT.Preload:
+        this.mediator.publish(INPUT.Preload);
+        break;
+    }
+  };
 
-  registerSubscriptions(): void {
-    // Subscribe to requests for posting messages
-    this.requestSubscriptions.push(
-      PubSub.subscribe(
-        TOPICS.Timeline.TimelineState,
-        this.handlePublishRequests.bind(this)
-      )
-    );
-  }
-
-  handlePublishRequests(_msg: string, data: Message): void {
+  /**
+   * Handle publishRequests from mediator.
+   */
+  handleBridgeOutput = (data: any): void => {
     // Handle requests to post a message to the popup
     // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
     if (this.open) {
       console.log(data);
       this.port.postMessage(data);
     }
-  }
+  };
 }
-
-export default Bridge;

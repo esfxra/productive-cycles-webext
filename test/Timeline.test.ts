@@ -1,15 +1,22 @@
 import Timeline from '../src/background/Timeline';
+import Mediator from '../src/background/Mediator';
 import { DEFAULT_SETTINGS } from '../src/shared-constants';
 import { Status } from '../src/shared-types';
 
 const settings = DEFAULT_SETTINGS;
 let timeline: Timeline;
+let mediator: Mediator;
+
+beforeAll(() => jest.mock('../src/background/Mediator'));
+afterAll(() => jest.mock('../src/background/Mediator'));
+
+beforeEach(() => {
+  jest.useFakeTimers();
+  mediator = new Mediator();
+  timeline = new Timeline(mediator, settings);
+});
 
 describe('Init', () => {
-  beforeEach(() => {
-    timeline = new Timeline(settings);
-  });
-
   test(`Array of ${settings.totalPeriods} periods is created`, () => {
     expect(timeline.periods.length).toBe(settings.totalPeriods);
   });
@@ -50,10 +57,6 @@ describe('Init', () => {
 });
 
 describe('Updating targets', () => {
-  beforeEach(() => {
-    timeline = new Timeline(settings);
-  });
-
   test.each([
     { current: 0 },
     { current: 1 },
@@ -108,10 +111,6 @@ describe('Updating targets', () => {
 });
 
 describe('Updating autostart (enabled or not)', () => {
-  beforeEach(() => {
-    timeline = new Timeline(settings);
-  });
-
   test.each([
     { current: 0 },
     { current: 1 },
@@ -169,11 +168,6 @@ describe('Updating autostart (enabled or not)', () => {
 });
 
 describe('Transition to next period', () => {
-  beforeEach(() => {
-    jest.useFakeTimers();
-    timeline = new Timeline(settings);
-  });
-
   test.each([
     { current: 0, expected: 1 },
     { current: 1, expected: 2 },
@@ -212,10 +206,6 @@ describe('Transition to next period', () => {
 });
 
 describe('Reset cycle logic', () => {
-  beforeEach(() => {
-    timeline = new Timeline(settings);
-  });
-
   test('Resets period to initial state when running', () => {
     timeline.current.start();
     expect(timeline.current.status).toBe(Status.Running);

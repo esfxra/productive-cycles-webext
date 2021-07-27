@@ -36,7 +36,6 @@
   },
   "dependencies": {
     "luxon": "^1.27.0",
-    "pubsub-js": "^1.9.3",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "styled-components": "^5.2.1"

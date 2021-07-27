@@ -1,28 +1,36 @@
-import Timer from './Timer';
-import PubSub from 'pubsub-js';
+import Mediator from './Mediator';
 import { millisToFormattedString } from './utils/utils';
-import { TOPICS } from './background-constants';
+import { Participant, PeriodState } from './background-types';
 import { Status } from '../shared-types';
-import { State } from './background-types';
 
-class Period extends Timer {
+class Period implements Participant {
+  mediator: Mediator;
+  subtractor: ReturnType<typeof setInterval> | null;
   id: number;
+  remaining: number;
   status: Status;
   target: number | null;
   enabled: boolean;
 
-  constructor({ id, duration }: { id: number; duration: number }) {
-    // Assignments
-    super({ duration });
+  constructor({
+    mediator,
+    id,
+    duration,
+  }: {
+    mediator: Mediator;
+    id: number;
+    duration: number;
+  }) {
+    this.mediator = mediator;
     this.id = id;
+    this.remaining = duration;
 
-    // Default values
     this.status = Status.Initial;
     this.target = null;
     this.enabled = false;
   }
 
-  get state(): State {
+  get state(): PeriodState {
     return {
       remaining: millisToFormattedString(this.remaining),
       status: this.status,
@@ -32,7 +40,7 @@ class Period extends Timer {
 
   start(): void {
     this.status = Status.Running;
-    PubSub.publishSync(TOPICS.Period.PeriodState);
+    this.mediator.publish('PeriodTick');
 
     this.run();
   }
@@ -40,22 +48,25 @@ class Period extends Timer {
   pause(): void {
     this.stop();
     this.status = Status.Paused;
-    PubSub.publishSync(TOPICS.Period.PeriodState);
+    this.mediator.publish('PeriodTick');
   }
 
   skip(): void {
     this.stop();
     this.complete();
-    PubSub.publishSync(TOPICS.Period.PeriodState);
+    this.mediator.publish('PeriodEnd');
   }
 
-  reset({ duration }: { duration: number }): void {
+  reset({ duration, publish }: { duration: number; publish: boolean }): void {
     this.stop();
     this.remaining = duration;
     this.status = Status.Initial;
     this.target = null;
     this.enabled = false;
-    PubSub.publishSync(TOPICS.Period.PeriodState);
+
+    if (publish) {
+      this.mediator.publish('PeriodTick');
+    }
   }
 
   /**
@@ -65,6 +76,38 @@ class Period extends Timer {
   complete(): void {
     this.status = Status.Complete;
   }
+
+  private run = (): void => {
+    // Start the timer
+    this.subtractor = setInterval(() => {
+      this.remaining = this.remaining - 1000;
+
+      if (this.remaining < 0) {
+        // Stop subtracting
+        this.stop();
+        this.end();
+        return;
+      }
+
+      // Post new time to period
+      this.tick();
+      return;
+    }, 1000);
+  };
+
+  private stop = (): void => {
+    // Stop the timer
+    clearInterval(this.subtractor);
+  };
+
+  private end = (): void => {
+    this.complete();
+    this.mediator.publish('PeriodEnd');
+  };
+
+  private tick = (): void => {
+    this.mediator.publish('PeriodTick');
+  };
 }
 
 export default Period;

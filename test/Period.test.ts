@@ -1,15 +1,18 @@
 import Period from '../src/background/Period';
+import Mediator from '../src/background/Mediator';
 import { Status } from '../src/shared-types';
 
 let period: Period;
+let mediator: Mediator;
 
-beforeAll(() => jest.mock('pubsub-js'));
-afterAll(() => jest.unmock('pubsub-js'));
+beforeAll(() => jest.mock('../src/background/Mediator'));
+afterAll(() => jest.unmock('../src/background/Mediator'));
 
 describe('State mutations', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    period = new Period({ id: 0, duration: 5000 });
+    mediator = new Mediator();
+    period = new Period({ id: 0, duration: 5000, mediator });
   });
 
   describe('On start', () => {
@@ -35,7 +38,7 @@ describe('State mutations', () => {
 
   describe('On reset', () => {
     beforeEach(() => {
-      period.reset({ duration: 2000 });
+      period.reset({ duration: 2000, publish: false });
     });
 
     test('The status is set to initial', () => {
@@ -66,7 +69,7 @@ describe('State mutations', () => {
 describe('Timer', () => {
   beforeEach(() => {
     jest.useFakeTimers();
-    period = new Period({ id: 0, duration: 5000 });
+    period = new Period({ id: 0, duration: 5000, mediator });
   });
 
   test('Counts down when started', () => {
