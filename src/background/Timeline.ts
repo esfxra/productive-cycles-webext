@@ -2,7 +2,6 @@ import Mediator from './Mediator';
 import Period from './Period';
 import { Status, TimelineSettings } from '../shared-types';
 import { Participant } from './background-types';
-import { TOPICS } from './background-constants';
 import { minutesToMillis } from './utils/utils';
 
 export default class Timeline implements Participant {
@@ -11,13 +10,11 @@ export default class Timeline implements Participant {
   periods: Period[];
   index: number;
 
-  constructor(mediator: Mediator, settings: TimelineSettings) {
+  constructor(mediator: Mediator) {
     this.mediator = mediator;
-    this.settings = settings;
+    this.settings = null;
     this.periods = [];
     this.index = 0;
-
-    this.build();
   }
 
   handleStart = (): void => {
@@ -111,17 +108,44 @@ export default class Timeline implements Participant {
   };
 
   handleMonitorTick = (): void => {
-    this.checkRemaining();
-    this.checkPeriod();
+    // - Pause timer
+    this.current.stop();
+
+    const periodID = this.determineCorrectPeriodID();
+
+    if (periodID !== this.index) {
+      // - Mark all periods between this.index and periodID as complete
+      // - Handle notifications for those periods?
+      // - Set index to periodID
+      this.index = periodID;
+      // - Adjust remaining
+      // - End? If remaining is < 1min
+      const remaining = this.current.target - Date.now();
+      this.current.remaining = remaining;
+      this.current.status = Status.Running;
+      // - Resume timer
+      this.current.run();
+      return;
+    }
+
+    // The case where the period is indeed the current one
+    // - Adjust remaining
+    // - End? If remaining is < 1sec
+    const remaining = this.current.target - Date.now();
+    this.current.remaining = remaining;
+    this.current.status = Status.Running;
+
+    // - Resume timer
+    this.current.run();
+    return;
   };
 
-  handlePeriodUpdate = (): void => {
+  handlePeriodTick = (): void => {
     // Consider adding throttling to publishState only once per second
     // Can use a closure for this
     this.publishState();
   };
 
-  //
   handlePeriodEnd = (): void => {
     // this.publishState();
     this.nextPeriod();
@@ -130,8 +154,13 @@ export default class Timeline implements Participant {
   /**
    * Gets the current period in an easy-to-chain format to invoke {@link Period#Period} methods.
    */
-  public get current(): Period {
+  get current(): Period {
     return this.periods[this.index];
+  }
+
+  init(settings: TimelineSettings): void {
+    this.settings = settings;
+    this.build();
   }
 
   /**
@@ -140,7 +169,7 @@ export default class Timeline implements Participant {
    * It uses timeline {@link Timeline#settings} to
    * initialize each period as either a cycle or a break.
    */
-  private build = (): void => {
+  build = (): void => {
     const { totalPeriods, cycleMinutes, breakMinutes } = this.settings;
 
     // Instantiate new periods, and populate this.periods array
@@ -162,7 +191,7 @@ export default class Timeline implements Participant {
    * as initial reference. All consequent periods use the previous period's target plus
    * the duration of the current period.
    */
-  private updateTargets = () => {
+  updateTargets = () => {
     this.periods = this.periods.map((period, idx, arr) => {
       if (period.status === Status.Complete) {
         return period;
@@ -185,7 +214,7 @@ export default class Timeline implements Participant {
    * - Current period is enabled by default .. @todo Consider moving this to start()
    * - Consequent periods are disabled if previous period is disabled
    */
-  private updateEnabled = () => {
+  updateEnabled = () => {
     const { cycleAutoStart, breakAutoStart } = this.settings;
 
     this.periods = this.periods.map((period, idx, arr) => {
@@ -223,7 +252,7 @@ export default class Timeline implements Participant {
    *
    * Note: The increment does not occur if this is called for the last period.
    */
-  private nextPeriod = (): void => {
+  nextPeriod = (): void => {
     const isLast = this.index === this.settings.totalPeriods - 1;
     if (isLast) {
       this.publishState();
@@ -238,20 +267,54 @@ export default class Timeline implements Participant {
     }
   };
 
-  private publishState = (): void => {
+  publishState = (): void => {
     const data = {
       ...this.current.state,
       totalPeriods: this.settings.totalPeriods,
     };
 
-    this.mediator.publish(TOPICS.MessageRequest, data);
+    this.mediator.publish('MessageRequest', data);
   };
 
-  private checkRemaining = () => {
-    //
-  };
+  determineCorrectPeriodID = (): number => {
+    // Identify periods that have not yet been completed
+    const pending = this.periods.filter(
+      (period) => period.status !== Status.Complete
+    );
 
-  private checkPeriod = () => {
-    //
+    console.log('Timeline - Pending periods:');
+    console.log(pending);
+
+    // Identify enabled periods
+    const subjects = pending.filter((period) => period.enabled);
+    console.log('Timeline - Filtered periods:');
+    console.log(subjects);
+
+    // Find the period with a target closest to the current time.
+    const [result] = subjects.filter((period, idx, arr) => {
+      console.log(idx);
+      const previous = idx - 1 >= 0 ? arr[idx - 1] : null;
+
+      // Special case for the current period
+      if (!previous) {
+        if (Date.now() < period.target) {
+          return true;
+        }
+
+        return false;
+      }
+
+      // Consequent periods
+      if (Date.now() > previous.target && Date.now() < period.target) {
+        return true;
+      }
+
+      // This is not the correct period
+      return false;
+    });
+
+    console.log(`Timeline - Determined period: ${result.id}`);
+
+    return result.id;
   };
 }

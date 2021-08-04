@@ -8,12 +8,15 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   notificationsEnabled: true,
   notificationsSound: true,
   cycleAutoStart: true,
-  breakAutoStart: true,
-  cycleMinutes: 0.2,
-  breakMinutes: 0.1,
+  breakAutoStart: false,
+  cycleMinutes: 2,
+  breakMinutes: 1,
   totalPeriods: 7,
 };
 
+/**
+ * @todo Use enum type-checking instead of string-based values
+ */
 export const INPUT = {
   Start: 'Start',
   Pause: 'Pause',

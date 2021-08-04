@@ -1,40 +1,49 @@
 import Mediator from './Mediator';
 import Bridge from './Bridge';
 import Timeline from './Timeline';
-import { DEFAULT_SETTINGS } from '../shared-constants';
-import { ExtensionSettings } from '../shared-types';
+import Settings from './Settings';
+import Monitor from './Monitor';
 
 main();
 
-async function main() {
-  const settings = await initSettings();
-
+function main() {
   const mediator = new Mediator();
   const bridge = new Bridge(mediator);
-  const timeline = new Timeline(mediator, settings);
+  const timeline = new Timeline(mediator);
+  const monitor = new Monitor(mediator);
 
   // Register browser-related listeners for install and storage
   registerInstallListeners();
-
-  // Register browser-related listeners for bridge
   bridge.registerPortListeners();
 
-  // Output state to UI
   bridge.mediator.subscribe('MessageRequest', bridge.handleBridgeOutput);
 
-  // Handle input from UI
   timeline.mediator.subscribe('Start', timeline.handleStart);
+  monitor.mediator.subscribe('Start', monitor.start);
+
   timeline.mediator.subscribe('Pause', timeline.handlePause);
+  monitor.mediator.subscribe('Pause', monitor.stop);
+
   timeline.mediator.subscribe('Skip', timeline.handleSkip);
+
   timeline.mediator.subscribe('ResetCycle', timeline.handleResetCycle);
+  monitor.mediator.subscribe('ResetCycle', monitor.stop);
+
   timeline.mediator.subscribe('ResetAll', timeline.handleResetAll);
+  monitor.mediator.subscribe('ResetAll', monitor.stop);
+
   timeline.mediator.subscribe('Preload', timeline.handlePreload);
+  timeline.mediator.subscribe('PeriodTick', timeline.handlePeriodTick);
 
-  // Listen to period updates for new state publications
-  timeline.mediator.subscribe('PeriodTick', timeline.handlePeriodUpdate);
-
-  // Listen to period end
   timeline.mediator.subscribe('PeriodEnd', timeline.handlePeriodEnd);
+  monitor.mediator.subscribe('PeriodEnd', monitor.stop);
+
+  timeline.mediator.subscribe('MonitorTick', timeline.handleMonitorTick);
+
+  // Init settings, then timeline
+  Settings.init().then((settings) => {
+    timeline.init(settings);
+  });
 }
 
 function registerInstallListeners() {
@@ -42,42 +51,17 @@ function registerInstallListeners() {
   chrome.runtime.onInstalled.addListener((details: { reason: string }) => {
     switch (details.reason) {
       case 'install':
-        chrome.storage.local.set({ showWelcome: true });
-        chrome.storage.local.set({ showUpdates: false });
+        chrome.storage.local.set(
+          { showWelcome: true, showUpdates: false },
+          () => console.log('installed')
+        );
         break;
       case 'update':
-        chrome.storage.local.set({ showWelcome: false });
-        chrome.storage.local.set({ showUpdates: true });
+        chrome.storage.local.set(
+          { showWelcome: false, showUpdates: true },
+          () => console.log('updated')
+        );
         break;
     }
-  });
-}
-
-function initSettings(): Promise<ExtensionSettings> {
-  return new Promise((resolve) => {
-    chrome.storage.local.get(null, (stored) => {
-      // Check if all default setttings are defined in storage
-      // const settings: ExtensionSettings = { ...DEFAULT_SETTINGS };
-      const settings = {} as ExtensionSettings;
-      const expected = Object.keys(DEFAULT_SETTINGS);
-
-      expected.forEach((setting) => {
-        if (typeof stored[setting] === 'undefined') {
-          // If undefined (i.e. new settings introduced in an update), use default settign
-          settings[setting] = DEFAULT_SETTINGS[setting];
-        } else {
-          // If it does exist, use stored setting
-          settings[setting] = stored[setting];
-        }
-      });
-
-      // Save all settings again
-      // - The re-save will maintain settings customized by the user per the conditions above
-      chrome.storage.local.set(settings);
-
-      // Resolve promise
-      // TODO: Should reject if there is some sort of runtime error (future implementation)
-      resolve(settings);
-    });
   });
 }

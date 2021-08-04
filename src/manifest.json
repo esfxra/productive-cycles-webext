@@ -22,5 +22,5 @@
     "page": "background/background-main.html"
   },
 
-  "permissions": ["notifications", "storage", "idle"]
+  "permissions": ["notifications", "storage", "alarms"]
 }

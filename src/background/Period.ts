@@ -77,7 +77,7 @@ class Period implements Participant {
     this.status = Status.Complete;
   }
 
-  private run = (): void => {
+  run = (): void => {
     // Start the timer
     this.subtractor = setInterval(() => {
       this.remaining = this.remaining - 1000;
@@ -95,17 +95,17 @@ class Period implements Participant {
     }, 1000);
   };
 
-  private stop = (): void => {
+  stop = (): void => {
     // Stop the timer
     clearInterval(this.subtractor);
   };
 
-  private end = (): void => {
+  end = (): void => {
     this.complete();
     this.mediator.publish('PeriodEnd');
   };
 
-  private tick = (): void => {
+  tick = (): void => {
     this.mediator.publish('PeriodTick');
   };
 }

@@ -5,6 +5,15 @@ export enum Status {
   Complete = 'Complete',
 }
 
+export enum BridgeInputs {
+  Start = 'Start',
+  Pause = 'Pause',
+  Skip = 'Skip',
+  ResetCycle = 'ResetCycle',
+  ResetAll = 'ResetAll',
+  Preload = 'Preload',
+}
+
 export interface TimelineSettings {
   cycleAutoStart: boolean;
   breakAutoStart: boolean;

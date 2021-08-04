@@ -1,6 +1,6 @@
 import Mediator from './Mediator';
 import { Participant } from './background-types';
-import { INPUT } from '../shared-constants';
+import { BridgeInputs } from '../shared-types';
 
 export default class Bridge implements Participant {
   mediator: Mediator;
@@ -51,25 +51,25 @@ export default class Bridge implements Participant {
   /**
    * Forward incoming messages to mediator.
    */
-  handlePortMessages = (message: { command: string }): void => {
+  handlePortMessages = (message: { command: BridgeInputs }): void => {
     switch (message.command) {
-      case INPUT.Start:
-        this.mediator.publish(INPUT.Start);
+      case BridgeInputs.Start:
+        this.mediator.publish('Start');
         break;
-      case INPUT.Pause:
-        this.mediator.publish(INPUT.Pause);
+      case BridgeInputs.Pause:
+        this.mediator.publish('Pause');
         break;
-      case INPUT.Skip:
-        this.mediator.publish(INPUT.Skip);
+      case BridgeInputs.Skip:
+        this.mediator.publish('Skip');
         break;
-      case INPUT.ResetCycle:
-        this.mediator.publish(INPUT.ResetCycle);
+      case BridgeInputs.ResetCycle:
+        this.mediator.publish('ResetCycle');
         break;
-      case INPUT.ResetAll:
-        this.mediator.publish(INPUT.ResetAll);
+      case BridgeInputs.ResetAll:
+        this.mediator.publish('ResetAll');
         break;
-      case INPUT.Preload:
-        this.mediator.publish(INPUT.Preload);
+      case BridgeInputs.Preload:
+        this.mediator.publish('Preload');
         break;
     }
   };
@@ -77,7 +77,7 @@ export default class Bridge implements Participant {
   /**
    * Handle publishRequests from mediator.
    */
-  handleBridgeOutput = (data: any): void => {
+  handleBridgeOutput = (data: unknown): void => {
     // Handle requests to post a message to the popup
     // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
     if (this.open) {
