@@ -69,6 +69,12 @@ export default class Mediator {
     monitor: Monitor,
     badge: Badge
   ): void {
+    // Mediator install
+    bridge.mediator = this;
+    timeline.mediator = this;
+    monitor.mediator = this;
+
+    // Message Request
     this.subscribe('MessageRequest', bridge.onMessageRequest);
 
     // Start
