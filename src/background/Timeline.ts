@@ -10,28 +10,28 @@ export default class Timeline implements Participant {
   periods: Period[];
   index: number;
 
-  constructor(mediator: Mediator) {
-    this.mediator = mediator;
+  constructor() {
+    this.mediator = null;
     this.settings = null;
     this.periods = [];
     this.index = 0;
   }
 
-  handleStart = (): void => {
+  public onStart = (): void => {
     this.updateTargets();
     this.updateEnabled();
     this.current.start();
   };
 
-  handlePause = (): void => {
+  public onPause = (): void => {
     this.current.pause();
   };
 
-  handleSkip = (): void => {
+  public onSkip = (): void => {
     this.current.skip();
   };
 
-  handleResetCycle = (): void => {
+  public onResetCycle = (): void => {
     /**
      * ResetCycle is currently only handled for cycles, not breaks.
      * The UI does not show the ResetCycle button for breaks, but this check is here just in case.
@@ -89,7 +89,7 @@ export default class Timeline implements Participant {
     }
   };
 
-  handleResetAll = (): void => {
+  public onResetAll = (): void => {
     const { cycleMinutes, breakMinutes } = this.settings;
 
     // Iterate all periods, and reset these
@@ -103,11 +103,11 @@ export default class Timeline implements Participant {
     this.publishState();
   };
 
-  handlePreload = (): void => {
+  public onPreload = (): void => {
     this.publishState();
   };
 
-  handleMonitorTick = (): void => {
+  public onMonitorTick = (): void => {
     // - Pause timer
     this.current.stop();
 
@@ -140,13 +140,13 @@ export default class Timeline implements Participant {
     return;
   };
 
-  handlePeriodTick = (): void => {
+  public onPeriodTick = (): void => {
     // Consider adding throttling to publishState only once per second
     // Can use a closure for this
     this.publishState();
   };
 
-  handlePeriodEnd = (): void => {
+  public onPeriodEnd = (): void => {
     // this.publishState();
     this.nextPeriod();
   };
@@ -154,11 +154,11 @@ export default class Timeline implements Participant {
   /**
    * Gets the current period in an easy-to-chain format to invoke {@link Period#Period} methods.
    */
-  get current(): Period {
+  public get current(): Period {
     return this.periods[this.index];
   }
 
-  init(settings: TimelineSettings): void {
+  public init(settings: TimelineSettings): void {
     this.settings = settings;
     this.build();
   }
@@ -191,7 +191,7 @@ export default class Timeline implements Participant {
    * as initial reference. All consequent periods use the previous period's target plus
    * the duration of the current period.
    */
-  updateTargets = () => {
+  updateTargets = (): void => {
     this.periods = this.periods.map((period, idx, arr) => {
       if (period.status === Status.Complete) {
         return period;
@@ -214,7 +214,7 @@ export default class Timeline implements Participant {
    * - Current period is enabled by default .. @todo Consider moving this to start()
    * - Consequent periods are disabled if previous period is disabled
    */
-  updateEnabled = () => {
+  updateEnabled = (): void => {
     const { cycleAutoStart, breakAutoStart } = this.settings;
 
     this.periods = this.periods.map((period, idx, arr) => {
@@ -263,7 +263,7 @@ export default class Timeline implements Participant {
     this.index += 1;
     if (this.current.enabled) {
       // TODO: Consider holding start() login in a different place since it is used in at least 2 places.
-      this.handleStart();
+      this.onStart();
     }
   };
 

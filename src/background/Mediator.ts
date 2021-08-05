@@ -1,4 +1,8 @@
 import { Topics, Subscriptions, TopicCallback } from './background-types';
+import Bridge from './Bridge';
+import Badge from './Badge';
+import Timeline from './Timeline';
+import Monitor from './Monitor';
 
 /**
  * @todo Add mutex to prevent conflicts during worksflows
@@ -57,5 +61,47 @@ export default class Mediator {
     this.subscriptions[topic].forEach((callback: TopicCallback) =>
       callback(data)
     );
+  }
+
+  setup(
+    bridge: Bridge,
+    timeline: Timeline,
+    monitor: Monitor,
+    badge: Badge
+  ): void {
+    this.subscribe('MessageRequest', bridge.onMessageRequest);
+
+    // Start
+    this.subscribe('Start', timeline.onStart);
+    this.subscribe('Start', monitor.onStart);
+
+    // Pause
+    this.subscribe('Pause', monitor.onPause);
+    this.subscribe('Pause', timeline.onPause);
+
+    // Skip
+    this.subscribe('Skip', timeline.onSkip);
+
+    // ResetCycle
+    this.subscribe('ResetCycle', monitor.onResetCycle);
+    this.subscribe('ResetCycle', timeline.onResetCycle);
+
+    // ResetAll
+    this.subscribe('ResetAll', monitor.onResetAll);
+    this.subscribe('ResetAll', timeline.onResetAll);
+
+    // Preload
+    this.subscribe('Preload', timeline.onPreload);
+
+    // PeriodTick
+    this.subscribe('PeriodTick', timeline.onPeriodTick);
+    this.subscribe('PeriodTick', badge.onPeriodTick);
+
+    // PeriodEnd
+    // this.subscribe('PeriodEnd', monitor.onPeriodEnd);
+    this.subscribe('PeriodEnd', timeline.onPeriodEnd);
+
+    // MonitorTick
+    this.subscribe('MonitorTick', timeline.onMonitorTick);
   }
 }

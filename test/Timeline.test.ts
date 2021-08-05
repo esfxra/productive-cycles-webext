@@ -5,15 +5,16 @@ import { Status } from '../src/shared-types';
 
 const settings = DEFAULT_SETTINGS;
 let timeline: Timeline;
-let mediator: Mediator;
+// let mediator: Mediator;
 
 beforeAll(() => jest.mock('../src/background/Mediator'));
 afterAll(() => jest.mock('../src/background/Mediator'));
 
 beforeEach(() => {
   jest.useFakeTimers();
-  mediator = new Mediator();
-  timeline = new Timeline(mediator, settings);
+  timeline = new Timeline();
+  timeline.mediator = new Mediator();
+  timeline.init(DEFAULT_SETTINGS);
 });
 
 describe('Init', () => {
@@ -69,7 +70,6 @@ describe('Updating targets', () => {
     'Current period is updated with current time + duration',
     ({ current }) => {
       timeline.index = current;
-      const duration = timeline.current.remaining;
       const reference = Date.now() + timeline.current.remaining;
 
       timeline.updateTargets();
@@ -210,7 +210,7 @@ describe('Reset cycle logic', () => {
     timeline.current.start();
     expect(timeline.current.status).toBe(Status.Running);
 
-    timeline.handleResetCycle();
+    timeline.onResetCycle();
 
     expect(timeline.current.status).toBe(Status.Initial);
     expect(timeline.current.target).toBe(null);
@@ -224,7 +224,7 @@ describe('Reset cycle logic', () => {
     timeline.index = 2;
     timeline.current.status = Status.Initial;
 
-    timeline.handleResetCycle();
+    timeline.onResetCycle();
 
     expect(timeline.index).toBe(0);
     expect(timeline.current.id).toBe(0);
@@ -240,7 +240,7 @@ describe('Reset cycle logic', () => {
     timeline.index = 0;
     timeline.current.status = Status.Initial;
 
-    timeline.handleResetCycle();
+    timeline.onResetCycle();
 
     expect(timeline.index).toBe(0);
     expect(timeline.current.id).toBe(0);
@@ -263,7 +263,7 @@ describe('Reset all logic', () => {
     timeline.periods[5].complete();
     timeline.periods[6].complete();
 
-    timeline.handleResetAll();
+    timeline.onResetAll();
 
     timeline.periods.forEach((period, idx) => {
       const duration =

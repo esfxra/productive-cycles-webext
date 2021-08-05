@@ -5,19 +5,39 @@ export default class Monitor implements Participant {
   mediator: Mediator;
   monitor: ReturnType<typeof setInterval>;
 
-  constructor(mediator: Mediator) {
-    this.mediator = mediator;
+  constructor() {
+    this.mediator = null;
     this.monitor = null;
   }
 
-  start = (): void => {
+  public onStart = (): void => {
+    this.start();
+  };
+
+  public onPause = (): void => {
+    this.stop();
+  };
+
+  public onResetCycle = (): void => {
+    this.stop();
+  };
+
+  public onResetAll = (): void => {
+    this.stop();
+  };
+
+  public onPeriodEnd = (): void => {
+    this.stop();
+  };
+
+  private start = (): void => {
     chrome.alarms.create('monitor', { periodInMinutes: 0.15 });
     chrome.alarms.onAlarm.addListener(this.onAlarm);
 
     console.info('Monitor - Registered alarm.');
   };
 
-  stop = (): void => {
+  private stop = (): void => {
     chrome.alarms.clear('monitor', (wasCleared) => {
       if (!wasCleared) {
         console.error('Monitor - Error occurred when clearing the alarm.');
@@ -27,7 +47,7 @@ export default class Monitor implements Participant {
     });
   };
 
-  onAlarm = (alarm: chrome.alarms.Alarm): void => {
+  private onAlarm = (alarm: chrome.alarms.Alarm): void => {
     if (alarm.name === 'monitor') {
       /**
        * @todo Consider sending scheduledTime through publish.

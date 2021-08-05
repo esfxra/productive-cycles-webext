@@ -7,17 +7,29 @@ export default class Bridge implements Participant {
   open: boolean;
   port: chrome.runtime.Port;
 
-  constructor(mediator: Mediator) {
-    this.mediator = mediator;
+  constructor() {
+    this.mediator = null;
     this.open = false;
     this.port = null;
   }
 
-  registerPortListeners = (): void => {
+  /**
+   * Handle publishRequests through mediator.
+   */
+  public onMessageRequest = (data: unknown): void => {
+    // Handle requests to post a message to the popup
+    // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
+    if (this.open) {
+      console.log(data);
+      this.port.postMessage(data);
+    }
+  };
+
+  public registerPortListeners = (): void => {
     chrome.runtime.onConnect.addListener(this.handlePortConnect);
   };
 
-  handlePortConnect = (port: chrome.runtime.Port): void => {
+  private handlePortConnect = (port: chrome.runtime.Port): void => {
     port.onDisconnect.addListener(this.handlePortDisconnect);
     port.onMessage.addListener(this.handlePortMessages);
 
@@ -32,7 +44,7 @@ export default class Bridge implements Participant {
     // chrome.runtime.onConnect.removeListener(this.handlePortConnect.bind(this));
   };
 
-  handlePortDisconnect = (): void => {
+  private handlePortDisconnect = (): void => {
     // Update port open flag if a disconnect occurs
     this.open = false;
 
@@ -51,7 +63,7 @@ export default class Bridge implements Participant {
   /**
    * Forward incoming messages to mediator.
    */
-  handlePortMessages = (message: { command: BridgeInputs }): void => {
+  private handlePortMessages = (message: { command: BridgeInputs }): void => {
     switch (message.command) {
       case BridgeInputs.Start:
         this.mediator.publish('Start');
@@ -71,18 +83,6 @@ export default class Bridge implements Participant {
       case BridgeInputs.Preload:
         this.mediator.publish('Preload');
         break;
-    }
-  };
-
-  /**
-   * Handle publishRequests from mediator.
-   */
-  handleBridgeOutput = (data: unknown): void => {
-    // Handle requests to post a message to the popup
-    // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
-    if (this.open) {
-      console.log(data);
-      this.port.postMessage(data);
     }
   };
 }

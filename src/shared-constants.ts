@@ -8,7 +8,7 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   notificationsEnabled: true,
   notificationsSound: true,
   cycleAutoStart: true,
-  breakAutoStart: false,
+  breakAutoStart: true,
   cycleMinutes: 2,
   breakMinutes: 1,
   totalPeriods: 7,
