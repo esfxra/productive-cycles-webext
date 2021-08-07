@@ -2,8 +2,8 @@ import { DEFAULT_SETTINGS } from '../shared-constants';
 import { ExtensionSettings } from '../shared-types';
 
 export default class Settings {
-  static async init(): Promise<ExtensionSettings> {
-    const stored = await Settings.getAll();
+  public static async init(): Promise<ExtensionSettings> {
+    const stored = await Settings.getSettings(null);
 
     return new Promise((resolve) => {
       const defaultKeys = Object.keys(DEFAULT_SETTINGS);
@@ -21,15 +21,30 @@ export default class Settings {
         {} as ExtensionSettings
       );
 
+      // Store the settings object to include new settings.
+      chrome.storage.local.set(settings);
+
+      // Register a listener to handle changes to the settings.
+      // chrome.storage.onChanged.addListener(this.handleChangedSettings);
+
+      // Resolve the promise.
       resolve(settings);
     });
   }
 
-  static async getAll(): Promise<ExtensionSettings> {
+  public static async getSettings(
+    settings: string[] | null
+  ): Promise<Partial<ExtensionSettings>> {
     return new Promise((resolve) => {
-      chrome.storage.local.get(null, (stored: ExtensionSettings) => {
+      chrome.storage.local.get(settings, (stored: ExtensionSettings) => {
         resolve(stored);
       });
     });
   }
+
+  // public static handleChangedSettings = (changes: {
+  //   [key: string]: { newValue: any };
+  // }): void => {
+  //   console.log(`handleChangedSettings: ${changes}`);
+  // };
 }
