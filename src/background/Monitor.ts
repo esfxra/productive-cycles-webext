@@ -31,20 +31,18 @@ export default class Monitor implements Participant {
   };
 
   private start = (): void => {
-    chrome.alarms.create('monitor', { periodInMinutes: 0.15 });
-    chrome.alarms.onAlarm.addListener(this.onAlarm);
-
-    console.info('Monitor - Registered alarm.');
+    // chrome.alarms.create('monitor', { periodInMinutes: 0.15 });
+    // chrome.alarms.onAlarm.addListener(this.onAlarm);
+    // console.info('Monitor - Registered alarm.');
   };
 
   private stop = (): void => {
-    chrome.alarms.clear('monitor', (wasCleared) => {
-      if (!wasCleared) {
-        console.error('Monitor - Error occurred when clearing the alarm.');
-      }
-
-      console.log('Monitor - Alarm cleared.');
-    });
+    // chrome.alarms.clear('monitor', (wasCleared) => {
+    //   if (!wasCleared) {
+    //     console.error('Monitor - Error occurred when clearing the alarm.');
+    //   }
+    //   console.log('Monitor - Alarm cleared.');
+    // });
   };
 
   private onAlarm = (alarm: chrome.alarms.Alarm): void => {

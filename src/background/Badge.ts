@@ -1,16 +1,55 @@
-import { Status } from '../shared-types';
+import { ExtensionSettings, Status } from '../shared-types';
 
 export default class Badge {
+  enabled: boolean;
+
   constructor() {
-    // Empty constructor
+    this.enabled = false;
   }
 
-  public onPeriodTick({
-    state,
+  /**
+   * @todo Find a way to get current period to determine whether break or cycle.
+   */
+  public onStart = (): void => {
+    this.updateBadgeColor(true);
+  };
+
+  public onResetCycle = (): void => {
+    this.updateBadgeTime(Status.Initial, '');
+  };
+
+  public onResetAll = (): void => {
+    this.updateBadgeTime(Status.Initial, '');
+  };
+
+  public onPeriodTick = ({
+    status,
+    remaining,
   }: {
-    state: { status: Status; time: string };
+    status: Status;
+    remaining: string;
+  }): void => {
+    this.updateBadgeTime(status, remaining);
+  };
+
+  public onPeriodEnd({
+    status,
+    remaining,
+  }: {
+    status: Status;
+    remaining: string;
   }): void {
-    this.updateBadgeTime(state.status, state.time);
+    this.updateBadgeTime(status, remaining);
+  }
+
+  public onNewSettings({ showBadge }: ExtensionSettings): void {
+    if (showBadge) {
+      this.enabled = showBadge;
+    }
+  }
+
+  public init({ showBadge }: ExtensionSettings): void {
+    this.enabled = showBadge;
   }
 
   private updateBadgeColor(isCycle: boolean): void {
@@ -26,6 +65,9 @@ export default class Badge {
     setBadgeColor('#484B56');
   }
 
+  /**
+   * @todo Refactor into more general function ... updateText()
+   */
   private updateBadgeTime(status: Status, time: string): void {
     const setBadgeText = (text: string) => {
       chrome.browserAction.setBadgeText({ text: text });

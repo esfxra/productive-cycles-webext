@@ -1,5 +1,5 @@
 import Mediator from './Mediator';
-import { millisToFormattedString } from './utils/utils';
+import { millisToMMSS } from './utils/utils';
 import { Participant, PeriodState } from './background-types';
 import { Status } from '../shared-types';
 
@@ -32,7 +32,7 @@ class Period implements Participant {
 
   get state(): PeriodState {
     return {
-      remaining: millisToFormattedString(this.remaining),
+      remaining: millisToMMSS(this.remaining),
       status: this.status,
       index: this.id,
     };
@@ -40,7 +40,7 @@ class Period implements Participant {
 
   start(): void {
     this.status = Status.Running;
-    this.mediator.publish('PeriodTick');
+    this.mediator.publish('PeriodTick', this.state);
 
     this.run();
   }
@@ -48,13 +48,13 @@ class Period implements Participant {
   pause(): void {
     this.stop();
     this.status = Status.Paused;
-    this.mediator.publish('PeriodTick');
+    this.mediator.publish('PeriodTick', this.state);
   }
 
   skip(): void {
     this.stop();
     this.complete();
-    this.mediator.publish('PeriodEnd');
+    this.mediator.publish('PeriodEnd', this.state);
   }
 
   reset({ duration, publish }: { duration: number; publish: boolean }): void {
@@ -65,7 +65,7 @@ class Period implements Participant {
     this.enabled = false;
 
     if (publish) {
-      this.mediator.publish('PeriodTick');
+      this.mediator.publish('PeriodTick', this.state);
     }
   }
 
@@ -77,7 +77,7 @@ class Period implements Participant {
     this.status = Status.Complete;
   }
 
-  run = (): void => {
+  run(): void {
     // Start the timer
     this.subtractor = setInterval(() => {
       this.remaining = this.remaining - 1000;
@@ -93,21 +93,21 @@ class Period implements Participant {
       this.tick();
       return;
     }, 1000);
-  };
+  }
 
-  stop = (): void => {
+  stop(): void {
     // Stop the timer
     clearInterval(this.subtractor);
-  };
+  }
 
-  end = (): void => {
+  end(): void {
     this.complete();
-    this.mediator.publish('PeriodEnd');
-  };
+    this.mediator.publish('PeriodEnd', this.state);
+  }
 
-  tick = (): void => {
-    this.mediator.publish('PeriodTick');
-  };
+  tick(): void {
+    this.mediator.publish('PeriodTick', this.state);
+  }
 }
 
 export default Period;

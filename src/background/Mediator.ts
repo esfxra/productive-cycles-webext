@@ -1,8 +1,9 @@
 import { Topics, Subscriptions, TopicCallback } from './background-types';
 import Bridge from './Bridge';
-import Badge from './Badge';
 import Timeline from './Timeline';
 import Monitor from './Monitor';
+import Badge from './Badge';
+import Notifications from './Notifications';
 
 /**
  * @todo Add mutex to prevent conflicts during worksflows
@@ -58,16 +59,23 @@ export default class Mediator {
     }
 
     // Call each callback in the topic's subscription array with the data provided
-    this.subscriptions[topic].forEach((callback: TopicCallback) =>
-      callback(data)
-    );
+    this.subscriptions[topic].forEach((callback: TopicCallback) => {
+      try {
+        callback(data);
+      } catch (error) {
+        console.error(
+          `An error occurred with a callback from topic '${topic}'`
+        );
+      }
+    });
   }
 
   setup(
     bridge: Bridge,
     timeline: Timeline,
     monitor: Monitor,
-    badge: Badge
+    badge: Badge,
+    notifications: Notifications
   ): void {
     // Mediator install
     bridge.mediator = this;
@@ -80,6 +88,7 @@ export default class Mediator {
     // Start
     this.subscribe('Start', timeline.onStart);
     this.subscribe('Start', monitor.onStart);
+    this.subscribe('Start', badge.onStart);
 
     // Pause
     this.subscribe('Pause', monitor.onPause);
@@ -91,10 +100,14 @@ export default class Mediator {
     // ResetCycle
     this.subscribe('ResetCycle', monitor.onResetCycle);
     this.subscribe('ResetCycle', timeline.onResetCycle);
+    // this.subscribe('ResetCycle', notifications.onResetCycle);
+    this.subscribe('ResetCycle', badge.onResetCycle);
 
     // ResetAll
     this.subscribe('ResetAll', monitor.onResetAll);
     this.subscribe('ResetAll', timeline.onResetAll);
+    this.subscribe('ResetAll', notifications.onResetAll);
+    this.subscribe('ResetAll', badge.onResetAll);
 
     // Preload
     this.subscribe('Preload', timeline.onPreload);
@@ -106,8 +119,15 @@ export default class Mediator {
     // PeriodEnd
     // this.subscribe('PeriodEnd', monitor.onPeriodEnd);
     this.subscribe('PeriodEnd', timeline.onPeriodEnd);
+    this.subscribe('PeriodEnd', notifications.onPeriodEnd);
+    this.subscribe('PeriodEnd', badge.onPeriodEnd);
 
     // MonitorTick
     this.subscribe('MonitorTick', timeline.onMonitorTick);
+
+    // NewSettings
+    // this.subscribe('NewSettings', timeline.onNewSettings);
+    // this.subscribe('NewSettings', notifications.onNewSettings);
+    // this.subscribe('NewSettings', badge.onNewSettings);
   }
 }

@@ -1,6 +1,6 @@
 import Mediator from './Mediator';
 import Period from './Period';
-import { Status, TimelineSettings } from '../shared-types';
+import { ExtensionSettings, Status, TimelineSettings } from '../shared-types';
 import { Participant } from './background-types';
 import { minutesToMillis } from './utils/utils';
 
@@ -149,6 +149,12 @@ export default class Timeline implements Participant {
   public onPeriodEnd = (): void => {
     // this.publishState();
     this.nextPeriod();
+  };
+
+  public onNewSettings = (settings: ExtensionSettings): void => {
+    this.settings = settings;
+    this.updateEnabled();
+    this.updateTargets();
   };
 
   /**

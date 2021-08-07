@@ -20,7 +20,6 @@ export default class Bridge implements Participant {
     // Handle requests to post a message to the popup
     // This could be implemented as a single interface for messages aimed at: timer, settings, statistics
     if (this.open) {
-      console.log(data);
       this.port.postMessage(data);
     }
   };

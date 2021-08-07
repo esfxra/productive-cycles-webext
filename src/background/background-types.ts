@@ -15,6 +15,12 @@ export interface PeriodState {
   index: number;
 }
 
+export interface Notification {
+  id: string;
+  title: string;
+  message: string;
+}
+
 export type Topics = keyof typeof TOPICS;
 
 export type Subscriptions = {

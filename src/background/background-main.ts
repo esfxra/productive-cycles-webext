@@ -3,7 +3,9 @@ import Bridge from './Bridge';
 import Timeline from './Timeline';
 import Monitor from './Monitor';
 import Badge from './Badge';
+import Notifications from './Notifications';
 import Settings from './Settings';
+import { registerInstallListeners } from './utils/utils';
 
 main();
 
@@ -13,8 +15,9 @@ function main() {
   const timeline = new Timeline();
   const monitor = new Monitor();
   const badge = new Badge();
+  const notifications = new Notifications();
 
-  mediator.setup(bridge, timeline, monitor, badge);
+  mediator.setup(bridge, timeline, monitor, badge, notifications);
 
   // Register browser-related listeners for install and storage
   registerInstallListeners();
@@ -23,25 +26,7 @@ function main() {
   // Init settings, then timeline
   Settings.init().then((settings) => {
     timeline.init(settings);
-  });
-}
-
-function registerInstallListeners() {
-  // Register install and update listeners
-  chrome.runtime.onInstalled.addListener((details: { reason: string }) => {
-    switch (details.reason) {
-      case 'install':
-        chrome.storage.local.set(
-          { showWelcome: true, showUpdates: false },
-          () => console.log('installed')
-        );
-        break;
-      case 'update':
-        chrome.storage.local.set(
-          { showWelcome: false, showUpdates: true },
-          () => console.log('updated')
-        );
-        break;
-    }
+    notifications.init(settings);
+    badge.init(settings);
   });
 }
