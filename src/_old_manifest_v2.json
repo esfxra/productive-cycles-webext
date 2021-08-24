@@ -1,5 +1,5 @@
 {
-  "manifest_version": 3,
+  "manifest_version": 2,
   "name": "__MSG_appName__",
   "description": "__MSG_appDesc__",
   "version": "0.8.0",
@@ -12,14 +12,15 @@
     "512": "manifest-icons/icon-512.png"
   },
 
-  "action": { 
+  "browser_action": {
     "default_title": "__MSG_appName__",
     "default_icon": "manifest-icons/icon-512.png",
     "default_popup": "popup.html"
   },
 
   "background": {
-    "service_worker": "background.bundle.js"
+    "scripts": ["background.bundle.js"],
+    "persistent": false
   },
 
   "permissions": ["notifications", "storage", "alarms"]

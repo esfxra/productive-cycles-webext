@@ -1,5 +1,5 @@
-import { DEFAULT_SETTINGS } from '../shared-constants';
-import { ExtensionSettings } from '../shared-types';
+import { DEFAULT_SETTINGS } from '../defaults';
+import { ExtensionSettings } from '../types';
 
 export default class Settings {
   public static async init(): Promise<ExtensionSettings> {

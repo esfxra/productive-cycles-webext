@@ -1,9 +1,9 @@
-import { Topics, TopicCallback, Subscriptions } from '../types';
-import Comms from './Comms';
+import { Topics, Subscriptions, TopicCallback } from './background-types';
+import Bridge from './Bridge';
 import Timeline from './Timeline';
-// import Monitor from './Monitor';
-// import Badge from './Badge';
-// import Notifications from './Notifications';
+import Monitor from './Monitor';
+import Badge from './Badge';
+import Notifications from './Notifications';
 
 /**
  * @todo Add mutex to prevent conflicts during worksflows
@@ -71,56 +71,59 @@ export default class Mediator {
   }
 
   setup(
-    comms: Comms,
-    timeline: Timeline
-    // monitor: Monitor,
-    // badge: Badge,
-    // notifications: Notifications
+    bridge: Bridge,
+    timeline: Timeline,
+    monitor: Monitor,
+    badge: Badge,
+    notifications: Notifications
   ): void {
     // Mediator install
-    comms.mediator = this;
+    bridge.mediator = this;
     timeline.mediator = this;
-    // monitor.mediator = this;
+    monitor.mediator = this;
 
     // Message Request
-    // this.subscribe('MessageRequest', comms.onMessageRequest);
+    this.subscribe('MessageRequest', bridge.onMessageRequest);
 
     // Start
     this.subscribe('Start', timeline.onStart);
-    // this.subscribe('Start', monitor.onStart);
-    // this.subscribe('Start', badge.onStart);
+    this.subscribe('Start', monitor.onStart);
+    this.subscribe('Start', badge.onStart);
 
     // Pause
-    // this.subscribe('Pause', monitor.onPause);
+    this.subscribe('Pause', monitor.onPause);
     this.subscribe('Pause', timeline.onPause);
 
     // Skip
     this.subscribe('Skip', timeline.onSkip);
 
     // ResetCycle
-    // this.subscribe('ResetCycle', monitor.onResetCycle);
+    this.subscribe('ResetCycle', monitor.onResetCycle);
     this.subscribe('ResetCycle', timeline.onResetCycle);
     // this.subscribe('ResetCycle', notifications.onResetCycle);
-    // this.subscribe('ResetCycle', badge.onResetCycle);
+    this.subscribe('ResetCycle', badge.onResetCycle);
 
     // ResetAll
-    // this.subscribe('ResetAll', monitor.onResetAll);
+    this.subscribe('ResetAll', monitor.onResetAll);
     this.subscribe('ResetAll', timeline.onResetAll);
-    // this.subscribe('ResetAll', notifications.onResetAll);
-    // this.subscribe('ResetAll', badge.onResetAll);
+    this.subscribe('ResetAll', notifications.onResetAll);
+    this.subscribe('ResetAll', badge.onResetAll);
+
+    // Preload
+    this.subscribe('Preload', timeline.onPreload);
 
     // PeriodTick
-    // this.subscribe('PeriodTick', timeline.onPeriodTick);
-    // this.subscribe('PeriodTick', badge.onPeriodTick);
+    this.subscribe('PeriodTick', timeline.onPeriodTick);
+    this.subscribe('PeriodTick', badge.onPeriodTick);
 
     // PeriodEnd
     // this.subscribe('PeriodEnd', monitor.onPeriodEnd);
-    this.subscribe('End', timeline.onEnd);
-    // this.subscribe('PeriodEnd', notifications.onPeriodEnd);
-    // this.subscribe('PeriodEnd', badge.onPeriodEnd);
+    this.subscribe('PeriodEnd', timeline.onPeriodEnd);
+    this.subscribe('PeriodEnd', notifications.onPeriodEnd);
+    this.subscribe('PeriodEnd', badge.onPeriodEnd);
 
     // MonitorTick
-    // this.subscribe('MonitorTick', timeline.onMonitorTick);
+    this.subscribe('MonitorTick', timeline.onMonitorTick);
 
     // NewSettings
     // this.subscribe('NewSettings', timeline.onNewSettings);

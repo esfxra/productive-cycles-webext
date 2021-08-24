@@ -79,9 +79,6 @@ export default class Bridge implements Participant {
       case BridgeInputs.ResetAll:
         this.mediator.publish('ResetAll');
         break;
-      case BridgeInputs.Preload:
-        this.mediator.publish('Preload');
-        break;
     }
   };
 }

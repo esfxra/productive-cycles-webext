@@ -1,13 +1,17 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "jsx": "react",
-    "noEmit": true,
-    "noImplicitAny": true,
+    "target": "ES2020",
+    "jsx": "preserve",
+    "outDir": "dist",
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "allowJs": true,
     "esModuleInterop": true,
+    "moduleResolution": "node",
     "alwaysStrict": true,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
   },
-  "include": ["src/background/*"],
-  "exclude": ["node_modules"]
+  "include": ["src/**/*", "assets.d.ts", "styled.d.ts"],
+  "exclude": ["node_modules", "dist", "src/_old_background"]
 }

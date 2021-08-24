@@ -9,7 +9,7 @@ import { registerInstallListeners } from './utils/utils';
 
 main();
 
-function main() {
+function main(): void {
   const mediator = new Mediator();
   const bridge = new Bridge();
   const timeline = new Timeline();

@@ -1,6 +1,6 @@
-import { ExtensionSettings } from './shared-types';
+import { ExtensionSettings, StoredState, TimerState, Status } from './types';
 
-export const DEFAULT_SETTINGS: ExtensionSettings = {
+export const SETTINGS: ExtensionSettings = {
   theme: 'light',
   showWelcome: false,
   showUpdates: false,
@@ -9,9 +9,22 @@ export const DEFAULT_SETTINGS: ExtensionSettings = {
   notificationsSound: true,
   cycleAutoStart: true,
   breakAutoStart: true,
-  cycleMinutes: 0.5,
-  breakMinutes: 0.5,
+  cycleMinutes: 0.2,
+  breakMinutes: 0.1,
   totalPeriods: 7,
+};
+
+export const STORED_STATE: StoredState = {
+  targets: [],
+  period: 0,
+  status: Status.Initial,
+};
+
+export const TIMER_STATE: TimerState = {
+  remaining: SETTINGS.cycleMinutes * 60000,
+  delay: null,
+  period: 0,
+  status: Status.Initial,
 };
 
 /**
