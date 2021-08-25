@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Section from '../Common/Section';
 import Counter from './Counter';
 import Control from './Control';
-import Cycles from './Cycles';
+import CycleController from './CycleController';
 import useLocale from '../../hooks/useLocale';
 
 const locale_set = ['complete', 'complete_button'];
@@ -63,14 +63,14 @@ const Timer = () => {
     <>
       <Counter remaining={time} />
       <Control period={period} status={status} handleInput={handleInput} />
-      <Cycles period={period} status={status} total={total} />
+      <CycleController status={status} period={period} totalPeriods={total} />
     </>
   );
 
   const complete = (
     <>
       <CompleteMessage>{locale['complete']}</CompleteMessage>
-      <Cycles period={period} status={status} total={total} />
+      <CycleController period={period} status={status} totalPeriods={total} />
       <NewTimerButton onClick={() => handleInput({ command: 'reset-all' })}>
         {locale['complete_button']}
       </NewTimerButton>
