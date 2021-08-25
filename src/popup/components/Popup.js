@@ -1,13 +1,13 @@
-"use strict";
+'use strict';
 
-import React, { useState, useEffect } from "react";
-import styled, { ThemeProvider, createGlobalStyle } from "styled-components";
-import { themes } from "./themes";
-import Nav from "./Common/Nav";
-import Timer from "./Timer/Timer";
-import Settings from "./Settings/Settings";
-import Updates from "./Updates";
-import "./Popup.css";
+import React, { useState, useEffect } from 'react';
+import styled, { ThemeProvider, createGlobalStyle } from 'styled-components';
+import { themes } from './themes';
+import Nav from './Common/Nav';
+import Timer from './Timer/Timer';
+import Settings from './Settings/Settings';
+import Updates from './Updates';
+import './Popup.css';
 
 const StyledPopup = styled.div`
   padding-right: 13px;
@@ -23,17 +23,17 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 const Popup = () => {
-  const [view, setView] = useState("timer");
+  const [view, setView] = useState('timer');
   const [theme, setTheme] = useState(); // Leave initial value empty on purpose to prevent flicker
 
   useEffect(() => {
-    chrome.storage.local.get(["theme", "updates"], (stored) => {
+    chrome.storage.local.get(['theme', 'updates'], (stored) => {
       // Set the theme
       setTheme(stored.theme);
 
       // Show updates if any have occurred, and disable flag afterwards
       if (stored.updates) {
-        setView("updates");
+        setView('updates');
         chrome.storage.local.set({ updates: false });
       }
     });
@@ -41,12 +41,12 @@ const Popup = () => {
 
   return (
     <StyledPopup>
-      <ThemeProvider theme={theme ? themes[theme] : themes["light"]}>
+      <ThemeProvider theme={theme ? themes[theme] : themes['light']}>
         <GlobalStyle />
         <Nav view={view} navigate={setView} />
-        {view === "timer" && <Timer />}
-        {view === "settings" && <Settings changeTheme={setTheme} />}
-        {view === "updates" && <Updates />}
+        {view === 'timer' && <Timer />}
+        {view === 'settings' && <Settings changeTheme={setTheme} />}
+        {view === 'updates' && <Updates />}
       </ThemeProvider>
     </StyledPopup>
   );

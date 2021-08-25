@@ -1,7 +1,7 @@
-"use strict";
+'use strict';
 
-import { Cycle, Break } from "./Period.js";
-import { Utilities } from "./Utilities.js";
+import { Cycle, Break } from './Period.js';
+import { Utilities } from './Utilities.js';
 
 class Timeline {
   constructor() {
@@ -35,7 +35,7 @@ class Timeline {
   }
 
   updateTime(current, cycleTime, breakTime) {
-    if (current.status === "initial") {
+    if (current.status === 'initial') {
       current.duration = current.isCycle ? cycleTime : breakTime;
       current.remaining = current.duration;
     }
@@ -101,7 +101,7 @@ class Timeline {
     this.timeline = [...updated];
 
     // Additional adjustment to handle adding periods after the last cycle had been completed
-    if (this.current.status === "complete") {
+    if (this.current.status === 'complete') {
       if (this.current.isCycle) {
         this.index += 1;
         this.current.end();

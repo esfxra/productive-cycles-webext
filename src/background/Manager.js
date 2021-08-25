@@ -1,12 +1,12 @@
-"use strict";
+'use strict';
 
-import { Timer } from "./Timer.js";
-import { Adjuster } from "./Adjuster.js";
-import { Utilities } from "./Utilities.js";
+import { Timer } from './Timer.js';
+import { Adjuster } from './Adjuster.js';
+import { Utilities } from './Utilities.js';
 
 const defaultSettings = {
   updates: true,
-  theme: "light",
+  theme: 'light',
   notificationsEnabled: true,
   notificationsSound: true,
   autoStartCycles: true,
@@ -91,11 +91,11 @@ class Manager {
 
   onInstall(details) {
     switch (details.reason) {
-      case "install":
+      case 'install':
         // Initialize storage
         chrome.storage.local.set(defaultSettings);
         break;
-      case "update":
+      case 'update':
         // Make any necessary storage upgrades
         chrome.storage.local.get(null, (stored) => {
           let upgrades = {};
@@ -103,7 +103,7 @@ class Manager {
           // Check if there are any default settings that do not exist
           const settings = Object.keys(defaultSettings);
           settings.forEach((setting) => {
-            if (typeof stored[setting] === "undefined") {
+            if (typeof stored[setting] === 'undefined') {
               upgrades[setting] = defaultSettings[setting];
             }
           });
@@ -136,22 +136,22 @@ class Manager {
   onMessage(message) {
     // User input cases
     switch (message.command) {
-      case "start":
+      case 'start':
         this.operations.add(() => this.timer.start());
         break;
-      case "pause":
+      case 'pause':
         this.operations.add(() => this.timer.pause());
         break;
-      case "skip":
+      case 'skip':
         this.operations.add(() => this.timer.skip());
         break;
-      case "reset-cycle":
+      case 'reset-cycle':
         this.operations.add(() => this.timer.reset());
         break;
-      case "reset-all":
+      case 'reset-all':
         this.operations.add(() => this.timer.resetAll());
         break;
-      case "preload":
+      case 'preload':
         this.timer.postState();
         break;
     }
@@ -168,35 +168,35 @@ class Manager {
       // Update settings relevant to timer functionality
       let change;
       switch (key) {
-        case "autoStartCycles":
+        case 'autoStartCycles':
           change = { cycles: storageChange.newValue };
           this.operations.add(() => this.timer.updateAutoStart(change));
           break;
-        case "autoStartBreaks":
+        case 'autoStartBreaks':
           change = { breaks: storageChange.newValue };
           this.operations.add(() => this.timer.updateAutoStart(change));
           break;
-        case "cycleMinutes":
+        case 'cycleMinutes':
           change = { cycleTime: storageChange.newValue * 60000 };
           this.operations.add(() => this.timer.updateTime(change));
           break;
-        case "breakMinutes":
+        case 'breakMinutes':
           change = { breakTime: storageChange.newValue * 60000 };
           this.operations.add(() => this.timer.updateTime(change));
           break;
-        case "totalCycles":
+        case 'totalCycles':
           change = storageChange.newValue * 2 - 1;
           this.operations.add(() => this.timer.updateTotalPeriods(change));
           break;
-        case "badgeTimer":
+        case 'badgeTimer':
           change = storageChange.newValue;
           this.operations.add(() => {
             this.timer.settings.badgeTimer = change;
 
             if (change) {
-              chrome.browserAction.setBadgeText({ text: "..." }, () => {});
+              chrome.browserAction.setBadgeText({ text: '...' }, () => {});
             } else {
-              chrome.browserAction.setBadgeText({ text: "" }, () => {});
+              chrome.browserAction.setBadgeText({ text: '' }, () => {});
             }
           });
           break;
@@ -211,7 +211,7 @@ class Manager {
 
     // Adjust the timer
     const status = this.timer.periods.current.status;
-    if (status === "running") {
+    if (status === 'running') {
       await Adjuster.adjust(this.timer, Date.now());
       Utilities.updateBadgeColor(this.timer.periods.current.isCycle);
     }

@@ -1,22 +1,22 @@
-"use strict";
+'use strict';
 
-import React from "react";
-import styled, { keyframes } from "styled-components";
+import React from 'react';
+import styled, { keyframes } from 'styled-components';
 
 const StyledCycles = styled.div`
   display: grid;
   grid-template-columns: ${(props) =>
-    props.total >= 4 ? "repeat(4, auto)" : `repeat(${props.total}, auto)`};
+    props.total >= 4 ? 'repeat(4, auto)' : `repeat(${props.total}, auto)`};
   grid-auto-flow: row;
   grid-auto-rows: 16px;
   gap: 16px;
   justify-content: ${(props) =>
-    props.total >= 3 ? "space-between" : "space-evenly"};
+    props.total >= 3 ? 'space-between' : 'space-evenly'};
   min-height: 17px;
 `;
 
 const Dot = styled.div.attrs((props) => ({
-  title: `${chrome.i18n.getMessage("progress_dot")} ${props.id}`,
+  title: `${chrome.i18n.getMessage('progress_dot')} ${props.id}`,
 }))`
   display: inline-block;
   justify-self: center;
@@ -45,11 +45,11 @@ const Complete = styled(Dot)`
 
 const Cycle = ({ status, id }) => {
   let cycle;
-  if (status === "running" || status === "paused") {
+  if (status === 'running' || status === 'paused') {
     cycle = <Running id={id} />;
-  } else if (status === "initial") {
+  } else if (status === 'initial') {
     cycle = <Pending id={id} />;
-  } else if (status === "complete") {
+  } else if (status === 'complete') {
     cycle = <Complete id={id} />;
   }
 
@@ -66,9 +66,9 @@ const Cycles = ({ period, status, total }) => {
       if (i === period) {
         cycles.push(<Cycle key={`cycle-${id}`} id={id} status={status} />);
       } else if (i < period) {
-        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={"complete"} />);
+        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={'complete'} />);
       } else if (i > period) {
-        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={"initial"} />);
+        cycles.push(<Cycle key={`cycle-${id}`} id={id} status={'initial'} />);
       }
     }
 

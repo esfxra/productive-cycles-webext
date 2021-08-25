@@ -1,6 +1,6 @@
-"use strict";
+'use strict';
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from 'react';
 
 const useLocale = (message_set) => {
   const [locale, setLocale] = useState({});

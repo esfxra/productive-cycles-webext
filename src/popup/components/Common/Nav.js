@@ -1,16 +1,16 @@
-"use strict";
+'use strict';
 
-import React, { useContext } from "react";
-import styled, { ThemeContext } from "styled-components";
+import React, { useContext } from 'react';
+import styled, { ThemeContext } from 'styled-components';
 
-import useLocale from "../../hooks/useLocale";
+import useLocale from '../../hooks/useLocale';
 
-import settingsLight from "../../assets/settings-light.svg";
-import settingsDark from "../../assets/settings-dark.svg";
-import backLight from "../../assets/back-light.svg";
-import backDark from "../../assets/back-dark.svg";
+import settingsLight from '../../assets/settings-light.svg';
+import settingsDark from '../../assets/settings-dark.svg';
+import backLight from '../../assets/back-light.svg';
+import backDark from '../../assets/back-dark.svg';
 
-const locale_set = ["nav_settings", "nav_back"];
+const locale_set = ['nav_settings', 'nav_back'];
 
 // Objects acting as dictionaries to trace image according to theme
 const settings = {
@@ -61,14 +61,14 @@ const Nav = ({ view, navigate }) => {
 
 // Helper functions
 function determineTarget(view) {
-  if (view === "timer") return "settings";
-  else return "timer";
+  if (view === 'timer') return 'settings';
+  else return 'timer';
 }
 
 function determineIcon(view, theme, locale) {
-  if (view === "timer")
-    return <Settings theme={theme} title={locale["nav_settings"]} />;
-  else return <Back theme={theme} title={locale["nav_back"]} />;
+  if (view === 'timer')
+    return <Settings theme={theme} title={locale['nav_settings']} />;
+  else return <Back theme={theme} title={locale['nav_back']} />;
 }
 
 export default Nav;

@@ -1,8 +1,8 @@
-"use strict";
+'use strict';
 
-import { Timeline } from "./Timeline.js";
-import { Notifications } from "./Notifications.js";
-import { Utilities } from "./Utilities.js";
+import { Timeline } from './Timeline.js';
+import { Notifications } from './Notifications.js';
+import { Utilities } from './Utilities.js';
 
 class Timer {
   constructor() {
@@ -97,7 +97,7 @@ class Timer {
 
   reset() {
     this.stopSubtractor();
-    if (this.periods.current.status === "initial" && this.periods.index > 0) {
+    if (this.periods.current.status === 'initial' && this.periods.index > 0) {
       [1, 2].forEach(() => {
         this.periods.index -= 1;
         this.periods.current.reset(this.settings);
@@ -159,9 +159,9 @@ class Timer {
   }
 
   notify() {
-    let type = "";
-    if (this.periods.isLast) type = "complete";
-    else type = this.periods.current.isCycle ? "cycle" : "break";
+    let type = '';
+    if (this.periods.isLast) type = 'complete';
+    else type = this.periods.current.isCycle ? 'cycle' : 'break';
 
     Notifications.send(this.periods.current.id, this.settings.breakTime, type);
   }

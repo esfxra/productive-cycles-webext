@@ -1,4 +1,5 @@
 {
-  "presets": ["@babel/preset-env"],
+  "targets": {"chrome": "88"},
+  "presets": [["@babel/preset-env", { "debug": true }], "@babel/preset-react", "@babel/preset-typescript"],
   "plugins": ["babel-plugin-styled-components"]
 }

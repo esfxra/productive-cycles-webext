@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class Period {
   constructor(id, duration) {
@@ -8,7 +8,7 @@ class Period {
     this.remaining = duration;
     this.target = 0;
 
-    this.status = "initial";
+    this.status = 'initial';
     this.enabled = false;
   }
 
@@ -17,11 +17,11 @@ class Period {
   }
 
   start() {
-    this.status = "running";
+    this.status = 'running';
   }
 
   end() {
-    this.status = "complete";
+    this.status = 'complete';
     this.remaining = -1000;
   }
 
@@ -44,13 +44,13 @@ class Cycle extends Period {
   }
 
   reset(settings) {
-    this.status = "initial";
+    this.status = 'initial';
     this.duration = settings.cycleTime;
     this.remaining = settings.cycleTime;
   }
 
   pause() {
-    this.status = "paused";
+    this.status = 'paused';
   }
 
   autoStart(autoStart) {
@@ -64,7 +64,7 @@ class Break extends Period {
   }
 
   reset(settings) {
-    this.status = "initial";
+    this.status = 'initial';
     this.duration = settings.breakTime;
     this.remaining = settings.breakTime;
   }

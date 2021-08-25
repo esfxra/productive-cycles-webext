@@ -1,4 +1,4 @@
-"use strict";
+'use strict';
 
 class Adjuster {
   static adjust(timer, reference) {
