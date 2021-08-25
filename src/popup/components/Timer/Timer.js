@@ -4,9 +4,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Section from '../Common/Section';
 import Counter from './Counter';
-import Control from './Control';
 import CycleController from './CycleController';
 import useLocale from '../../hooks/useLocale';
+import InputController from './InputController';
 
 const locale_set = ['complete', 'complete_button'];
 
@@ -53,8 +53,8 @@ const Timer = () => {
     setTotal(message.totalPeriods);
   };
 
-  const handleInput = (input) => {
-    port.current.postMessage({ command: input.command });
+  const handleInput = ({ type }) => {
+    port.current.postMessage({ command: type });
   };
 
   const isComplete = period === total - 1 && status === 'complete';
@@ -62,7 +62,7 @@ const Timer = () => {
   const normal = (
     <>
       <Counter remaining={time} />
-      <Control period={period} status={status} handleInput={handleInput} />
+      <InputController status={status} period={period} onInput={handleInput} />
       <CycleController status={status} period={period} totalPeriods={total} />
     </>
   );

@@ -1,1 +1,7 @@
-export type Status = 'initial' | 'paused' | 'running' | 'complete';
+export type Status = 'initial' | 'running' | 'paused' | 'complete';
+
+export type CycleInputs = 'start' | 'pause' | 'reset-cycle' | 'reset-all';
+
+export type BreakInputs = 'skip';
+
+export type Inputs = CycleInputs | BreakInputs;
