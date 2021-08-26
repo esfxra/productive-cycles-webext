@@ -17,7 +17,7 @@ const CounterText = styled.div`
   color: ${(props) => props.theme.foreground};
 `;
 
-export default function Counter({ remaining }: Props) {
+export default function Counter({ remaining }: Props): JSX.Element {
   return (
     <CounterWrapper>
       <CounterText>{remaining}</CounterText>

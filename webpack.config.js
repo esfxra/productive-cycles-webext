@@ -5,7 +5,7 @@ const config = (mode) => ({
   mode: mode,
   devtool: mode === 'development' ? 'inline-source-map' : 'source-map',
   entry: {
-    popup: path.resolve(__dirname, './src/popup/popup.js'),
+    popup: path.resolve(__dirname, './src/popup/popup.tsx'),
     background: path.resolve(__dirname, './src/background/background.js'),
   },
   output: {
