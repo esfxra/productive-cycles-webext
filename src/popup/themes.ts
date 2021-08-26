@@ -1,6 +1,6 @@
-'use strict';
+import { DefaultTheme } from 'styled-components';
 
-const light = {
+const light: DefaultTheme = {
   name: 'light',
   foreground: '#747980',
   background: '#eeeeee',
@@ -25,7 +25,7 @@ const light = {
   },
 };
 
-const dark = {
+const dark: DefaultTheme = {
   name: 'dark',
   foreground: '#f5f5f5',
   background: '#202124',
