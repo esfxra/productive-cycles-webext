@@ -1,14 +1,15 @@
-'use strict';
-
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import Section from '../Common/Section';
 import Counter from './Counter';
 import CycleController from './CycleController';
-import useLocale from '../../hooks/useLocale';
 import InputController from './InputController';
+import { Inputs, Status } from '../../../types';
 
-const locale_set = ['complete', 'complete_button'];
+const locale = {
+  complete: chrome.i18n.getMessage('complete'),
+  completeButton: chrome.i18n.getMessage('complete_button'),
+};
 
 const CompleteMessage = styled.div`
   margin-bottom: 18px;
@@ -27,13 +28,12 @@ const NewTimerButton = styled.div`
   cursor: pointer;
 `;
 
-const Timer = () => {
-  const port = useRef();
+export default function Timer(): JSX.Element {
+  const port = useRef<chrome.runtime.Port>();
   const [time, setTime] = useState('25:00');
   const [period, setPeriod] = useState(0);
-  const [status, setStatus] = useState('initial');
+  const [status, setStatus] = useState<Status>('initial');
   const [total, setTotal] = useState(7);
-  const locale = useLocale(locale_set);
 
   useEffect(() => {
     port.current = chrome.runtime.connect({ name: 'port-from-popup' });
@@ -41,21 +41,34 @@ const Timer = () => {
     port.current.postMessage({ command: 'preload' });
 
     return () => {
-      port.current.onMessage.removeListener(handleMessage);
-      port.current.disconnect();
+      if (port.current) {
+        port.current.onMessage.removeListener(handleMessage);
+        port.current.disconnect();
+      } else {
+        throw new Error('The messaging port was not present no unmount.');
+      }
     };
   }, []);
 
-  const handleMessage = (message) => {
+  function handleMessage(message: {
+    time: string;
+    period: number;
+    status: Status;
+    totalPeriods: number;
+  }) {
     setTime(message.time);
     setPeriod(message.period);
     setStatus(message.status);
     setTotal(message.totalPeriods);
-  };
+  }
 
-  const handleInput = ({ type }) => {
-    port.current.postMessage({ command: type });
-  };
+  function handleInput({ type }: { type: Inputs }) {
+    if (port.current) {
+      port.current.postMessage({ command: type });
+    } else {
+      throw new Error('The messaging port is not present.');
+    }
+  }
 
   const isComplete = period === total - 1 && status === 'complete';
 
@@ -71,13 +84,11 @@ const Timer = () => {
     <>
       <CompleteMessage>{locale['complete']}</CompleteMessage>
       <CycleController period={period} status={status} totalPeriods={total} />
-      <NewTimerButton onClick={() => handleInput({ command: 'reset-all' })}>
-        {locale['complete_button']}
+      <NewTimerButton onClick={() => handleInput({ type: 'reset-all' })}>
+        {locale['completeButton']}
       </NewTimerButton>
     </>
   );
 
-  return <Section width={140}>{isComplete ? complete : normal}</Section>;
-};
-
-export default Timer;
+  return <Section>{isComplete ? complete : normal}</Section>;
+}
